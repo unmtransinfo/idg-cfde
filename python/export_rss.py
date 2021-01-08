@@ -1,4 +1,8 @@
 #!/usr/bin/env python3
+'''
+Generate a JSON file for each Pharos-ready resource currently in the RSS system.
+File names are: <RSS ID>.json
+'''
 
 import requests
 import json

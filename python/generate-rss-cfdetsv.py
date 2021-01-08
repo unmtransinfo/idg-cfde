@@ -1,12 +1,18 @@
 #!/usr/bin/env python3
+'''
+Generate a TSV file with CFDE C2M2 Level 0 data describing RSS JSON files.
+- Local IDs are RSS resource IDs
+- Persistent IDs are a random UUID produced by Python's uuid.uuid4()
+'''
 
 import os
 import glob
 import hashlib
+import uuid
 import csv
 
 INPUT_GLOB = '../RSS_JSON/*.json'
-OUTPUT_FILE = '../RSS_JSON/DRGC_Resources_test.tsv'
+OUTPUT_FILE = '../output/IDG-DRGC_Resources.tsv'
 HEADER = ['id_namespace', 'local_id', 'persistent_id', 'size_in_bytes', 'sha256', 'md5', 'filename']
 
 def run():
@@ -15,9 +21,9 @@ def run():
     csvwriter.writerow(HEADER)
     row_ct = 1
     for f in glob.glob(INPUT_GLOB):
-      outrow =['IDG'] # id_namespace
+      outrow = ['IDG'] # id_namespace
       outrow.append(os.path.basename(f).replace('.json', '')) # local_id
-      outrow.append('DOI:ARK:WHATEVER_{:0>10}'.format(row_ct)) # persistant_id ???
+      outrow.append(str(uuid.uuid4())) # persistant_id
       outrow.append(os.path.getsize(f)) # size_in_bytes
       outrow.append(get_sha256(f)) # sha256
       outrow.append('') # md5 not required
