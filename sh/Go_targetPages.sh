@@ -2,6 +2,10 @@
 # Create TCRD target page files, plus metadata TSV.
 ###
 
+date
+
+T0=$(date +%s)
+
 cwd=$(pwd)
 
 DATADIR="${cwd}/data/targetpages"
@@ -9,25 +13,25 @@ DATADIR="${cwd}/data/targetpages"
 if [ ! -f ${DATADIR} ]; then
 	mkdir -p ${DATADIR}
 fi
-
+#
 metadatafile="${DATADIR}/tcrd_targetpages_metadata.tsv"
 printf "id_namespace\tlocal_id\tpersistent_id\tsize_in_bytes\tsha256\tmd5\tfilename\n" \
 	>$metadatafile
-
+#
 python3 -m BioClients.idg.tcrd.Client listTargets \
 	--o $DATADIR/tcrd_targets.tsv
-
+#
 cat $DATADIR/tcrd_targets.tsv |sed '1d' \
 	|awk -F '\t' '{print $1}' |sort -nu \
 	>$DATADIR/tcrd_targets.tid
-	
+#
 N=$(cat $DATADIR/tcrd_targets.tid |wc -l)
-
+#
 printf "N_targets = %d\n" "$N"
-
+#
 ID_NAMESPACE="cfde_idg_tcrd"
 TCRD_VERSION="670"
-
+#
 if [ "$(which sha256sum)" ]; then
 	SHA_EXE="sha256sum"
 elif [ "$(which sha)" ]; then
@@ -44,10 +48,10 @@ else
 	echo "ERROR: Cannot find MD5_EXE."
 	exit
 fi
-
+#
 I=0
 while [ $I -lt $N ]; do
-	I=$(($I + 1))
+	I=$[$I + 1]
 	tid=$(cat $DATADIR/tcrd_targets.tid |sed "${I}q;d")
 	TID=$(printf "%05d" ${tid})
 	FILENAME="tcrd_target_${TID}.json"
@@ -57,8 +61,12 @@ while [ $I -lt $N ]; do
 	LOCAL_ID="TARGET_ID_${TID}"
 	PERSISTENT_ID="${ID_NAMESPACE}.${TCRD_VERSION}.${LOCAL_ID}"
 	SIZE_IN_BYTES=$(cat $ofile |wc -c)
-	SHA256=$(cat $FILENAME |$SHA_EXE |sed 's/ .*$//')
-	MD5=$(cat $FILENAME |$MD5_EXE |sed 's/ .*$//')
+	SHA256=$(cat $ofile |$SHA_EXE |sed 's/ .*$//')
+	MD5=$(cat $ofile |$MD5_EXE |sed 's/ .*$//')
 	printf "${ID_NAMESPACE}\t${LOCAL_ID}\t${PERSISTENT_ID}\t${SIZE_IN_BYTES}\t${SHA256}\t${MD5}\t${FILENAME}\n" \
 		>>$metadatafile
 done
+#
+printf "Elapsed: %ds\n" "$[$(date +%s) - $T0]"
+date
+#
