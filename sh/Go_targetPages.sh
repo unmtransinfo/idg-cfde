@@ -1,5 +1,5 @@
 #!/bin/bash
-# Create TCRD target page files, plus metadata in TSV.
+# Create TCRD target page files, plus metadata TSV.
 ###
 
 cwd=$(pwd)
@@ -25,7 +25,7 @@ N=$(cat $DATADIR/tcrd_targets.tid |wc -l)
 
 printf "N_targets = %d\n" "$N"
 
-ID_NAMESPACE="http://nih-cfde.org/idg/tcrd"
+ID_NAMESPACE="cfde_idg_tcrd"
 TCRD_VERSION="670"
 
 if [ "$(which sha256sum)" ]; then
@@ -50,12 +50,13 @@ while [ $I -lt $N ]; do
 	I=$(($I + 1))
 	tid=$(cat $DATADIR/tcrd_targets.tid |sed "${I}q;d")
 	TID=$(printf "%05d" ${tid})
-	FILENAME="$DATADIR/tcrd_target_${TID}.json"
+	FILENAME="tcrd_target_${TID}.json"
 	printf "${I}. TID=${tid}; FILE=${FILENAME}\n"
-	python3 -m BioClients.idg.tcrd.Client getTargetPage --ids "${tid}" --o $FILENAME
+	ofile=${DATADIR}/${FILENAME}
+	python3 -m BioClients.idg.tcrd.Client getTargetPage --ids "${tid}" --o $ofile
 	LOCAL_ID="TARGET_ID_${TID}"
-	PERSISTENT_ID="${ID_NAMESPACE}/${TCRD_VERSION}/${LOCAL_ID}"
-	SIZE_IN_BYTES=$(cat $FILENAME |wc -c)
+	PERSISTENT_ID="${ID_NAMESPACE}.${TCRD_VERSION}.${LOCAL_ID}"
+	SIZE_IN_BYTES=$(cat $ofile |wc -c)
 	SHA256=$(cat $FILENAME |$SHA_EXE |sed 's/ .*$//')
 	MD5=$(cat $FILENAME |$MD5_EXE |sed 's/ .*$//')
 	printf "${ID_NAMESPACE}\t${LOCAL_ID}\t${PERSISTENT_ID}\t${SIZE_IN_BYTES}\t${SHA256}\t${MD5}\t${FILENAME}\n" \
