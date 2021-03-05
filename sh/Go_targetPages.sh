@@ -6,9 +6,11 @@ date
 
 T0=$(date +%s)
 
+TCRD_VERSION="684"
+
 cwd=$(pwd)
 
-DATADIR="${cwd}/data/targetpages"
+DATADIR="${cwd}/data/targetpages${TCRD_VERSION}"
 
 if [ ! -f ${DATADIR} ]; then
 	mkdir -p ${DATADIR}
@@ -30,7 +32,6 @@ N=$(cat $DATADIR/tcrd_targets.tid |wc -l)
 printf "N_targets = %d\n" "$N"
 #
 ID_NAMESPACE="cfde_idg_tcrd"
-TCRD_VERSION="670"
 #
 if [ "$(which sha256sum)" ]; then
 	SHA_EXE="sha256sum"
