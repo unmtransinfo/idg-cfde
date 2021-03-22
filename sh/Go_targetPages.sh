@@ -11,12 +11,15 @@ TCRD_VERSION="684"
 cwd=$(pwd)
 
 DATADIR="${cwd}/data/targetpages${TCRD_VERSION}"
-
 if [ ! -f ${DATADIR} ]; then
 	mkdir -p ${DATADIR}
 fi
+SUBMISSIONDIR="${DATADIR}/submission"
+if [ ! -f ${SUBMISSIONDIR} ]; then
+	mkdir -p ${SUBMISSIONDIR}
+fi
 #
-metadatafile="${DATADIR}/tcrd_targetpages_metadata.tsv"
+metadatafile="${SUBMISSIONDIR}/file.tsv"
 printf "id_namespace\tlocal_id\tpersistent_id\tsize_in_bytes\tsha256\tmd5\tfilename\n" \
 	>$metadatafile
 #
