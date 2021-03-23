@@ -23,6 +23,17 @@ if [ ! "$DATAPATH/C2M2_datapackage.json" ]; then
 	wget -O - 'https://osf.io/e5tc2/download' >$DATAPATH/C2M2_datapackage.json
 fi
 #
+# Headers (blank tables) for all C2M2 TSVs, except file.tsv!
+# https://osf.io/rdeks/
+for f in $(ls ${cwd}/C2M2/*.tsv); do
+	if [ $(basename $) = "file.tsv" ]; then
+		continue
+	fi
+	printf "Copying C2M2 TSV header: %s\n" $(basename $f)
+	cp $f $DATAPATH
+done
+#
+#
 cfde-submit run --help
 #
 cfde-submit login

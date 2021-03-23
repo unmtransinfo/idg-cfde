@@ -40,6 +40,8 @@ if [ "$(which sha256sum)" ]; then
 	SHA_EXE="sha256sum"
 elif [ "$(which sha)" ]; then
 	SHA_EXE="sha -a 256"
+elif [ "$(which shasum)" ]; then
+	SHA_EXE="shasum -a 256"
 else
 	echo "ERROR: Cannot find SHA_EXE."
 	exit
