@@ -7,11 +7,11 @@ set -x
 #
 #conda activate cfde
 #
-metadatafile="${DATADIR}/tcrd_targetpages_c2m2.tsv"
-#
 cwd=$(pwd)
 DATADIR="${cwd}/data"
 DATAPATH="${cwd}/data/targetpages684/submission"
+#
+metadatafile="${DATADIR}/tcrd_targetpages_c2m2.tsv"
 #
 if [ ! -e "$DATAPATH" ]; then
 	mkdir -p $DATAPATH
