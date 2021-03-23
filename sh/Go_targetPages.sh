@@ -14,12 +14,7 @@ DATADIR="${cwd}/data/targetpages${TCRD_VERSION}"
 if [ ! -f ${DATADIR} ]; then
 	mkdir -p ${DATADIR}
 fi
-SUBMISSIONDIR="${DATADIR}/submission"
-if [ ! -f ${SUBMISSIONDIR} ]; then
-	mkdir -p ${SUBMISSIONDIR}
-fi
-#
-metadatafile="${SUBMISSIONDIR}/file.tsv"
+metadatafile="${DATADIR}/tcrd_targetpages_c2m2.tsv"
 printf "id_namespace\tlocal_id\tpersistent_id\tsize_in_bytes\tsha256\tmd5\tfilename\n" \
 	>$metadatafile
 #
