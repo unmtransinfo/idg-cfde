@@ -15,8 +15,7 @@ if [ ! -f ${DATADIR} ]; then
 	mkdir -p ${DATADIR}
 fi
 metadatafile="${DATADIR}/tcrd_targetpages_c2m2.tsv"
-printf "id_namespace\tlocal_id\tpersistent_id\tsize_in_bytes\tsha256\tmd5\tfilename\n" \
-	>$metadatafile
+printf "id_namespace\tlocal_id\tproject_id_namespace\tproject_local_id\tpersistent_id\tcreation_time\tsize_in_bytes\tuncompressed_size_in_bytes\tsha256\tmd5\tfilename\tfile_format\tdata_type\tassay_type\tmime_type\n" >$metadatafile
 #
 python3 -m BioClients.idg.tcrd.Client listTargets \
 	--o $DATADIR/tcrd_targets.tsv
@@ -50,6 +49,14 @@ else
 	exit
 fi
 #
+PROJECT_ID_NAMESPACE="idgtcrd"
+PROJECT_LOCAL_ID="idgtcrd"
+CREATION_TIME=$(date +'%Y-%m-%d')
+# http://edamontology.org/format_3464
+FILE_FORMAT="format:3464"
+DATA_TYPE=""
+ASSAY_TYPE=""
+MIME_TYPE="application/json"
 I=0
 while [ $I -lt $N ]; do
 	I=$[$I + 1]
@@ -62,10 +69,10 @@ while [ $I -lt $N ]; do
 	LOCAL_ID="TARGET_ID_${TID}"
 	PERSISTENT_ID="${ID_NAMESPACE}.${TCRD_VERSION}.${LOCAL_ID}"
 	SIZE_IN_BYTES=$(cat $ofile |wc -c)
+	UNCOMPRESSED_SIZE_IN_BYTES=${SIZE_IN_BYTES}
 	SHA256=$(cat $ofile |$SHA_EXE |sed 's/ .*$//')
 	MD5=$(cat $ofile |$MD5_EXE |sed 's/ .*$//')
-	printf "${ID_NAMESPACE}\t${LOCAL_ID}\t${PERSISTENT_ID}\t${SIZE_IN_BYTES}\t${SHA256}\t${MD5}\t${FILENAME}\n" \
-		>>$metadatafile
+	printf "${ID_NAMESPACE}\t${LOCAL_ID}\t${PROJECT_ID_NAMESPACE}\t${PROJECT_LOCAL_ID}\t${PERSISTENT_ID}\t${CREATION_TIME}\t${SIZE_IN_BYTES}\t${UNCOMPRESSED_SIZE_IN_BYTES}\t${SHA256}\t${MD5}\t${FILENAME}\t${FILE_FORMAT}\t${DATA_TYPE}\t${ASSAY_TYPE}\t${MIME_TYPE}\n" >>$metadatafile
 done
 #
 printf "Elapsed: %ds\n" "$[$(date +%s) - $T0]"
