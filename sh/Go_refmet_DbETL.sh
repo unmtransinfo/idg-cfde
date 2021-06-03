@@ -19,14 +19,16 @@ DBHOST="localhost"
 REFMET_DIR="$(cd $HOME/../data/RefMet; pwd)"
 csvfile="$REFMET_DIR/refmet.csv.gz"
 #
+cwd=$(pwd)
+#
 createdb $DBNAME
 #
 gunzip -c $csvfile \
-	|csv2sql.py create --tablename "main" --fixtags --maxchar 2000 \
+	|${cwd}/python/csv2sql.py create --tablename "main" --fixtags --maxchar 2000 \
 	|psql -d $DBNAME
 #
 gunzip -c $csvfile \
-	|csv2sql.py insert --tablename "main" --fixtags --maxchar 2000 \
+	|${cwd}/python/csv2sql.py insert --tablename "main" --fixtags --maxchar 2000 \
 	|psql -q -d $DBNAME
 #
 psql -d $DBNAME -c "COMMENT ON DATABASE $DBNAME IS 'RefMet: A Reference list of Metabolite names, from the Metabolomics Workbench'";
