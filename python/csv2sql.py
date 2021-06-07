@@ -5,6 +5,7 @@ control over column names, datatypes, and database systems (dbsystem).
 """
 #
 import sys,os,argparse,re,gzip,logging
+import numpy as np
 import pandas as pd
 #
 PROG=os.path.basename(sys.argv[0])
@@ -107,16 +108,25 @@ def Csv2Insert(fin, fout, dbsystem, dtypes, schema, tablename, colnames, coltype
     else:
       line = (f"INSERT INTO {schema}.{tablename} ({','.join(df.columns)}) VALUES (")
     for j,colname in enumerate(df.columns):
-      val = str(row[colname])
+      val = row[colname]
       #logging.debug("%s: '%s'"%(colname, val))
       if coltypes[j].upper() in chartypes:
-        val = EscapeString(str(val), nullify, dbsystem)
+        val = EscapeString(str(val), dbsystem)
+        if val.strip()=='' and nullify: val='NULL'
         if len(val)>maxchar:
           val = val[:maxchar]
           logging.warning(f"[row={i}] string truncated to {maxchar} chars: '{val}'")
         val = (f"'{val}'")
       elif coltypes[j].upper() in numtypes:
-        val = 'NULL' if (val.upper() in nullwords or val=='') else (f"{val}")
+        try:
+          if type(val) is str:
+            val = 'NULL' if val.upper() in nullwords else (f"{val}")
+          else:
+            val = 'NULL' if (np.isnan(val) or pd.isna(val) or str(val)=='nan') else (f"{val}")
+        except Exception as e:
+          logging.debug(f"{e}")
+          logging.debug(f"val: {val}; type(val): {type(val)}")
+          val = 'NULL'
       elif coltypes[j].upper() in timetypes:
         val = (f"to_timestamp('{val}')")
       else:
@@ -170,13 +180,12 @@ def DedupNames(colnames):
   return colnames
 
 #############################################################################
-def EscapeString(val, nullify, dbsystem):
-  val=re.sub(r"'", '', val)
+def EscapeString(val, dbsystem):
+  val = re.sub(r"'", '', val)
   if dbsystem=='postgres':
-    val=re.sub(r'\\', r"'||E'\\\\'||'", val)
+    val = re.sub(r'\\', r"'||E'\\\\'||'", val)
   elif dbsystem=='mysql':
-    val=re.sub(r'\\', r'\\\\', val)
-  if val.strip()=='' and nullify: val='NULL'
+    val = re.sub(r'\\', r'\\\\', val)
   return val
 
 #############################################################################

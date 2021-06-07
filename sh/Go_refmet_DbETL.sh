@@ -21,20 +21,25 @@ csvfile="$REFMET_DIR/refmet.csv.gz"
 #
 cwd=$(pwd)
 #
+dropdb $DBNAME
 createdb $DBNAME
 #
 gunzip -c $csvfile \
-	|${cwd}/python/csv2sql.py create --tablename "main" --fixtags --maxchar 2000 \
+	|${cwd}/python/csv2sql.py create \
+		--tablename "main" --fixtags --maxchar 2000 \
+		--coltypes "CHAR,CHAR,CHAR,CHAR,CHAR,CHAR,CHAR,CHAR,INT" \
 	|psql -d $DBNAME
 #
 gunzip -c $csvfile \
-	|${cwd}/python/csv2sql.py insert --tablename "main" --fixtags --maxchar 2000 \
+	|${cwd}/python/csv2sql.py insert \
+		--tablename "main" --fixtags --maxchar 2000 \
+		--coltypes "CHAR,CHAR,CHAR,CHAR,CHAR,CHAR,CHAR,CHAR,INT" \
 	|psql -q -d $DBNAME
 #
 psql -d $DBNAME -c "COMMENT ON DATABASE $DBNAME IS 'RefMet: A Reference list of Metabolite names, from the Metabolomics Workbench'";
 psql -d $DBNAME -c "COMMENT ON TABLE main IS 'RefMet: A Reference list of Metabolite names, from the Metabolomics Workbench'";
 #
-COLS="smiles _refmet_name pubchem_cid inchi_key"
+COLS="smiles refmet_name inchi_key"
 for col in $COLS ; do
 	psql -d $DBNAME -c "UPDATE main SET $col = NULL WHERE $col = ''";
 done
@@ -85,7 +90,7 @@ psql -d $DBNAME -c "CREATE INDEX fps_ttbv_idx ON ${DBSCHEMA}.mols USING gist(tor
 psql -d $DBNAME <<__EOF__
 CREATE OR REPLACE FUNCTION
 	rdk_simsearch(smiles text)
-RETURNS TABLE(pubchem_cid VARCHAR, mol mol, similarity double precision) AS
+RETURNS TABLE(pubchem_cid INT, mol mol, similarity double precision) AS
 	\$\$
 	SELECT
 		pubchem_cid,mol,tanimoto_sml(rdkit_fp(mol_from_smiles(\$1::cstring)),fp) AS similarity
@@ -100,4 +105,11 @@ RETURNS TABLE(pubchem_cid VARCHAR, mol mol, similarity double precision) AS
 LANGUAGE SQL STABLE
 	;
 __EOF__
+#
+###
+psql -d $DBNAME -c "CREATE ROLE www WITH LOGIN PASSWORD 'foobar'"
+psql -d $DBNAME -c "GRANT SELECT ON ALL TABLES IN SCHEMA ${DBSCHEMA} TO www"
+psql -d $DBNAME -c "GRANT SELECT ON ALL SEQUENCES IN SCHEMA ${DBSCHEMA} TO www"
+psql -d $DBNAME -c "GRANT EXECUTE ON ALL FUNCTIONS IN SCHEMA ${DBSCHEMA} TO www"
+psql -d $DBNAME -c "GRANT USAGE ON SCHEMA ${DBSCHEMA} TO www"
 #
