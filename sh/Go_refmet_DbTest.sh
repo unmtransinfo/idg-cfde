@@ -49,19 +49,18 @@ __EOF__
 #
 psql -d $DBNAME <<__EOF__
 SELECT
-	tanimoto_sml(rdkit_fp(mol_from_smiles('NCCc1ccc(O)c(O)c1'::cstring)),m.fp) AS "sim",
 	m.id,
 	refmet.pubchem_cid,
 	refmet.refmet_name,
-	m.cansmi
+	m.cansmi,
+	ROUND(tanimoto_sml(rdkit_fp(mol_from_smiles('NCCc1ccc(O)c(O)c1'::cstring)), m.fp)::NUMERIC, 2) similarity
 FROM
 	mols m
-JOIN
-	refmet ON (refmet.mol_id = m.id)
+	JOIN refmet ON (refmet.mol_id = m.id)
 WHERE
 	rdkit_fp(mol_from_smiles('NCCc1ccc(O)c(O)c1'::cstring))%m.fp
 ORDER BY
-	sim DESC
+	similarity DESC
 	;
 __EOF__
 #

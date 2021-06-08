@@ -14,6 +14,8 @@
 # 9. "pubchem_cid"
 ###
 #
+T0=$(date +%s)
+#
 DBNAME="refmet"
 DBSCHEMA="public"
 DBHOST="localhost"
@@ -72,7 +74,6 @@ __EOF__
 #
 psql -d $DBNAME -c "ALTER TABLE mols ADD COLUMN id SERIAL PRIMARY KEY"
 #
-#
 psql -d $DBNAME -c "ALTER TABLE refmet ADD COLUMN mol_id INT"
 psql -d $DBNAME -c "UPDATE refmet SET mol_id = m.id FROM mols m WHERE refmet.cansmi = m.cansmi"
 #
@@ -80,6 +81,12 @@ psql -d $DBNAME -c "ALTER TABLE mols ADD COLUMN mol MOL"
 psql -d $DBNAME -c "UPDATE mols SET mol = mol_from_smiles(cansmi::cstring)"
 psql -d $DBNAME -c "CREATE INDEX molidx ON mols USING gist(mol)"
 #
+###
+N_refmet_name=$(psql -d $DBNAME -qAc "SELECT COUNT(DISTINCT refmet_name) FROM refmet" |grep '^[0-9]')
+N_cid=$(psql -d $DBNAME -qAc "SELECT COUNT(DISTINCT pubchem_cid) FROM refmet" |grep '^[0-9]')
+N_cansmi=$(psql -d $DBNAME -qAc "SELECT COUNT(DISTINCT cansmi) FROM refmet" |grep '^[0-9]')
+N_mol=$(psql -d $DBNAME -qAc "SELECT COUNT(*) FROM mols" |grep '^[0-9]')
+printf "N_refmet_name: ${N_refmet_name}; N_cid: ${N_cid}; N_cansmi: ${N_cansmi}; N_mol: ${N_mol}\n"
 #
 ### Add FPs to mols table.
 # sfp : a sparse count vector fingerprint (SparseIntVect in C++ and Python)
@@ -114,9 +121,10 @@ CREATE OR REPLACE FUNCTION
 RETURNS TABLE(pubchem_cid INT, mol MOL, similarity double precision) AS
 	\$\$
 	SELECT
+		refmet.mol_id,
 		refmet.pubchem_cid,
-		m.mol,
-		tanimoto_sml(rdkit_fp(mol_from_smiles(\$1::cstring)),m.fp) AS similarity
+		refmet.cansmi,
+		ROUND(tanimoto_sml(rdkit_fp(mol_from_smiles(\$1::cstring)), m.fp)::NUMERIC, 3) AS similarity
 	FROM
 		${DBSCHEMA}.mols m
 	JOIN
@@ -137,4 +145,6 @@ psql -d $DBNAME -c "GRANT SELECT ON ALL TABLES IN SCHEMA ${DBSCHEMA} TO www"
 psql -d $DBNAME -c "GRANT SELECT ON ALL SEQUENCES IN SCHEMA ${DBSCHEMA} TO www"
 psql -d $DBNAME -c "GRANT EXECUTE ON ALL FUNCTIONS IN SCHEMA ${DBSCHEMA} TO www"
 psql -d $DBNAME -c "GRANT USAGE ON SCHEMA ${DBSCHEMA} TO www"
+#
+printf "Elapsed time: %ds\n" "$[$(date +%s) - ${T0}]"
 #
