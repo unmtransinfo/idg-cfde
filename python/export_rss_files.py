@@ -18,7 +18,7 @@ def run():
   fo_ct = 0
   for td in target_data:
     ct += 1
-    if not td['pharosReady']:
+    if not td['pharosReady']: # Pharos-ready filter
       continue
     pr_ct += 1
     resource_data = get_resource_data(td['id'])
