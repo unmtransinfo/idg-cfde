@@ -13,13 +13,15 @@ DBHOST="localhost"
 #
 psql -d $DBNAME <<__EOF__
 SELECT
-	m.pubchem_cid,
-	s.refmet_name,
-	mol_to_smiles(m.mol) AS "smiles"
+	m.id,
+	refmet.pubchem_cid,
+	refmet.refmet_name,
+	refmet.smiles,
+	m.cansmi
 FROM
-	$DBSCHEMA.mols m
+	mols m
 JOIN
-	$DBSCHEMA.main s ON (s.pubchem_cid = m.pubchem_cid)
+	refmet ON (refmet.mol_id = m.id)
 WHERE
 	m.mol = 'NCCc1ccc(O)c(O)c1'
 	;
@@ -29,13 +31,15 @@ __EOF__
 #
 psql -d $DBNAME <<__EOF__
 SELECT
-	m.pubchem_cid,
-	s.refmet_name,
-	mol_to_smiles(m.mol) AS "smiles"
+	m.id,
+	refmet.pubchem_cid,
+	refmet.refmet_name,
+	refmet.smiles,
+	m.cansmi
 FROM
-	$DBSCHEMA.mols m
+	mols m
 JOIN
-	$DBSCHEMA.main s ON (s.pubchem_cid = m.pubchem_cid)
+	refmet ON (refmet.mol_id = m.id)
 WHERE
 	m.mol @> 'C12CCCC1CCC1C2CCC2=CCCCC12'
 	;
@@ -45,18 +49,18 @@ __EOF__
 #
 psql -d $DBNAME <<__EOF__
 SELECT
-	tanimoto_sml(rdkit_fp(mol_from_smiles('NCCc1ccc(O)c(O)c1'::cstring)),m.fp) AS "sim",
-	m.pubchem_cid,
-	s.refmet_name,
-	mol_to_smiles(m.mol) AS "smiles"
+	m.id,
+	refmet.pubchem_cid,
+	refmet.refmet_name,
+	m.cansmi,
+	ROUND(tanimoto_sml(rdkit_fp(mol_from_smiles('NCCc1ccc(O)c(O)c1'::cstring)), m.fp)::NUMERIC, 2) similarity
 FROM
-	$DBSCHEMA.mols m
-JOIN
-	$DBSCHEMA.main s ON (s.pubchem_cid = m.pubchem_cid)
+	mols m
+	JOIN refmet ON (refmet.mol_id = m.id)
 WHERE
 	rdkit_fp(mol_from_smiles('NCCc1ccc(O)c(O)c1'::cstring))%m.fp
 ORDER BY
-	sim DESC
+	similarity DESC
 	;
 __EOF__
 #
