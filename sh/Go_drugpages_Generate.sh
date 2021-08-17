@@ -6,7 +6,7 @@ date
 
 T0=$(date +%s)
 
-DC_VERSION="2021"
+DC_VERSION="2020"
 
 cwd=$(pwd)
 
