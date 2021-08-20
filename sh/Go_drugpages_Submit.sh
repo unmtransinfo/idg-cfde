@@ -125,7 +125,7 @@ cfde-submit login
 cfde-submit run $DATAPATH \
 	--dcc-id cfde_registry_dcc:idg \
 	--output-dir $DATADIR/submission_output \
-	--dry-run \
+	--delete-dir \
 	--verbose
 #
 #	--dry-run \
