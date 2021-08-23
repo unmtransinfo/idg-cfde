@@ -1,8 +1,11 @@
+# DrugCentral Schema documentation
+
+
 | schema\_nm | table\_nm                      | obj\_typ | ord | is\_key | column\_nm                 | data\_typ                      | nullable | column\_descr                                                                                       |
 | ---------- | ------------------------------ | -------- | --- | ------- | -------------------------- | ------------------------------ | -------- | --------------------------------------------------------------------------------------------------- |
-| public     | DRTESTS\_fda\_approved\_drugs  | TBL      | 1   |         | cd\_formula                | character varying(100)         | NULL     | (null)                                                                                              |
+| public     | DRTESTS\_fda\_approved\_drugs  | TBL      | 1   |         | `cd\_formula`               | character varying(100)         | NULL     | (null)                                                                                              |
 | public     | DRTESTS\_fda\_approved\_drugs  | TBL      | 2   |         | cd\_molweight              | double precision(53)           | NULL     | (null)                                                                                              |
-| public     | DRTESTS\_fda\_approved\_drugs  | TBL      | 3   |         | id                         | integer(32)                    | NULL     | (null)                                                                                              |
+| public     | DRTESTS\_fda\_approved\_drugs  | TBL      | 3   |         | `id`                        | integer(32)                    | NULL     | (null)                                                                                              |
 | public     | DRTESTS\_fda\_approved\_drugs  | TBL      | 4   |         | name                       | character varying(250)         | NULL     | (null)                                                                                              |
 | public     | DRTESTS\_fda\_approved\_drugs  | TBL      | 5   |         | no\_formulations           | integer(32)                    | NULL     | (null)                                                                                              |
 | public     | DRTESTS\_fda\_approved\_drugs  | TBL      | 6   |         | inchi                      | character varying(32672)       | NULL     | (null)                                                                                              |
