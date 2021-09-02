@@ -1,0 +1,125 @@
+
+<html>
+  <head><title>CSV2HTML: Tools.tsv</title></head>
+  <style type="text/css">/* includes alternating gray and white with on-hover color */
+
+.mystyle {
+  font-size: 11pt; 
+  font-family: Arial;
+  border-collapse: collapse; 
+  border: 1px solid silver;
+}
+
+.mystyle table {
+  width: 100%;
+}
+
+.mystyle td, th {
+  padding: 5px;
+  max-width:400px;
+  word-wrap:break-word;
+  overflow-wrap: break-word;
+}
+
+.mystyle tr:nth-child(even) {
+  background: #E0E0E0;
+}
+
+.mystyle tr:hover {
+  background: silver;
+  cursor: pointer;
+}
+</style>
+  <body>
+    <table border="1" class="dataframe mystyle">
+  <thead>
+    <tr style="text-align: center;">
+      <th>Name</th>
+      <th>Description</th>
+      <th>Comments</th>
+      <th>URL</th>
+      <th>Publication</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>Harmonizome</td>
+      <td>A collection of information about genes and proteins derived from 114 datasets and 66 resources.</td>
+      <td>Java servlet built with Java 8 and running in an Apache Tomcat 8 container.</td>
+      <td><a href="https://maayanlab.cloud/Harmonizome/" target="_blank">https://maayanlab.cloud/Harmonizome/</a></td>
+      <td>Rouillard, A. D., Gundersen, G. W., Fernandez, N. F., Wang, Z., Monteiro, C. D., McDermott, M. G., &amp; Ma’ayan, A. (2016). The harmonizome: a collection of processed datasets gathered to serve and mine knowledge about genes and proteins. Database, 2016.</td>
+    </tr>
+    <tr>
+      <td>Drugmonizome</td>
+      <td>A web portal for querying sets of known drugs and computing significant biomedical terms that drugs in the set share.</td>
+      <td>Signature commons architecture consisting of metadata-api and data-api implemented using Typescript, Java, and Python</td>
+      <td><a href="https://maayanlab.cloud/drugmonizome/" target="_blank">https://maayanlab.cloud/drugmonizome/</a></td>
+      <td>Kropiwnicki, E., Evangelista, J. E., Stein, D. J., Clarke, D. J., Lachmann, A., Kuleshov, M. V., ... &amp; Ma’ayan, A. (2021). Drugmonizome and Drugmonizome-ML: integration and abstraction of small molecule attributes for drug enrichment analysis and machine learning. Database, 2021.</td>
+    </tr>
+    <tr>
+      <td>DrugCentral</td>
+      <td>Online drug compendium</td>
+      <td>Python Django web UI. TCRD/Pharos integrated.</td>
+      <td><a href="https://drugcentral.org/" target="_blank">https://drugcentral.org/</a></td>
+      <td>DrugCentral 2021 supports drug discovery and repositioning, S. Avram et al., Nucleic Acids Research, 2020.</td>
+    </tr>
+    <tr>
+      <td>TIN-X</td>
+      <td>Target Importance and Novelty Explorer</td>
+      <td>Python Django web UI, Swagger REST API, Dockered. TCRD/Pharos integrated.</td>
+      <td><a href="https://newdrugtargets.net" target="_blank">https://newdrugtargets.net</a></td>
+      <td>TIN-X: Target Importance and Novelty Explorer, D.C. Cannon et al., Bioinformatics, 2017.</td>
+    </tr>
+    <tr>
+      <td>TIGA</td>
+      <td>Target Illumination GWAS Analytics</td>
+      <td>R Shiny web UI. TCRD/Pharos integration in progress.</td>
+      <td><a href="https://unmtid-shinyapps.net/tiga" target="_blank">https://unmtid-shinyapps.net/tiga</a></td>
+      <td>Preprint: https://www.biorxiv.org/content/10.1101/2020.11.11.378596v1</td>
+    </tr>
+    <tr>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+    </tr>
+    <tr>
+      <td>Geneshot</td>
+      <td>A web portal for submitting biomedical terms of interest to receive a list of prioritized genes.</td>
+      <td>Python Flask backend, HTML/Javascript frontend</td>
+      <td><a href="https://maayanlab.cloud/geneshot/" target="_blank">https://maayanlab.cloud/geneshot/</a></td>
+      <td>Lachmann, A., Schilder, B. M., Wojciechowicz, M. L., Torre, D., Kuleshov, M. V., Keenan, A. B., &amp; Ma’ayan, A. (2019). Geneshot: search engine for ranking genes from arbitrary text queries. Nucleic acids research, 47(W1), W571-W577</td>
+    </tr>
+    <tr>
+      <td>PrismExp</td>
+      <td>A machine learning method that utilizes RNA-seq coexpression correlations to impute knowledge about understudied genes and proteins.</td>
+      <td>Appyter</td>
+      <td><a href="https://appyters.maayanlab.cloud/PrismEXP/" target="_blank">https://appyters.maayanlab.cloud/PrismEXP/</a></td>
+      <td>Lachmann, A., Rizzo, K., Bartal, A., Jeon, M., Clarke, D. J., &amp; Ma'ayan, A. (2021). PrismExp: Predicting Human Gene Function by Partitioning Massive RNA-seq Co-expression Data. bioRxiv.</td>
+    </tr>
+    <tr>
+      <td>ARCHS4</td>
+      <td>ARCHS4 provides access to gene counts  from HiSeq 2000 and HiSeq 2500 platforms for human and mouse experiments.</td>
+      <td>AJAX application implemented with PHP and JavaScript</td>
+      <td><a href="https://maayanlab.cloud/archs4/" target="_blank">https://maayanlab.cloud/archs4/</a></td>
+      <td>Lachmann, A., Torre, D., Keenan, A. B., Jagodnik, K. M., Lee, H. J., Wang, L., ... &amp; Ma’ayan, A. (2018). Massive mining of publicly available RNA-seq data from human and mouse. Nature communications, 9(1), 1-10.</td>
+    </tr>
+    <tr>
+      <td>Drugshot</td>
+      <td>A web portal for submitting biomedical terms of interest to receive a list of prioritized small molecules.</td>
+      <td>Appyter + Flask backend, HTML/Javascript frontend</td>
+      <td><a href="https://appyters.maayanlab.cloud/DrugShot/" target="_blank">https://appyters.maayanlab.cloud/DrugShot/</a></td>
+      <td>Clarke, D. J. B. et al. (2021). Appyters: turning Jupyter Notebooks into data-driven web apps. Patterns. doi: 10.1016/j.patter.2021.100213.</td>
+    </tr>
+    <tr>
+      <td>KEA3</td>
+      <td>Web portal for analysis of data from phosphoproteomics and proteomics  studies to predict the upstream kinases responsible for observed differential phosphorylation.</td>
+      <td>Java servlet running on Tomcat 9</td>
+      <td><a href="https://maayanlab.cloud/kea3/" target="_blank">https://maayanlab.cloud/kea3/</a></td>
+      <td>Kuleshov, M.V. et al. (2021). KEA3: improved kinase enrichment analysis via data integration, Nucleic Acids Research, Volume 49, Issue W1,Pages W304–W316</td>
+    </tr>
+  </tbody>
+</table>
+  </body>
+</html>
