@@ -1,0 +1,15 @@
+Name	Description	Number of files	Comments	URL	Registered in CFDE?
+TCRD	MySql dump, full database.	1		http://juniper.health.unm.edu/tcrd/download/	
+TCRD tables	TSVs, one per MySql table.	93	Tables must be mapped to standard IDs to be interoperable.		
+TIN-X database	TSVs, one per MySql table.	4	Subset of TCRD.		
+TCRD target pages	JSON, one per target_id.	20412	Focus on content unique to TCRD, e.g. TDL.		YES
+Harmonizome	Datasets	114		https://maayanlab.cloud/Harmonizome/download	YES
+Harmonizome	Genes	30904		https://maayanlab.cloud/Harmonizome/download	YES
+Drugmonizome	Datasets	35		https://maayanlab.cloud/drugmonizome/#/TermSearch/Drug%20set%20libraries	
+Drugmonizome	Small molecules	14579		https://maayanlab.cloud/drugmonizome/#/TermSearch/Small%20molecules	
+RSS Resource Tables	From RSS API	800	Metadata for Mice, Kits, Reagents, Small Molecules, etc.		
+IDG Protein List	NIH approved list of understudied targets	1			
+DrugCentral database	PostgreSql dump, full database.	1		https://drugcentral.org/download	
+DrugCentral tables	TSVs, one per PostgreSql table.	61	Tables must be mapped to standard IDs to be interoperable.		
+DrugCentral drug pages	JSON, one per struct_id.	4642	Initial version submitted via cfde-submit.		
+TIGA tables	TSVs, one per MySql table.	4	Subset of TCRD.		
