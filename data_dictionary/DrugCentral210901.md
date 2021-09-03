@@ -1,52 +1,55 @@
- | ﻿table_name |obj_typ |ord |column_name |data_typ |nullable |column_descr | |
- |--- | --- | --- | --- | --- | --- | --- | --- | 
- | act_table_full | TBL | 1 | act_id | integer(32) | NOT NULL | Unique id for activity data |  | 
- | act_table_full | TBL | 2 | struct_id | integer(32) | NOT NULL | DrugCentral structure id for drugs |  | 
- | act_table_full | TBL | 3 | target_id | integer(32) | NOT NULL | DrugCentral target id for targets |  | 
- | act_table_full | TBL | 4 | target_name | character varying(200) | NULL | Target name |  | 
- | act_table_full | TBL | 5 | target_class | character varying(50) | NULL | Protein target class |  | 
- | act_table_full | TBL | 6 | accession | character varying(1000) | NULL | Unique entry identifier from UniProtKB |  | 
- | act_table_full | TBL | 7 | gene | character varying(1000) | NULL | Name of the gene encoding the protein from UniProtKB |  | 
- | act_table_full | TBL | 8 | swissprot | character varying(1000) | NULL | Entry name identifier from UniProtKB |  | 
- | act_table_full | TBL | 9 | act_value | double precision(53) | NULL | Bioactivity data extracted from different sources |  | 
- | act_table_full | TBL | 10 | act_unit | character varying(100) | NULL | Bioactivity measurement unit type |  | 
- | act_table_full | TBL | 11 | act_type | character varying(100) | NULL | Bioactivity measurement type |  | 
- | act_table_full | TBL | 12 | act_comment | character varying(1000) | NULL | Short description of the bioactivity data, e.g. assay type, measurement, conditions, etc |  | 
- | act_table_full | TBL | 13 | act_source | character varying(100) | NULL | Source of the bioactivity data |  | 
- | act_table_full | TBL | 14 | relation | character varying(5) | NULL | Mathematical identifier |  | 
- | act_table_full | TBL | 15 | moa | smallint(16) | NULL | Mechanism of action of the drug |  | 
- | act_table_full | TBL | 16 | moa_source | character varying(100) | NULL | Mechanism of action source |  | 
- | act_table_full | TBL | 17 | act_source_url | character varying(500) | NULL | The URL for the source of the bioactivity data |  | 
- | act_table_full | TBL | 18 | moa_source_url | character varying(500) | NULL | The URL for the source of the mechanism of action for a drug |  | 
- | act_table_full | TBL | 19 | action_type | character varying(50) | NULL | Pharmacological action type |  | 
- | act_table_full | TBL | 20 | first_in_class | smallint(16) | NULL | First in class drug annotation |  | 
- | act_table_full | TBL | 21 | tdl | character varying(500) | NULL | Target development level, as defined at http://juniper.health.unm.edu/tcrd/ |  | 
- | act_table_full | TBL | 22 | act_ref_id | integer(32) | NULL | Unique identifier of the bioactivity data reference |  | 
- | act_table_full | TBL | 23 | moa_ref_id | integer(32) | NULL | Unique identifier of the reference for the mechanism of action |  | 
- | act_table_full | TBL | 24 | organism | character varying(150) | NULL | The species expressing the target |  | 
- | action_type | TBL | 1 | id | integer(32) | NOT NULL | Unique identifier of the pharmacological action type |  | 
- | action_type | TBL | 2 | action_type | character varying(50) | NOT NULL | Pharmacological action type |  | 
- | action_type | TBL | 3 | description | character varying(200) | NOT NULL | Short description of each pharmacological action type |  | 
- | action_type | TBL | 4 | parent_type | character varying(50) | NULL | Pharmacological action type of the parent molecule |  | 
- | active_ingredient | TBL | 1 | id | integer(32) | NOT NULL | DrugCentral unique identifier for active ingredient entry extracted from DailyMed data |  | 
- | active_ingredient | TBL | 2 | active_moiety_unii | character varying(20) | NULL | UNII moiety code of the active substance extracted from DailyMed data |  | 
- | active_ingredient | TBL | 3 | active_moiety_name | character varying(4000) | NULL | UNII moiety nameof the active substance extracted from DailyMed data |  | 
- | active_ingredient | TBL | 4 | unit | character varying(20) | NULL | Measurement unit type |  | 
- | active_ingredient | TBL | 5 | quantity | double precision(53) | NULL | The amount of active ingredient |  | 
- | active_ingredient | TBL | 6 | substance_unii | character varying(20) | NULL | UNII code of the active substance extracted from DailyMed data |  | 
- | active_ingredient | TBL | 7 | substance_name | character varying(4000) | NULL | Active substance name extracted from DailyMed data |  | 
- | active_ingredient | TBL | 8 | ndc_product_code | character varying(20) | NULL | FDA NDC code of the drug product extracted from DailyMed data |  | 
- | active_ingredient | TBL | 9 | struct_id | integer(32) | NULL | DrugCentral structure id mapped to the active substance |  | 
- | active_ingredient | TBL | 10 | quantity_denom_unit | character varying(20) | NULL | Unit type for the quantitiy of the active substance in the drug product (DailyMed) |  | 
- | active_ingredient | TBL | 11 | quantity_denom_value | double precision(53) | NULL | Quantitiy value of the active substance in the drug product (DailyMed) |  | 
- | approval | TBL | 1 | id | integer(32) | NOT NULL | Unique identifier for the approval entry |  | 
- | approval | TBL | 2 | struct_id | integer(32) | NOT NULL | DrugCentral structure id for drug |  | 
- | approval | TBL | 3 | approval | date(3) | NULL | Approval date of the drug |  | 
- | approval | TBL | 4 | type | character varying(200) | NOT NULL | Approval agency |  | 
- | approval | TBL | 5 | applicant | character varying(100) | NULL | The name of the applicant |  | 
- | approval | TBL | 6 | orphan | boolean | NULL | Orphan status |  | 
- | approval_type | TBL | 1 | id | integer(32) | NOT NULL | Unique DrugCentral identifier for the indexed approval agencies |  | 
- | approval_type | TBL | 2 | descr | character varying(200) | NULL | The name of the approval agengies indexed in DrugCentral |  | 
+ # DrugCentral Data Dictionary
+ **last updated: 9/1/2021**
+ 
+ | ﻿table_name |obj_type |order |column_name |data_type |nullable |column_description | 
+ |--- | --- | --- | --- | --- | --- | --- | 
+ | act_table_full | TBL | 1 | `act_id` | integer(32) | NOT NULL | Unique id for activity data |   
+ | act_table_full | TBL | 2 | `struct_id` | integer(32) | NOT NULL | DrugCentral structure id for drugs |  
+ | act_table_full | TBL | 3 | `target_id` | integer(32) | NOT NULL | DrugCentral target id for targets |  
+ | act_table_full | TBL | 4 | `target_name` | character varying(200) | NULL | Target name |   
+ | act_table_full | TBL | 5 | `target_class` | character varying(50) | NULL | Protein target class |   
+ | act_table_full | TBL | 6 | `accession` | character varying(1000) | NULL | Unique entry identifier from UniProtKB |   
+ | act_table_full | TBL | 7 | `gene` | character varying(1000) | NULL | Name of the gene encoding the protein from UniProtKB |   
+ | act_table_full | TBL | 8 | `swissprot` | character varying(1000) | NULL | Entry name identifier from UniProtKB |   
+ | act_table_full | TBL | 9 | `act_value` | double precision(53) | NULL | Bioactivity data extracted from different sources |   
+ | act_table_full | TBL | 10 | `act_unit` | character varying(100) | NULL | Bioactivity measurement unit type |   
+ | act_table_full | TBL | 11 | `act_type` | character varying(100) | NULL | Bioactivity measurement type |   
+ | act_table_full | TBL | 12 | `act_comment` | character varying(1000) | NULL | Short description of the bioactivity data, e.g. assay type, measurement, conditions, etc |  
+ | act_table_full | TBL | 13 | `act_source` | character varying(100) | NULL | Source of the bioactivity data |  
+ | act_table_full | TBL | 14 | `relation` | character varying(5) | NULL | Mathematical identifier |   
+ | act_table_full | TBL | 15 | `moa` | smallint(16) | NULL | Mechanism of action of the drug |   
+ | act_table_full | TBL | 16 | `moa_source` | character varying(100) | NULL | Mechanism of action source |   
+ | act_table_full | TBL | 17 | `act_source_url` | character varying(500) | NULL | The URL for the source of the bioactivity data |   
+ | act_table_full | TBL | 18 | `moa_source_url` | character varying(500) | NULL | The URL for the source of the mechanism of action for a drug |   
+ | act_table_full | TBL | 19 | `action_type` | character varying(50) | NULL | Pharmacological action type |   
+ | act_table_full | TBL | 20 | `first_in_class` | smallint(16) | NULL | First in class drug annotation |  
+ | act_table_full | TBL | 21 | `tdl` | character varying(500) | NULL | Target development level, as defined at http://juniper.health.unm.edu/tcrd/ |   
+ | act_table_full | TBL | 22 | `act_ref_id` | integer(32) | NULL | Unique identifier of the bioactivity data reference |  | 
+ | act_table_full | TBL | 23 | `moa_ref_id` | integer(32) | NULL | Unique identifier of the reference for the mechanism of action |  | 
+ | act_table_full | TBL | 24 | `organism` | character varying(150) | NULL | The species expressing the target |  | 
+ | action_type | TBL | 1 | `id` | integer(32) | NOT NULL | Unique identifier of the pharmacological action type |  | 
+ | action_type | TBL | 2 | `action_type` | character varying(50) | NOT NULL | Pharmacological action type |  | 
+ | action_type | TBL | 3 | `description` | character varying(200) | NOT NULL | Short description of each pharmacological action type |  | 
+ | action_type | TBL | 4 | `parent_type` | character varying(50) | NULL | Pharmacological action type of the parent molecule |  | 
+ | active_ingredient | TBL | 1 | `id` | integer(32) | NOT NULL | DrugCentral unique identifier for active ingredient entry extracted from DailyMed data |  | 
+ | active_ingredient | TBL | 2 | `active_moiety_unii` | character varying(20) | NULL | UNII moiety code of the active substance extracted from DailyMed data |  | 
+ | active_ingredient | TBL | 3 | `active_moiety_name` | character varying(4000) | NULL | UNII moiety nameof the active substance extracted from DailyMed data |  | 
+ | active_ingredient | TBL | 4 | `unit` | character varying(20) | NULL | Measurement unit type |  | 
+ | active_ingredient | TBL | 5 | `quantity` | double precision(53) | NULL | The amount of active ingredient |  | 
+ | active_ingredient | TBL | 6 | `substance_unii` | character varying(20) | NULL | UNII code of the active substance extracted from DailyMed data |  | 
+ | active_ingredient | TBL | 7 | `substance_name` | character varying(4000) | NULL | Active substance name extracted from DailyMed data |  | 
+ | active_ingredient | TBL | 8 | `ndc_product_code` | character varying(20) | NULL | FDA NDC code of the drug product extracted from DailyMed data |  | 
+ | active_ingredient | TBL | 9 | `struct_id` | integer(32) | NULL | DrugCentral structure id mapped to the active substance |  | 
+ | active_ingredient | TBL | 10 | `quantity_denom_unit` | character varying(20) | NULL | Unit type for the quantitiy of the active substance in the drug product (DailyMed) |  | 
+ | active_ingredient | TBL | 11 | `quantity_denom_value` | double precision(53) | NULL | Quantitiy value of the active substance in the drug product (DailyMed) |  | 
+ | approval | TBL | 1 | `id` | integer(32) | NOT NULL | Unique identifier for the approval entry |  | 
+ | approval | TBL | 2 | `struct_id` | integer(32) | NOT NULL | DrugCentral structure id for drug |  | 
+ | approval | TBL | 3 | `approval` | date(3) | NULL | Approval date of the drug |  | 
+ | approval | TBL | 4 | `type` | character varying(200) | NOT NULL | Approval agency |  | 
+ | approval | TBL | 5 | `applicant` | character varying(100) | NULL | The name of the applicant |  | 
+ | approval | TBL | 6 | `orphan` | boolean | NULL | Orphan status |  | 
+ | approval_type | TBL | 1 | `id` | integer(32) | NOT NULL | Unique DrugCentral identifier for the indexed approval agencies |  | 
+ | approval_type | TBL | 2 | `descr` | character varying(200) | NULL | The name of the approval agengies indexed in DrugCentral |  | 
  | atc | TBL | 1 | id | integer(32) | NOT NULL | DrugCentral identifier for the ATC codes |  | 
  | atc | TBL | 2 | code | character(7) | NOT NULL | The ATC code of the specific drug |  | 
  | atc | TBL | 3 | chemical_substance | character varying(250) | NOT NULL | The drug name |  | 
