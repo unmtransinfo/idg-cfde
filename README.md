@@ -13,6 +13,7 @@ The IDG CFDE team is led by PI's Tudor Oprea, MD, PhD, of UNM, and Avi Ma'ayan, 
 
   * [TCRD Data Dictionary](data_dictionary/tcrd_data_dictionary.md)
   * [DrugCentral Data Dictionary](data_dictionary/DrugCentral210901.md)
+  * [Drugmonizome and Drugmonizome-ML Tutorials](https://maayanlab.cloud/drugmonizome/#/Tutorial)
 
 ## IDG
 
