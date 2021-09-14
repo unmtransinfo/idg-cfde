@@ -1,4 +1,4 @@
-# idg-cfde
+# idg-cfde <img align="right" src="/doc/images/cfde_logo.png" height="120">
 
 Illuminating the Druggable Genome (IDG) code, tools, and workflows for integration, harmonization and FAIRification in the Common Fund Data Ecosystem (CFDE).
 
