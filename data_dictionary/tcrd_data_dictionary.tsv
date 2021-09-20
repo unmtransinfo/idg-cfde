@@ -61,12 +61,12 @@ compartment	url	Empty (reserved for future use)	(null)	text	184602
 compartment	reliability	Reliability of association between target and cellular compartment	Supported, Approved, Validated, (null)	enum('Supported','Approved','Validated')	4	
 compartment_type	name	Name of the source for the cellular compartment data	Human Cell Atlas, JensenLab Experiment, JensenLab Knowledge, JensenLab Prediction, JensenLab Text Mining	varchar(255)	5	
 compartment_type	description	Description of the source for the cellular compartment data	Human Cell Atlas protein locations, minus rows with Uncertain reliability. Experiment channel subcellular locations from JensenLab COMPARTMENTS resource, filtered for confidence scores of 3 or greater. Knowledge channel subcellular locations from JensenLab COMPARTMENTS resource, filtered for confidence scores of 3 or greater. Prediction channel subcellular locations from JensenLab COMPARTMENTS resource, filtered for confidence scores of 3 or greater. Text Mining channel subcellular locations from JensenLab COMPARTMENTS resource, filtered for zscore of 3.0 or greater.	text	5	
-disease	id	TCRD disease identifier	1-407551	int(11)	407551	
+disease	id	Primary key	1-407551	int(11)	407551	
 disease	dtype	Foreign key to column name in table disease_type.	CTD, DisGeNET, DrugCentral Indication, eRAM, Expression Atlas, JensenLab Experiment COSMIC, JensenLab Experiment DistiLD, JensenLab Knowledge GHR, JensenLab Knowledge UniProtKB-KW, JensenLab Text Mining, Monarch, UniProt Disease	varchar(255)	12	
 disease	protein_id	Foreign key to column id in table protein.	1	int(11)	18879	
 disease	nhprotein_id	Foreign key to column id in table nhprotein.	(null)	int(11)	0	
 disease	name	Disease name	Cystathioninuria	text	20032	
-disease	did	Disease identifier	MIM:219500, OMIM:219500, C0220993, DOID:0090142	varchar(20)	28232	
+disease	did	Disease identifier (DOID, UMLS, MESH, AmyCo, OrphaNet, or NCBIGene)	MIM:219500, OMIM:219500, C0220993, DOID:0090142	varchar(20)	28232	
 disease	evidence	Evidence of association between target and disease	2 PubMed IDs; 3 SNPs	text	3225	
 disease	zscore	Standard score for the strength of association between target and disease	(null)	decimal(4,3)	4511	
 disease	conf	Confidence level for the strength of association between target and disease	(null)	decimal(2,1)	37	
@@ -125,9 +125,9 @@ expression	string_value	Textual description of expression results, using differe
 expression	pubmed_id	Pubmed ID for the paper reporting the expression results	17974005	int(11)	10490	
 expression	evidence	Level of evidence	(null), CURATED, Approved, Enhanced, Supported	varchar(255)	5	
 expression	zscore	Standard score for the strength of association between target and tissue	(null)	decimal(4,3)	4046	
-expression	conf	Confidence level for the strength of association between target and tissue	(null)	decimal(2,1)	0	
+expression	conf	Confidence values from JensenLab TISSUES  resource. Only persent for rows where etype LIKE 'JensenLab%'	(null)	decimal(2,1)	51	
 expression	oid	Tissue ontology ID	(null)	varchar(20)	4060	
-expression	confidence	Confidence scores for 	0, 1, 2, 3, 4, 5, NULL	tinyint(1)	3	
+expression	confidence	A score indicating how many sources agree on the qualitative level of expression for a given target. Only present for rows where etype = 'Consensus' 	0, 1, 2, 3, 4, 5, NULL	tinyint(1)	7	
 expression	url	URL of specific expression data	(null)	text	60782	
 expression	cell_id	Cell line identifier	HELA	varchar(20)	1155	
 expression	uberon_id	Foreign key to column uid in table uberon.	UBERON:0000955	varchar(20)	1269	
