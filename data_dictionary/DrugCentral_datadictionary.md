@@ -1,6 +1,7 @@
 # DrugCentral Data Dictionary
 **last updated: 9/1/2021**
 
+
  | ﻿table_name |column_name |data_type |column_descr | |
  |--- | --- | --- | --- | --- |
  | act_table_full | `act_id` | integer(32) | Unique id for activity data |  |
