@@ -22,14 +22,26 @@ python3 -m rdktools.util.Cansmi canonicalize \
 ###
 python3 -m BioClients.pubchem.Client get_smi2cid \
 	--i ${DATADIR}/LS_Mapping.smiles \
-	--o ${DATADIR}/LS_Mapping_PubChem-CID.tsv
+	--o ${DATADIR}/LS_Mapping_PubChem.tsv
 # INFO:Input IDs: 856
 # INFO:SMIs: 856; CIDs out: 743
-
+#
+cat ${DATADIR}/LS_Mapping_PubChem.tsv \
+	|sed '1d' |awk -F '\t' '{print $1}' |grep -v '^$' |sort -u \
+	>${DATADIR}/LS_Mapping_PubChem.cid
+printf "LS CIDs: %d\n" $(cat ${DATADIR}/LS_Mapping_PubChem.cid |wc -l)
+# LS CIDs: 737
+###
+cat ${DATADIR}/SM_LINCS_10272021.tsv \
+	|sed '1d' |awk -F '\t' '{print $2}' |grep -v '^$' |sort -u \
+	>${DATADIR}/SM_LINCS_10272021.cid
+printf "LINCS CIDs: %d\n" $(cat ${DATADIR}/SM_LINCS_10272021.cid |wc -l)
+# LINCS CIDs: 43827
+#
 ###
 (cd $DATADIR; ${cwd}/pdmerge.py)
-# LS_Mapping_PubChem-CID.tsv: rows: 743
-# LS_Mapping_PubChem-CID.tsv: unique CIDs: 737
+# LS_Mapping_PubChem.tsv: rows: 743
+# LS_Mapping_PubChem.tsv: unique CIDs: 737
 # SM_LINCS_10272021.tsv: rows: 44346
 # SM_LINCS_10272021.tsv: unique CIDs: 43827
 # CIDS from Leadscope in LINCS: 243
