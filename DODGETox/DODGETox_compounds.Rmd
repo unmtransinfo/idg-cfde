@@ -47,7 +47,7 @@ display_venn <- function(x, ...) {
 ## LeadScope
 
 ```{r}
-LS_Mapping <- read_delim("/disk2/data/CFDE/DODGETox/LS_Mapping_PubChem.tsv", "\t")
+LS_Mapping <- read_delim(paste0(Sys.getenv()["HOME"], "/../data/CFDE/DODGETox/LS_Mapping_PubChem.tsv"), "\t")
 setDT(LS_Mapping)
 LS_CIDs <- unique(LS_Mapping[, CID])
 ```
@@ -57,7 +57,7 @@ LS_CIDs <- unique(LS_Mapping[, CID])
 Why LINCS cpds with no CIDs? (~1%)
 
 ```{r}
-SM_LINCS <- read_delim("/disk2/data/CFDE/DODGETox/SM_LINCS_10272021.tsv", "\t")
+SM_LINCS <- read_delim(paste0(Sys.getenv()["HOME"], "/../data/CFDE/DODGETox/SM_LINCS_10272021.tsv"), "\t")
 setDT(SM_LINCS)
 SM_LINCS_CIDs <- unique(SM_LINCS[!is.na(SM_PubChem_CID), SM_PubChem_CID])
 message(sprintf("SM_LINCS with CID: %d / %d (%.1f%%)", 
@@ -69,15 +69,15 @@ message(sprintf("SM_LINCS with CID: %d / %d (%.1f%%)",
 ## ReproTox
 
 ```{r}
-ReproTox_data_Blood <- read_delim("/disk2/data/CFDE/DODGETox/ReproTox_data-Blood_PubChem_cas2cid.tsv", "\t")
+ReproTox_data_Blood <- read_delim(paste0(Sys.getenv()["HOME"], "/../data/CFDE/DODGETox/ReproTox_data-Blood_PubChem_cas2cid.tsv"), "\t")
 setDT(ReproTox_data_Blood)
 ReproTox_data_Blood_CIDs <- unique(ReproTox_data_Blood[, CID])
 
-ReproTox_data_Cardiovascular <- read_delim("/disk2/data/CFDE/DODGETox/ReproTox_data-Cardiovascular_PubChem_cas2cid.tsv", "\t")
+ReproTox_data_Cardiovascular <- read_delim(paste0(Sys.getenv()["HOME"], "/../data/CFDE/DODGETox/ReproTox_data-Cardiovascular_PubChem_cas2cid.tsv"), "\t")
 setDT(ReproTox_data_Cardiovascular)
 ReproTox_data_Cardiovascular_CIDs <- unique(ReproTox_data_Cardiovascular[, CID])
 
-ReproTox_data_CNS <- read_delim("/disk2/data/CFDE/DODGETox/ReproTox_data-CNS_PubChem_cas2cid.tsv", "\t")
+ReproTox_data_CNS <- read_delim(paste0(Sys.getenv()["HOME"], "/../data/CFDE/DODGETox/ReproTox_data-CNS_PubChem_cas2cid.tsv"), "\t")
 setDT(ReproTox_data_CNS)
 ReproTox_data_CNS_CIDs <- unique(ReproTox_data_CNS[, CID])
 ```
