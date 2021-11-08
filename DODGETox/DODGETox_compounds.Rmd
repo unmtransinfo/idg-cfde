@@ -1,0 +1,117 @@
+---
+title: "DODGE-Tox compounds"
+author: "Jeremy Yang"
+output:
+  html_document:
+    fig_caption: yes
+    number_sections: yes
+    toc: yes
+  pdf_document:
+    toc: yes
+editor_options:
+  chunk_output_type: console
+---
+
+# Introduction
+
+Initial analysis of compound membership for DODGE-Tox, using PubChem CIDs as
+unique compound identifier.
+
+* LeadScope compounds mapped from SMILES to CIDs via PubChem REST API.
+* ReproTox compounds mapped from CAS Registry Numbers to CIDs via PubChem REST API.
+* LINCS compounds (almost) all have CIDs.
+
+
+```{r echo=FALSE, message=FALSE}
+knitr::opts_chunk$set(echo=FALSE, message=FALSE)
+base::date() 
+```          
+             
+```{r echo=FALSE, message=FALSE}
+library(readr)
+library(data.table)
+require(grid)
+require(futile.logger)
+library(VennDiagram)
+flog.appender(appender.console(), name='VennDiagram') #VennDiagram log messages to console.
+
+display_venn <- function(x, ...) {
+  grid.newpage()
+  venn_object <- venn.diagram(x, filename=NULL, ...)
+  grid.draw(venn_object)
+}
+```
+
+# Read files
+
+## LeadScope
+
+```{r}
+LS_Mapping <- read_delim("/disk2/data/CFDE/DODGETox/LS_Mapping_PubChem.tsv", "\t")
+setDT(LS_Mapping)
+LS_CIDs <- unique(LS_Mapping[, CID])
+```
+
+## LINCS
+
+Why LINCS cpds with no CIDs? (~1%)
+
+```{r}
+SM_LINCS <- read_delim("/disk2/data/CFDE/DODGETox/SM_LINCS_10272021.tsv", "\t")
+setDT(SM_LINCS)
+SM_LINCS_CIDs <- unique(SM_LINCS[!is.na(SM_PubChem_CID), SM_PubChem_CID])
+message(sprintf("SM_LINCS with CID: %d / %d (%.1f%%)", 
+	nrow(SM_LINCS[!is.na(SM_PubChem_CID)]),
+	nrow(SM_LINCS),
+	100*nrow(SM_LINCS[!is.na(SM_PubChem_CID)]) / nrow(SM_LINCS)))
+```
+
+## ReproTox
+
+```{r}
+ReproTox_data_Blood <- read_delim("/disk2/data/CFDE/DODGETox/ReproTox_data-Blood_PubChem_cas2cid.tsv", "\t")
+setDT(ReproTox_data_Blood)
+ReproTox_data_Blood_CIDs <- unique(ReproTox_data_Blood[, CID])
+
+ReproTox_data_Cardiovascular <- read_delim("/disk2/data/CFDE/DODGETox/ReproTox_data-Cardiovascular_PubChem_cas2cid.tsv", "\t")
+setDT(ReproTox_data_Cardiovascular)
+ReproTox_data_Cardiovascular_CIDs <- unique(ReproTox_data_Cardiovascular[, CID])
+
+ReproTox_data_CNS <- read_delim("/disk2/data/CFDE/DODGETox/ReproTox_data-CNS_PubChem_cas2cid.tsv", "\t")
+setDT(ReproTox_data_CNS)
+ReproTox_data_CNS_CIDs <- unique(ReproTox_data_CNS[, CID])
+```
+
+# Venn diagrams from compound sets (by PubChem CID).
+
+## LeadScope, LINCS, ReproTox-Blood, ReproTox-Cardiovascular, ReproTox-CNS
+
+```{r}
+X <- list(
+	ReproTox_Blood = ReproTox_data_Blood_CIDs, 
+	ReproTox_Cardiovascular = ReproTox_data_Cardiovascular_CIDs, 
+	ReproTox_CNS = ReproTox_data_CNS_CIDs,
+	LINCS = SM_LINCS_CIDs,
+	LeadScope = LS_CIDs)
+display_venn(X, fill = c("#0073C2FF", "#EFC000FF", "#868686FF", "pink", "cyan"))
+```
+
+## ReproTox-Blood, ReproTox-Cardiovascular, ReproTox-CNS
+
+```{r}
+X <- list(
+	ReproTox_Blood = ReproTox_data_Blood_CIDs, 
+	ReproTox_Cardiovascular = ReproTox_data_Cardiovascular_CIDs, 
+	ReproTox_CNS = ReproTox_data_CNS_CIDs)
+display_venn(X, fill=c("#0073C2FF", "#EFC000FF", "#868686FF"))
+```
+
+## LeadScope, LINCS, ReproTox-ALL
+
+```{r}
+X <- list(
+ReproTox_ALL = unique(c(ReproTox_data_Blood_CIDs, ReproTox_data_Cardiovascular_CIDs, ReproTox_data_CNS_CIDs)),
+	LINCS = SM_LINCS_CIDs,
+	LeadScope = LS_CIDs)
+display_venn(X, fill = c("#868686FF", "pink", "cyan"))
+```
