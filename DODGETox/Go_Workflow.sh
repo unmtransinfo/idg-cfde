@@ -7,13 +7,13 @@ DATADIR="$(cd $HOME/../data/CFDE/DODGETox; pwd)"
 #
 ###
 python3 -m rdktools.standard.App standardize \
-	--i ${DATADIR}/LS_Mapping.smiles --smilesColumn 0 --nameColumn 1
+	--i ${DATADIR}/LS_Mapping_UMiami.smiles --smilesColumn 0 --nameColumn 1
 # INFO:Mols in: 856; mols out: 856; empty mols: 75
 # INFO:Errors: 3
 
 ###
 python3 -m rdktools.util.Cansmi canonicalize \
-	--i ${DATADIR}/LS_Mapping.smiles
+	--i ${DATADIR}/LS_Mapping_UMiami.smiles
 # INFO:Mols in: 856; mols out: 856
 # INFO:Empty mols: 75; non-empty mols: 781
 # INFO:Unique canonical SMILES: 771
@@ -21,7 +21,7 @@ python3 -m rdktools.util.Cansmi canonicalize \
 
 ###
 python3 -m BioClients.pubchem.Client get_smi2cid \
-	--i ${DATADIR}/LS_Mapping.smiles \
+	--i ${DATADIR}/LS_Mapping_UMiami.smiles \
 	--o ${DATADIR}/LS_Mapping_PubChem.tsv
 # INFO:Input IDs: 856
 # INFO:SMIs: 856; CIDs out: 743

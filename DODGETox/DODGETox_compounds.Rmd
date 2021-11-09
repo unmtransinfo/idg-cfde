@@ -44,14 +44,6 @@ display_venn <- function(x, ...) {
 
 # Read files
 
-## LeadScope
-
-```{r}
-LS_Mapping <- read_delim(paste0(Sys.getenv()["HOME"], "/../data/CFDE/DODGETox/LS_Mapping_PubChem.tsv"), "\t")
-setDT(LS_Mapping)
-LS_CIDs <- unique(LS_Mapping[, CID])
-```
-
 ## LINCS
 
 Why LINCS cpds with no CIDs? (~1%)
@@ -67,6 +59,9 @@ message(sprintf("SM_LINCS with CID: %d / %d (%.1f%%)",
 ```
 
 ## ReproTox
+
+Reproductive and developmental toxicity dataset excerpted from CDC-RTECS, provided by LeadScope.
+RTECS = Registry of Toxic Effects of Chemical Substances (https://cdc.gov/niosh/rtecs).
 
 ```{r}
 ReproTox_data_Blood <- read_delim(paste0(Sys.getenv()["HOME"], "/../data/CFDE/DODGETox/ReproTox_data-Blood_PubChem_cas2cid.tsv"), "\t")
@@ -84,16 +79,15 @@ ReproTox_data_CNS_CIDs <- unique(ReproTox_data_CNS[, CID])
 
 # Venn diagrams from compound sets (by PubChem CID).
 
-## LeadScope, LINCS, ReproTox-Blood, ReproTox-Cardiovascular, ReproTox-CNS
+## LINCS, ReproTox-Blood, ReproTox-Cardiovascular, ReproTox-CNS
 
 ```{r}
 X <- list(
 	ReproTox_Blood = ReproTox_data_Blood_CIDs, 
 	ReproTox_Cardiovascular = ReproTox_data_Cardiovascular_CIDs, 
 	ReproTox_CNS = ReproTox_data_CNS_CIDs,
-	LINCS = SM_LINCS_CIDs,
-	LeadScope = LS_CIDs)
-display_venn(X, fill = c("#0073C2FF", "#EFC000FF", "#868686FF", "pink", "cyan"))
+	LINCS = SM_LINCS_CIDs)
+display_venn(X, fill = c("#0073C2FF", "#EFC000FF", "#868686FF", "pink"), main="LINCS and RTECS-ReproTox chemical datasets by CID")
 ```
 
 ## ReproTox-Blood, ReproTox-Cardiovascular, ReproTox-CNS
@@ -103,15 +97,14 @@ X <- list(
 	ReproTox_Blood = ReproTox_data_Blood_CIDs, 
 	ReproTox_Cardiovascular = ReproTox_data_Cardiovascular_CIDs, 
 	ReproTox_CNS = ReproTox_data_CNS_CIDs)
-display_venn(X, fill=c("#0073C2FF", "#EFC000FF", "#868686FF"))
+display_venn(X, fill=c("#0073C2FF", "#EFC000FF", "#868686FF"), main="RTECS-ReproTox chemical datasets by CID")
 ```
 
-## LeadScope, LINCS, ReproTox-ALL
+## LINCS, ReproTox-ALL
 
 ```{r}
 X <- list(
 ReproTox_ALL = unique(c(ReproTox_data_Blood_CIDs, ReproTox_data_Cardiovascular_CIDs, ReproTox_data_CNS_CIDs)),
-	LINCS = SM_LINCS_CIDs,
-	LeadScope = LS_CIDs)
-display_venn(X, fill = c("#868686FF", "pink", "cyan"))
+	LINCS = SM_LINCS_CIDs)
+display_venn(X, fill = c("#868686FF", "pink"), main="(1) LINCS and (2) RTECS-ReproTox chemical datasets (combined) by CID")
 ```
