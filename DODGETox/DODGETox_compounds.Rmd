@@ -14,13 +14,11 @@ editor_options:
 
 # Introduction
 
-Initial analysis of compound membership for DODGE-Tox, using PubChem CIDs as
+Initial analysis of compound membership for DODGE-Tox, using (1) Canonical SMILES or (2) PubChem CIDs as
 unique compound identifier.
 
-* LeadScope compounds mapped from SMILES to CIDs via PubChem REST API.
-* ReproTox compounds mapped from CAS Registry Numbers to CIDs via PubChem REST API.
-* LINCS compounds (almost) all have CIDs.
-
+RTECS-ReproTox: Reproductive and developmental toxicity dataset excerpted from CDC-RTECS, provided by LeadScope.
+RTECS = Registry of Toxic Effects of Chemical Substances (https://cdc.gov/niosh/rtecs).
 
 ```{r echo=FALSE, message=FALSE}
 knitr::opts_chunk$set(echo=FALSE, message=FALSE)
@@ -42,11 +40,69 @@ display_venn <- function(x, ...) {
 }
 ```
 
-# Read files
+# Compound sets by CFDE-RDKit Canonical SMILES
 
-## LINCS
+Canonical SMILES are not globally canonical, thus must be canonicalized via the same algorithm, in this case the RDKit-based CFDE Cheminformatics Db and DevEnv.
+
+## Venn diagrams
+
+```{r}
+LS_Cansmi <- read_delim(paste0(Sys.getenv()["HOME"], "/../data/CFDE/DODGETox/LS_Mapping_UMiami_std_can.smi"), "\t", col_names=c("CANSMI", "LS_ID"))
+setDT(LS_Cansmi)
+LINCS_Cansmi <- read_delim(paste0(Sys.getenv()["HOME"], "/../data/CFDE/DODGETox/SM_LINCS_10272021_std_can.smi"), "\t", col_names=c("CANSMI", "LCS_ID"))
+setDT(LINCS_Cansmi)
+LS2DiseaseArea <- read_delim(paste0(Sys.getenv()["HOME"], "/../data/CFDE/DODGETox/LS_mapping_MSSM.tsv"), "\t", col_names=c("LS_ID", "DiseaseArea"))
+setDT(LS2DiseaseArea)
+```
+
+### LINCS, ReproTox-ALL
+
+```{r}
+X <- list(
+	LINCS = LINCS_Cansmi[!is.na(CANSMI), CANSMI], 
+	ReproTox = LS_Cansmi[!is.na(CANSMI), CANSMI])
+display_venn(X, fill=c("pink", "cyan"), main="RTECS-ReproTox and LINCS chemical datasets by CFDE-RDKit-Cansmi")
+```
+
+### ReproTox-Blood, ReproTox-Cardiovascular, ReproTox-CNS
+
+```{r}
+LS_Blood <- LS2DiseaseArea[DiseaseArea=="Blood"]
+LS_Blood <- merge(LS_Blood, LS_Cansmi, by="LS_ID", all.x=T, all.y=F)
+LS_Cardiovascular <- LS2DiseaseArea[DiseaseArea=="CV"]
+LS_Cardiovascular <- merge(LS_Cardiovascular, LS_Cansmi, by="LS_ID", all.x=T, all.y=F)
+LS_CNS <- LS2DiseaseArea[DiseaseArea=="CNS"]
+LS_CNS <- merge(LS_CNS, LS_Cansmi, by="LS_ID", all.x=T, all.y=F)
+X <- list(
+	ReproTox_Blood = LS_Blood[!is.na(CANSMI), CANSMI],
+	ReproTox_Cardiovascular = LS_Cardiovascular[!is.na(CANSMI), CANSMI],
+	ReproTox_CNS = LS_CNS[!is.na(CANSMI), CANSMI]
+	)
+display_venn(X, fill=c("#0073C2FF", "#EFC000FF", "#868686FF"), main="RTECS-ReproTox chemical datasets by CFDE-RDKit-Cansmi")
+```
+
+### LINCS, ReproTox-Blood, ReproTox-Cardiovascular, ReproTox-CNS
+
+```{r}
+X <- list(
+  LINCS = LINCS_Cansmi[!is.na(CANSMI), CANSMI],
+	ReproTox_Blood = LS_Blood[!is.na(CANSMI), CANSMI],
+	ReproTox_Cardiovascular = LS_Cardiovascular[!is.na(CANSMI), CANSMI],
+	ReproTox_CNS = LS_CNS[!is.na(CANSMI), CANSMI]
+	)
+display_venn(X, fill=c("pink", "#0073C2FF", "#EFC000FF", "#868686FF"), main="LINCS and RTECS-ReproTox chemical datasets by CFDE-RDKit-Cansmi")
+```
+
+
+# Compound sets by PubChem CID.
+
+* SMILES to CIDs via PubChem REST API.
+* CAS Registry Numbers mapped to CIDs via PubChem REST API.
+* LINCS compounds (almost) all have CIDs.
 
 Why LINCS cpds with no CIDs? (~1%)
+
+## Venn diagrams
 
 ```{r}
 SM_LINCS <- read_delim(paste0(Sys.getenv()["HOME"], "/../data/CFDE/DODGETox/SM_LINCS_10272021.tsv"), "\t")
@@ -58,10 +114,7 @@ message(sprintf("SM_LINCS with CID: %d / %d (%.1f%%)",
 	100*nrow(SM_LINCS[!is.na(SM_PubChem_CID)]) / nrow(SM_LINCS)))
 ```
 
-## ReproTox
 
-Reproductive and developmental toxicity dataset excerpted from CDC-RTECS, provided by LeadScope.
-RTECS = Registry of Toxic Effects of Chemical Substances (https://cdc.gov/niosh/rtecs).
 
 ```{r}
 ReproTox_data_Blood <- read_delim(paste0(Sys.getenv()["HOME"], "/../data/CFDE/DODGETox/ReproTox_data-Blood_PubChem_cas2cid.tsv"), "\t")
@@ -77,20 +130,17 @@ setDT(ReproTox_data_CNS)
 ReproTox_data_CNS_CIDs <- unique(ReproTox_data_CNS[, CID])
 ```
 
-# Venn diagrams from compound sets (by PubChem CID).
-
-## LINCS, ReproTox-Blood, ReproTox-Cardiovascular, ReproTox-CNS
+### LINCS, ReproTox-ALL
 
 ```{r}
 X <- list(
-	ReproTox_Blood = ReproTox_data_Blood_CIDs, 
-	ReproTox_Cardiovascular = ReproTox_data_Cardiovascular_CIDs, 
-	ReproTox_CNS = ReproTox_data_CNS_CIDs,
-	LINCS = SM_LINCS_CIDs)
-display_venn(X, fill = c("#0073C2FF", "#EFC000FF", "#868686FF", "pink"), main="LINCS and RTECS-ReproTox chemical datasets by CID")
+	LINCS = SM_LINCS_CIDs,
+	ReproTox_ALL = unique(c(ReproTox_data_Blood_CIDs, ReproTox_data_Cardiovascular_CIDs, ReproTox_data_CNS_CIDs))
+)
+display_venn(X, fill = c("pink", "cyan"), main="(1) LINCS and (2) RTECS-ReproTox chemical datasets (combined) by CID")
 ```
 
-## ReproTox-Blood, ReproTox-Cardiovascular, ReproTox-CNS
+### ReproTox-Blood, ReproTox-Cardiovascular, ReproTox-CNS
 
 ```{r}
 X <- list(
@@ -100,11 +150,14 @@ X <- list(
 display_venn(X, fill=c("#0073C2FF", "#EFC000FF", "#868686FF"), main="RTECS-ReproTox chemical datasets by CID")
 ```
 
-## LINCS, ReproTox-ALL
+
+### LINCS, ReproTox-Blood, ReproTox-Cardiovascular, ReproTox-CNS
 
 ```{r}
 X <- list(
-ReproTox_ALL = unique(c(ReproTox_data_Blood_CIDs, ReproTox_data_Cardiovascular_CIDs, ReproTox_data_CNS_CIDs)),
+	ReproTox_Blood = ReproTox_data_Blood_CIDs, 
+	ReproTox_Cardiovascular = ReproTox_data_Cardiovascular_CIDs, 
+	ReproTox_CNS = ReproTox_data_CNS_CIDs,
 	LINCS = SM_LINCS_CIDs)
-display_venn(X, fill = c("#868686FF", "pink"), main="(1) LINCS and (2) RTECS-ReproTox chemical datasets (combined) by CID")
+display_venn(X, fill = c("#0073C2FF", "#EFC000FF", "#868686FF", "pink"), main="LINCS and RTECS-ReproTox chemical datasets by CID")
 ```
