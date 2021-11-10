@@ -62,7 +62,8 @@ done
 
 ###
 # INFO:Input IDs: 600
-# INFO:n_name: 600; n_sid: 17577; n_sid_unique: 17575; n_cid: 17233; n_cid_unique: 1017
+# INFO:n_name: 600; n_sid: 36862; n_sid_unique: 36839; n_cid: 36151; n_cid_unique: 2512
+# INFO:elapsed time: 03h:50m:35s
 # ReproTox "CNS" CAS RNs found: 589/600 (98%)
 
 ###
