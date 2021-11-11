@@ -6,6 +6,7 @@ cwd=$(pwd)
 DATADIR="$(cd $HOME/../data/CFDE/DODGETox; pwd)"
 #
 ###
+source $(dirname $(which conda))/../bin/activate rdkit
 python3 -m rdktools.standard.App standardize \
 	--i ${DATADIR}/LS_Mapping_UMiami.smiles --smilesColumn 0 --nameColumn 1 \
 	--o ${DATADIR}/LS_Mapping_UMiami_std.smi
@@ -17,6 +18,7 @@ python3 -m rdktools.util.Cansmi canonicalize \
 # INFO:Mols in: 856; mols out: 856; empty mols: 75
 # INFO:Unique CANONICAL SMILES: 771
 # INFO:Errors: 0
+conda deactivate
 ###
 python3 -m BioClients.pubchem.Client get_smi2cid \
 	--i ${DATADIR}/LS_Mapping_UMiami.smiles \
@@ -52,7 +54,7 @@ python3 -m rdktools.standard.App standardize \
 # ERROR:[N=44278]: standardize failed: Explicit valence for atom # 6 Cl, 2, is greater than permitted
 ###
 python3 -m rdktools.util.Cansmi canonicalize \
-	--i ${DATADIR}/SM_LINCS_10272021_std.smi
+	--i ${DATADIR}/SM_LINCS_10272021_std.smi \
 	--o ${DATADIR}/SM_LINCS_10272021_std_can.smi
 # INFO:Mols in: 44345; mols out: 44345
 # INFO:Empty mols: 128; non-empty mols: 44217
