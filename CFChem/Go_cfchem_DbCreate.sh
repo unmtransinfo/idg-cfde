@@ -16,25 +16,27 @@
 #
 T0=$(date +%s)
 #
-DBNAME="refmet"
+DBNAME="cfchem"
 DBSCHEMA="public"
 DBHOST="localhost"
-#
-REFMET_DIR="$(cd $HOME/../data/RefMet; pwd)"
-csvfile="$REFMET_DIR/refmet.csv.gz"
 #
 cwd=$(pwd)
 #
 dropdb $DBNAME
 createdb $DBNAME
 #
-gunzip -c $csvfile \
+###
+# LOAD RefMet:
+REFMET_DIR="$(cd $HOME/../data/RefMet; pwd)"
+refmet_csvfile="$REFMET_DIR/refmet.csv.gz"
+#
+gunzip -c $refmet_csvfile \
 	|${cwd}/python/csv2sql.py create \
 		--tablename "refmet" --fixtags --maxchar 2000 \
 		--coltypes "CHAR,CHAR,CHAR,CHAR,CHAR,CHAR,CHAR,CHAR,INT" \
 	|psql -d $DBNAME
 #
-gunzip -c $csvfile \
+gunzip -c $refmet_csvfile \
 	|${cwd}/python/csv2sql.py insert \
 		--tablename "refmet" --fixtags --maxchar 2000 \
 		--coltypes "CHAR,CHAR,CHAR,CHAR,CHAR,CHAR,CHAR,CHAR,INT" \
@@ -47,8 +49,8 @@ COLS="smiles refmet_name inchi_key"
 for col in $COLS ; do
 	psql -d $DBNAME -c "UPDATE refmet SET $col = NULL WHERE $col = ''";
 done
-#
-### Create mols table for RDKit structural searching.
+###
+# Create mols table for RDKit structural searching.
 #
 sudo -u postgres psql -d $DBNAME -c 'CREATE EXTENSION rdkit'
 #
