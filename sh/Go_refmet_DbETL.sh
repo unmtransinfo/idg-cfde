@@ -73,6 +73,8 @@ WHERE
 __EOF__
 #
 psql -d $DBNAME -c "ALTER TABLE mols ADD COLUMN id SERIAL PRIMARY KEY"
+psql -d $DBNAME -c "ALTER TABLE mols ADD COLUMN name VARCHAR(100)"
+psql -d $DBNAME -c "UPDATE mols SET name = refmet.refmet_name FROM refmet WHERE refmet.cansmi = mols.cansmi AND mols.cansmi IS NOT NULL"
 #
 psql -d $DBNAME -c "ALTER TABLE refmet ADD COLUMN mol_id INT"
 psql -d $DBNAME -c "UPDATE refmet SET mol_id = m.id FROM mols m WHERE refmet.cansmi = m.cansmi"
