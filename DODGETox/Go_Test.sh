@@ -36,7 +36,7 @@ set -x
 #
 run_test "Blood" "32222-06-3"
 #
-run_test "Cardiovascular" "50-14-6"
+run_test "CV" "50-14-6"
 #
 run_test "CNS" "13292-46-1"
 #

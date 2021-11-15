@@ -25,7 +25,7 @@ printf "LINCS CIDs: %d\n" $(cat ${DATADIR}/SM_LINCS_10272021.cid |wc -l)
 # LINCS CIDs: 43827
 #
 ###
-for TERM in "Blood" "Cardiovascular" "CNS"; do
+for TERM in "Blood" "CV" "CNS"; do
 	cat ${DATADIR}/ReproTox_data-${TERM}.tsv |sed '1d' |awk -F '\t' '{print $2}' |grep -v '^$' |sort -u >${DATADIR}/ReproTox_data-${TERM}.casrn
 	python3 -m BioClients.pubchem.Client get_name2cid --i ${DATADIR}/ReproTox_data-${TERM}.casrn --o ${DATADIR}/ReproTox_data-${TERM}_PubChem_cas2cid.tsv
 	n="$(cat ${DATADIR}/ReproTox_data-${TERM}.casrn |wc -l)"
@@ -48,10 +48,10 @@ done
 # INFO:Input IDs: 272
 # INFO:n_name: 272; n_sid: 18463; n_sid_unique: 18452; n_cid: 18165; n_cid_unique: 1095
 # INFO:elapsed time: 01h:55m:01s
-# ReproTox "Cardiovascular" CAS RNs found: 266/272 (97%)
+# ReproTox "CV" CAS RNs found: 266/272 (97%)
 #
 ###
-for TERM in "Blood" "Cardiovascular" "CNS"; do
+for TERM in "Blood" "CV" "CNS"; do
 	cat ${DATADIR}/ReproTox_data-${TERM}_PubChem_cas2cid.tsv |sed '1d' |awk -F '\t' '{print $2}' |sort -u >${DATADIR}/ReproTox_data-${TERM}.sid
 	printf "ReproTox_data-${TERM} SIDs: %d\n" $(cat ${DATADIR}/ReproTox_data-${TERM}.sid |wc -l)
 	cat ${DATADIR}/ReproTox_data-${TERM}_PubChem_cas2cid.tsv |sed '1d' |awk -F '\t' '{print $3}' |sort -u >${DATADIR}/ReproTox_data-${TERM}.cid
@@ -59,7 +59,7 @@ for TERM in "Blood" "Cardiovascular" "CNS"; do
 done
 ###
 # CAS Common Chemistry API
-for TERM in "Blood" "Cardiovascular" "CNS"; do
+for TERM in "Blood" "CV" "CNS"; do
 	python3 -m BioClients.cas.Client get_rn2details \
 		--i ${DATADIR}/ReproTox_data-${TERM}.casrn \
 		--o ${DATADIR}/ReproTox_data-${TERM}_cas.tsv

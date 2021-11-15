@@ -25,14 +25,16 @@ knitr::opts_chunk$set(echo=FALSE, message=FALSE)
 base::date() 
 ```          
              
-```{r echo=FALSE, message=FALSE}
+```{r echo=FALSE, message=FALSE, results="hide"}
 library(readr)
 library(data.table)
 require(grid)
 require(futile.logger)
 library(VennDiagram)
 flog.appender(appender.console(), name='VennDiagram') #VennDiagram log messages to console.
+```
 
+```{r echo=FALSE, message=FALSE, results="hide"}
 display_venn <- function(x, ...) {
   grid.newpage()
   venn_object <- venn.diagram(x, filename=NULL, ...)
@@ -44,8 +46,6 @@ display_venn <- function(x, ...) {
 
 Canonical SMILES are not globally canonical, thus must be canonicalized via the same algorithm, in this case the RDKit-based CFDE Cheminformatics Db and DevEnv.
 
-## Venn diagrams
-
 ```{r}
 LS_Cansmi <- read_delim(paste0(Sys.getenv()["HOME"], "/../data/CFDE/DODGETox/LS_Mapping_UMiami_std_can.smi"), "\t", col_names=c("CANSMI", "LS_ID"))
 setDT(LS_Cansmi)
@@ -55,7 +55,7 @@ LS2DiseaseArea <- read_delim(paste0(Sys.getenv()["HOME"], "/../data/CFDE/DODGETo
 setDT(LS2DiseaseArea)
 ```
 
-### LINCS, ReproTox-ALL
+## LINCS, ReproTox-ALL
 
 ```{r}
 X <- list(
@@ -64,33 +64,57 @@ X <- list(
 display_venn(X, fill=c("pink", "cyan"), main="RTECS-ReproTox and LINCS chemical datasets by CFDE-RDKit-Cansmi")
 ```
 
-### ReproTox-Blood, ReproTox-Cardiovascular, ReproTox-CNS
+## ReproTox-Blood, ReproTox-CV, ReproTox-CNS
+
+CV = Cardiovascular, CNS = Central Nervous System
 
 ```{r}
 LS_Blood <- LS2DiseaseArea[DiseaseArea=="Blood"]
 LS_Blood <- merge(LS_Blood, LS_Cansmi, by="LS_ID", all.x=T, all.y=F)
-LS_Cardiovascular <- LS2DiseaseArea[DiseaseArea=="CV"]
-LS_Cardiovascular <- merge(LS_Cardiovascular, LS_Cansmi, by="LS_ID", all.x=T, all.y=F)
+LS_CV <- LS2DiseaseArea[DiseaseArea=="CV"]
+LS_CV <- merge(LS_CV, LS_Cansmi, by="LS_ID", all.x=T, all.y=F)
 LS_CNS <- LS2DiseaseArea[DiseaseArea=="CNS"]
 LS_CNS <- merge(LS_CNS, LS_Cansmi, by="LS_ID", all.x=T, all.y=F)
 X <- list(
 	ReproTox_Blood = LS_Blood[!is.na(CANSMI), CANSMI],
-	ReproTox_Cardiovascular = LS_Cardiovascular[!is.na(CANSMI), CANSMI],
+	ReproTox_CV = LS_CV[!is.na(CANSMI), CANSMI],
 	ReproTox_CNS = LS_CNS[!is.na(CANSMI), CANSMI]
 	)
 display_venn(X, fill=c("#0073C2FF", "#EFC000FF", "#868686FF"), main="RTECS-ReproTox chemical datasets by CFDE-RDKit-Cansmi")
 ```
 
-### LINCS, ReproTox-Blood, ReproTox-Cardiovascular, ReproTox-CNS
+## LINCS, ReproTox-Blood, ReproTox-CV, ReproTox-CNS
 
 ```{r}
 X <- list(
   LINCS = LINCS_Cansmi[!is.na(CANSMI), CANSMI],
 	ReproTox_Blood = LS_Blood[!is.na(CANSMI), CANSMI],
-	ReproTox_Cardiovascular = LS_Cardiovascular[!is.na(CANSMI), CANSMI],
+	ReproTox_CV = LS_CV[!is.na(CANSMI), CANSMI],
 	ReproTox_CNS = LS_CNS[!is.na(CANSMI), CANSMI]
 	)
 display_venn(X, fill=c("pink", "#0073C2FF", "#EFC000FF", "#868686FF"), main="LINCS and RTECS-ReproTox chemical datasets by CFDE-RDKit-Cansmi")
+```
+
+View chemical structures
+
+```{r}
+library(rcdk)
+depictor <- get.depictor(style='cow')
+img <- view.image.2d(parse.smiles("B([C@H](CC(C)C)NC(=O)[C@H](CC1=CC=CC=C1)NC(=O)C2=NC=CN=C2)(O)O")[[1]], depictor=depictor)
+#plot(1:10, 1:10, pch=19)
+plot.new()
+plot.window(xlim=c(0,600), ylim=c(0,400))
+frame()
+rasterImage(img, xleft=0, ybottom=200, xright=300, ytop=400)
+```
+
+
+
+```{r}
+#view.molecule.2d(mols)
+#view.table is fragile.  Needs non-NA strings.
+moldata <- LS_Blood[!is.na(CANSMI)]
+view.table(parse.smiles(moldata$CANSMI), moldata)
 ```
 
 
@@ -102,10 +126,8 @@ display_venn(X, fill=c("pink", "#0073C2FF", "#EFC000FF", "#868686FF"), main="LIN
 
 Why LINCS cpds with no CIDs? (~1%)
 
-## Venn diagrams
-
-```{r}
-SM_LINCS <- read_delim(paste0(Sys.getenv()["HOME"], "/../data/CFDE/DODGETox/SM_LINCS_10272021.tsv"), "\t")
+```{r warning=FALSE}
+SM_LINCS <- read_delim(paste0(Sys.getenv()["HOME"], "/../data/CFDE/DODGETox/SM_LINCS_10272021.tsv"), "\t", col_types = cols(.default = col_character()))
 setDT(SM_LINCS)
 SM_LINCS_CIDs <- unique(SM_LINCS[!is.na(SM_PubChem_CID), SM_PubChem_CID])
 message(sprintf("SM_LINCS with CID: %d / %d (%.1f%%)", 
@@ -117,46 +139,46 @@ message(sprintf("SM_LINCS with CID: %d / %d (%.1f%%)",
 
 
 ```{r}
-ReproTox_data_Blood <- read_delim(paste0(Sys.getenv()["HOME"], "/../data/CFDE/DODGETox/ReproTox_data-Blood_PubChem_cas2cid.tsv"), "\t")
+ReproTox_data_Blood <- read_delim(paste0(Sys.getenv()["HOME"], "/../data/CFDE/DODGETox/ReproTox_data-Blood_PubChem_cas2cid.tsv"), "\t", col_types = cols(.default = col_character()))
 setDT(ReproTox_data_Blood)
 ReproTox_data_Blood_CIDs <- unique(ReproTox_data_Blood[, CID])
 
-ReproTox_data_Cardiovascular <- read_delim(paste0(Sys.getenv()["HOME"], "/../data/CFDE/DODGETox/ReproTox_data-Cardiovascular_PubChem_cas2cid.tsv"), "\t")
-setDT(ReproTox_data_Cardiovascular)
-ReproTox_data_Cardiovascular_CIDs <- unique(ReproTox_data_Cardiovascular[, CID])
+ReproTox_data_CV <- read_delim(paste0(Sys.getenv()["HOME"], "/../data/CFDE/DODGETox/ReproTox_data-CV_PubChem_cas2cid.tsv"), "\t", col_types = cols(.default = col_character()))
+setDT(ReproTox_data_CV)
+ReproTox_data_CV_CIDs <- unique(ReproTox_data_CV[, CID])
 
-ReproTox_data_CNS <- read_delim(paste0(Sys.getenv()["HOME"], "/../data/CFDE/DODGETox/ReproTox_data-CNS_PubChem_cas2cid.tsv"), "\t")
+ReproTox_data_CNS <- read_delim(paste0(Sys.getenv()["HOME"], "/../data/CFDE/DODGETox/ReproTox_data-CNS_PubChem_cas2cid.tsv"), "\t", col_types = cols(.default = col_character()))
 setDT(ReproTox_data_CNS)
 ReproTox_data_CNS_CIDs <- unique(ReproTox_data_CNS[, CID])
 ```
 
-### LINCS, ReproTox-ALL
+## LINCS, ReproTox-ALL
 
 ```{r}
 X <- list(
 	LINCS = SM_LINCS_CIDs,
-	ReproTox_ALL = unique(c(ReproTox_data_Blood_CIDs, ReproTox_data_Cardiovascular_CIDs, ReproTox_data_CNS_CIDs))
+	ReproTox_ALL = unique(c(ReproTox_data_Blood_CIDs, ReproTox_data_CV_CIDs, ReproTox_data_CNS_CIDs))
 )
 display_venn(X, fill = c("pink", "cyan"), main="(1) LINCS and (2) RTECS-ReproTox chemical datasets (combined) by CID")
 ```
 
-### ReproTox-Blood, ReproTox-Cardiovascular, ReproTox-CNS
+## ReproTox-Blood, ReproTox-CV, ReproTox-CNS
 
 ```{r}
 X <- list(
 	ReproTox_Blood = ReproTox_data_Blood_CIDs, 
-	ReproTox_Cardiovascular = ReproTox_data_Cardiovascular_CIDs, 
+	ReproTox_CV = ReproTox_data_CV_CIDs, 
 	ReproTox_CNS = ReproTox_data_CNS_CIDs)
 display_venn(X, fill=c("#0073C2FF", "#EFC000FF", "#868686FF"), main="RTECS-ReproTox chemical datasets by CID")
 ```
 
 
-### LINCS, ReproTox-Blood, ReproTox-Cardiovascular, ReproTox-CNS
+## LINCS, ReproTox-Blood, ReproTox-CV, ReproTox-CNS
 
 ```{r}
 X <- list(
 	ReproTox_Blood = ReproTox_data_Blood_CIDs, 
-	ReproTox_Cardiovascular = ReproTox_data_Cardiovascular_CIDs, 
+	ReproTox_CV = ReproTox_data_CV_CIDs, 
 	ReproTox_CNS = ReproTox_data_CNS_CIDs,
 	LINCS = SM_LINCS_CIDs)
 display_venn(X, fill = c("#0073C2FF", "#EFC000FF", "#868686FF", "pink"), main="LINCS and RTECS-ReproTox chemical datasets by CID")
