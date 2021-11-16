@@ -1,7 +1,7 @@
 library(readr)
 library(data.table)
 
-LS_UM <- read_delim(paste0(Sys.getenv()["HOME"], "/../data/CFDE/DODGETox/LS_Mapping_UMiami.smiles"), "\t", col_names = c("SMILES", "LS_ID"))
+LS_UM <- read_delim(paste0(Sys.getenv()["HOME"], "/../data/CFDE/ReproTox/LS_Mapping_UMiami.smiles"), "\t", col_names = c("SMILES", "LS_ID"))
 setDT(LS_UM)
 message(sprintf("UM: rows: %d; SMILES: %d; unique(SMILES): %d; missing SMILES: %d; LS_ID: %d; unique(LS_ID): %d", nrow(LS_UM),
                 nrow(LS_UM[!is.na(SMILES)]),
@@ -11,7 +11,7 @@ message(sprintf("UM: rows: %d; SMILES: %d; unique(SMILES): %d; missing SMILES: %
                 LS_UM[!is.na(LS_ID), uniqueN(LS_ID)]
                 ))
 
-LS_MS <- read_delim(paste0(Sys.getenv()["HOME"], "/../data/CFDE/DODGETox/LS_mapping_MSSM.tsv"), "\t", col_names = c("LS_ID", "TERM"))
+LS_MS <- read_delim(paste0(Sys.getenv()["HOME"], "/../data/CFDE/ReproTox/LS_mapping_MSSM.tsv"), "\t", col_names = c("LS_ID", "TERM"))
 setDT(LS_MS)
 message(sprintf("UM: rows: %d; TERM: %d; unique(TERM): %d; LS_ID: %d; unique(LS_ID): %d", nrow(LS_MS),
                 nrow(LS_MS[!is.na(TERM)]),

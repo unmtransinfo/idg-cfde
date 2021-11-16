@@ -1,5 +1,5 @@
 ---
-title: "DODGE-Tox compounds"
+title: "ReproTox compounds"
 author: "Jeremy Yang"
 output:
   html_document:
@@ -14,7 +14,7 @@ editor_options:
 
 # Introduction
 
-Initial analysis of compound membership for DODGE-Tox, using (1) Canonical SMILES or (2) PubChem CIDs as
+Initial analysis of compound membership for Repro-Tox, using (1) Canonical SMILES or (2) PubChem CIDs as
 unique compound identifier.
 
 RTECS-ReproTox: Reproductive and developmental toxicity dataset excerpted from CDC-RTECS, provided by LeadScope.
@@ -48,11 +48,11 @@ display_venn <- function(x, ...) {
 Canonical SMILES are not globally canonical, thus must be canonicalized via the same algorithm, in this case the RDKit-based CFDE Cheminformatics Db and DevEnv.
 
 ```{r}
-LS_Cansmi <- read_delim(paste0(Sys.getenv()["HOME"], "/../data/CFDE/DODGETox/LS_Mapping_UMiami_std_can.smi"), "\t", col_names=c("CANSMI", "LS_ID"))
+LS_Cansmi <- read_delim(paste0(Sys.getenv()["HOME"], "/../data/CFDE/ReproTox/LS_Mapping_UMiami_std_can.smi"), "\t", col_names=c("CANSMI", "LS_ID"))
 setDT(LS_Cansmi)
-LINCS_Cansmi <- read_delim(paste0(Sys.getenv()["HOME"], "/../data/CFDE/DODGETox/SM_LINCS_10272021_std_can.smi"), "\t", col_names=c("CANSMI", "LCS_ID"))
+LINCS_Cansmi <- read_delim(paste0(Sys.getenv()["HOME"], "/../data/CFDE/ReproTox/SM_LINCS_10272021_std_can.smi"), "\t", col_names=c("CANSMI", "LCS_ID"))
 setDT(LINCS_Cansmi)
-LS2DiseaseArea <- read_delim(paste0(Sys.getenv()["HOME"], "/../data/CFDE/DODGETox/LS_mapping_MSSM.tsv"), "\t", col_names=c("LS_ID", "DiseaseArea"))
+LS2DiseaseArea <- read_delim(paste0(Sys.getenv()["HOME"], "/../data/CFDE/ReproTox/LS_mapping_MSSM.tsv"), "\t", col_names=c("LS_ID", "DiseaseArea"))
 setDT(LS2DiseaseArea)
 ```
 
@@ -142,7 +142,7 @@ rasimg
 Why LINCS cpds with no CIDs? (~1%)
 
 ```{r warning=FALSE}
-SM_LINCS <- read_delim(paste0(Sys.getenv()["HOME"], "/../data/CFDE/DODGETox/SM_LINCS_10272021.tsv"), "\t", col_types = cols(.default = col_character()))
+SM_LINCS <- read_delim(paste0(Sys.getenv()["HOME"], "/../data/CFDE/ReproTox/SM_LINCS_10272021.tsv"), "\t", col_types = cols(.default = col_character()))
 setDT(SM_LINCS)
 SM_LINCS_CIDs <- unique(SM_LINCS[!is.na(SM_PubChem_CID), SM_PubChem_CID])
 message(sprintf("SM_LINCS with CID: %d / %d (%.1f%%)", 
@@ -154,15 +154,15 @@ message(sprintf("SM_LINCS with CID: %d / %d (%.1f%%)",
 
 
 ```{r}
-ReproTox_data_Blood <- read_delim(paste0(Sys.getenv()["HOME"], "/../data/CFDE/DODGETox/ReproTox_data-Blood_PubChem_cas2cid.tsv"), "\t", col_types = cols(.default = col_character()))
+ReproTox_data_Blood <- read_delim(paste0(Sys.getenv()["HOME"], "/../data/CFDE/ReproTox/ReproTox_data-Blood_PubChem_cas2cid.tsv"), "\t", col_types = cols(.default = col_character()))
 setDT(ReproTox_data_Blood)
 ReproTox_data_Blood_CIDs <- unique(ReproTox_data_Blood[, CID])
 
-ReproTox_data_CV <- read_delim(paste0(Sys.getenv()["HOME"], "/../data/CFDE/DODGETox/ReproTox_data-CV_PubChem_cas2cid.tsv"), "\t", col_types = cols(.default = col_character()))
+ReproTox_data_CV <- read_delim(paste0(Sys.getenv()["HOME"], "/../data/CFDE/ReproTox/ReproTox_data-CV_PubChem_cas2cid.tsv"), "\t", col_types = cols(.default = col_character()))
 setDT(ReproTox_data_CV)
 ReproTox_data_CV_CIDs <- unique(ReproTox_data_CV[, CID])
 
-ReproTox_data_CNS <- read_delim(paste0(Sys.getenv()["HOME"], "/../data/CFDE/DODGETox/ReproTox_data-CNS_PubChem_cas2cid.tsv"), "\t", col_types = cols(.default = col_character()))
+ReproTox_data_CNS <- read_delim(paste0(Sys.getenv()["HOME"], "/../data/CFDE/ReproTox/ReproTox_data-CNS_PubChem_cas2cid.tsv"), "\t", col_types = cols(.default = col_character()))
 setDT(ReproTox_data_CNS)
 ReproTox_data_CNS_CIDs <- unique(ReproTox_data_CNS[, CID])
 ```
