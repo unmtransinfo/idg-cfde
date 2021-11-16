@@ -3,7 +3,7 @@
 #
 cwd=$(pwd)
 #
-DATADIR="$(cd $HOME/../data/CFDE/DODGETox; pwd)"
+DATADIR="$(cd $HOME/../data/CFDE/ReproTox; pwd)"
 #
 #
 # Why are some CAS RNs mapped to so many PubChem CIDs?
