@@ -66,3 +66,7 @@ for TERM in "Blood" "CV" "CNS"; do
 		--o ${DATADIR}/ReproTox_data-${TERM}_cas.tsv
 done
 ###
+# DrugCentral
+python3 -m BioClients.drugcentral.Client list_structures --o ${DATADIR}/drugcentral_structures.tsv
+python3 -m BioClients.drugcentral.Client list_synonyms --o ${DATADIR}/drugcentral_synonyms.tsv
+#
