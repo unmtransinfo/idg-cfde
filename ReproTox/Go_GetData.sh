@@ -15,9 +15,14 @@ python3 -m BioClients.pubchem.Client get_smi2cid \
 #
 cat ${DATADIR}/LS_Mapping_PubChem.tsv \
 	|sed '1d' |awk -F '\t' '{print $1}' |grep -v '^$' |sort -u \
+	|grep -v '^0$' \
 	>${DATADIR}/LS_Mapping_PubChem.cid
 printf "LS CIDs: %d\n" $(cat ${DATADIR}/LS_Mapping_PubChem.cid |wc -l)
 # LS CIDs: 737
+python3 -m BioClients.pubchem.Client get_cid2synonyms \
+	--i ${DATADIR}/LS_Mapping_PubChem.cid \
+	--o ${DATADIR}/LS_Mapping_PubChem_synonyms.tsv
+#
 ###
 cat ${DATADIR}/SM_LINCS_10272021.tsv \
 	|sed '1d' |awk -F '\t' '{print $2}' |grep -v '^$' |sort -u \
