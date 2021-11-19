@@ -16,7 +16,7 @@
 #
 T0=$(date +%s)
 #
-DBNAME="cfchem"
+DBNAME="cfchemdb"
 DBSCHEMA="public"
 DBHOST="localhost"
 #
@@ -24,92 +24,144 @@ cwd=$(pwd)
 #
 dropdb $DBNAME
 createdb $DBNAME
+psql -d $DBNAME -c "COMMENT ON DATABASE $DBNAME IS 'CFChemDb: Common Fund Data Ecosystem (CFDE) Chemical Database'";
+###
+# Create mols table for RDKit structural searching.
+#sudo -u postgres psql -d $DBNAME -c 'CREATE EXTENSION rdkit'
+psql -d $DBNAME -c 'CREATE EXTENSION rdkit'
+#
+# Molecules table:
+psql -d $DBNAME <<__EOF__
+CREATE TABLE mols (
+	id SERIAL PRIMARY KEY,
+	name VARCHAR(100),
+	cansmi VARCHAR(2000),
+	molecule MOL
+	);
+__EOF__
 #
 ###
 # LOAD RefMet:
 REFMET_DIR="$(cd $HOME/../data/RefMet; pwd)"
 refmet_csvfile="$REFMET_DIR/refmet.csv.gz"
 #
+TNAME="refmet"
 gunzip -c $refmet_csvfile \
-	|${cwd}/python/csv2sql.py create \
-		--tablename "refmet" --fixtags --maxchar 2000 \
+	|${cwd}/../python/csv2sql.py create \
+		--tablename "${TNAME}" --fixtags --maxchar 2000 \
 		--coltypes "CHAR,CHAR,CHAR,CHAR,CHAR,CHAR,CHAR,CHAR,INT" \
 	|psql -d $DBNAME
 #
 gunzip -c $refmet_csvfile \
-	|${cwd}/python/csv2sql.py insert \
-		--tablename "refmet" --fixtags --maxchar 2000 \
+	|${cwd}/../python/csv2sql.py insert \
+		--tablename "${TNAME}" --fixtags --maxchar 2000 \
 		--coltypes "CHAR,CHAR,CHAR,CHAR,CHAR,CHAR,CHAR,CHAR,INT" \
 	|psql -q -d $DBNAME
 #
-psql -d $DBNAME -c "COMMENT ON DATABASE $DBNAME IS 'RefMet: A Reference list of Metabolite names, from the Metabolomics Workbench'";
-psql -d $DBNAME -c "COMMENT ON TABLE refmet IS 'RefMet: A Reference list of Metabolite names, from the Metabolomics Workbench'";
+psql -d $DBNAME -c "COMMENT ON TABLE ${TNAME} IS 'RefMet: A Reference list of Metabolite names, from the Metabolomics Workbench'";
 #
 COLS="smiles refmet_name inchi_key"
 for col in $COLS ; do
-	psql -d $DBNAME -c "UPDATE refmet SET $col = NULL WHERE $col = ''";
+	psql -d $DBNAME -c "UPDATE ${TNAME} SET $col = NULL WHERE $col = ''";
 done
-###
-# Create mols table for RDKit structural searching.
-#
-sudo -u postgres psql -d $DBNAME -c 'CREATE EXTENSION rdkit'
 #
 # N.B.: mol_to_smiles(mol) : returns the canonical SMILES for a molecule.
 #
-psql -d $DBNAME -c "ALTER TABLE refmet ADD COLUMN mol MOL"
-psql -d $DBNAME -c "ALTER TABLE refmet ADD COLUMN cansmi VARCHAR(2000)"
-psql -d $DBNAME -c "UPDATE refmet SET mol = mol_from_smiles(smiles::cstring)"
-psql -d $DBNAME -c "UPDATE refmet SET cansmi = mol_to_smiles(mol)"
-psql -d $DBNAME -c "ALTER TABLE refmet DROP COLUMN mol"
+psql -d $DBNAME -c "ALTER TABLE ${TNAME} ADD COLUMN mol MOL"
+psql -d $DBNAME -c "ALTER TABLE ${TNAME} ADD COLUMN cansmi VARCHAR(2000)"
+psql -d $DBNAME -c "UPDATE ${TNAME} SET mol = mol_from_smiles(smiles::cstring)"
+psql -d $DBNAME -c "UPDATE ${TNAME} SET cansmi = mol_to_smiles(mol)"
+psql -d $DBNAME -c "ALTER TABLE ${TNAME} DROP COLUMN mol"
 #
 psql -d $DBNAME <<__EOF__
+INSERT INTO
+	mols (cansmi, molecule)
 SELECT
-	cansmi
-INTO
-	mols
+	${TNAME}.cansmi, mol_from_smiles(${TNAME}.cansmi::cstring)
 FROM
-	(SELECT DISTINCT cansmi FROM refmet) tmp
+	${TNAME}
 WHERE
-	cansmi IS NOT NULL
+	${TNAME}.cansmi IS NOT NULL
+	AND NOT EXISTS (SELECT cansmi FROM mols WHERE cansmi = ${TNAME}.cansmi)
 	;
 __EOF__
 #
-psql -d $DBNAME -c "ALTER TABLE mols ADD COLUMN id SERIAL PRIMARY KEY"
-psql -d $DBNAME -c "ALTER TABLE mols ADD COLUMN name VARCHAR(100)"
-psql -d $DBNAME -c "UPDATE mols SET name = refmet.refmet_name FROM refmet WHERE refmet.cansmi = mols.cansmi AND mols.cansmi IS NOT NULL"
+psql -d $DBNAME -c "ALTER TABLE ${TNAME} ADD COLUMN mol_id INT"
+psql -d $DBNAME -c "UPDATE ${TNAME} SET mol_id = m.id FROM mols m WHERE ${TNAME}.cansmi = m.cansmi"
 #
-psql -d $DBNAME -c "ALTER TABLE refmet ADD COLUMN mol_id INT"
-psql -d $DBNAME -c "UPDATE refmet SET mol_id = m.id FROM mols m WHERE refmet.cansmi = m.cansmi"
-#
-psql -d $DBNAME -c "ALTER TABLE mols ADD COLUMN mol MOL"
-psql -d $DBNAME -c "UPDATE mols SET mol = mol_from_smiles(cansmi::cstring)"
-psql -d $DBNAME -c "CREATE INDEX molidx ON mols USING gist(mol)"
+printf "REFMET: N_name:\t%6d\n" $(psql -d $DBNAME -qAc "SELECT COUNT(DISTINCT refmet_name) FROM ${TNAME}" |grep '^[0-9]')
+printf "REFMET: N_cid:\t%6d\n" $(psql -d $DBNAME -qAc "SELECT COUNT(DISTINCT pubchem_cid) FROM ${TNAME}" |grep '^[0-9]')
+printf "REFMET: N_cansmi:\t%6d\n" $(psql -d $DBNAME -qAc "SELECT COUNT(DISTINCT cansmi) FROM ${TNAME}" |grep '^[0-9]')
 #
 ###
-N_refmet_name=$(psql -d $DBNAME -qAc "SELECT COUNT(DISTINCT refmet_name) FROM refmet" |grep '^[0-9]')
-N_cid=$(psql -d $DBNAME -qAc "SELECT COUNT(DISTINCT pubchem_cid) FROM refmet" |grep '^[0-9]')
-N_cansmi=$(psql -d $DBNAME -qAc "SELECT COUNT(DISTINCT cansmi) FROM refmet" |grep '^[0-9]')
-N_mol=$(psql -d $DBNAME -qAc "SELECT COUNT(*) FROM mols" |grep '^[0-9]')
-printf "N_refmet_name: ${N_refmet_name}; N_cid: ${N_cid}; N_cansmi: ${N_cansmi}; N_mol: ${N_mol}\n"
+# LOAD LINCS:
+# https://s3.amazonaws.com/lincs-dcic/sigcom-lincs-metadata/LINCS_small_molecules.tsv
+LINCS_DIR="$(cd $HOME/../data/LINCS/data; pwd)"
+lincs_csvfile="$LINCS_DIR/LINCS_small_molecules.tsv"
+TNAME="lincs"
+#pert_name, target, moa, canonical_smiles, inchi_key, compound_aliases, sig_count
+cat $lincs_csvfile \
+	|${cwd}/../python/csv2sql.py create --tsv \
+		--tablename "${TNAME}" --fixtags --maxchar 2000 \
+		--colnames "id,pert_name,target,moa,smiles,inchi_key,compound_aliases,sig_count" \
+		--coltypes "CHAR,CHAR,CHAR,CHAR,CHAR,CHAR,CHAR,INT" \
+	|psql -d $DBNAME
 #
+cat $lincs_csvfile \
+	|${cwd}/../python/csv2sql.py insert --tsv \
+		--tablename "${TNAME}" --fixtags --maxchar 2000 \
+		--colnames "id,pert_name,target,moa,smiles,inchi_key,compound_aliases,sig_count" \
+		--coltypes "CHAR,CHAR,CHAR,CHAR,CHAR,CHAR,CHAR,INT" \
+	|psql -q -d $DBNAME
+#
+psql -d $DBNAME -c "COMMENT ON TABLE ${TNAME} IS 'LINCS: Small molecules from LINCS Sigcom download'";
+#
+COLS="pert_name target moa smiles inchi_key compound_aliases"
+for col in $COLS ; do
+	psql -d $DBNAME -c "UPDATE ${TNAME} SET $col = NULL WHERE $col = '' OR $col = '-'";
+done
+#
+psql -d $DBNAME -c "ALTER TABLE ${TNAME} ADD COLUMN mol MOL"
+psql -d $DBNAME -c "ALTER TABLE ${TNAME} ADD COLUMN cansmi VARCHAR(2000)"
+psql -d $DBNAME -c "UPDATE ${TNAME} SET mol = mol_from_smiles(smiles::cstring)"
+psql -d $DBNAME -c "UPDATE ${TNAME} SET cansmi = mol_to_smiles(mol)"
+psql -d $DBNAME -c "ALTER TABLE ${TNAME} DROP COLUMN mol"
+#
+psql -d $DBNAME <<__EOF__
+INSERT INTO
+	mols (cansmi, molecule)
+SELECT
+	${TNAME}.cansmi, mol_from_smiles(${TNAME}.cansmi::cstring)
+FROM
+	${TNAME}
+WHERE
+	${TNAME}.cansmi IS NOT NULL
+	AND NOT EXISTS (SELECT cansmi FROM mols WHERE cansmi = ${TNAME}.cansmi)
+	;
+__EOF__
+#
+psql -d $DBNAME -c "ALTER TABLE ${TNAME} ADD COLUMN mol_id INT"
+psql -d $DBNAME -c "UPDATE ${TNAME} SET mol_id = m.id FROM mols m WHERE ${TNAME}.cansmi = m.cansmi"
+#
+#
+###
+printf "N_mol:\t%6d\n" $(psql -d $DBNAME -qAc "SELECT COUNT(*) FROM mols" |grep '^[0-9]')
+###
+# Postprocess molecules table for chemical search functionality.
+psql -d $DBNAME -c "CREATE INDEX molidx ON mols USING gist(molecule)"
+#
+###
+# Names?
+#psql -d $DBNAME -c "UPDATE mols SET name = refmet.refmet_name FROM refmet WHERE refmet.cansmi = mols.cansmi AND mols.cansmi IS NOT NULL"
 ### Add FPs to mols table.
-# sfp : a sparse count vector fingerprint (SparseIntVect in C++ and Python)
-# bfp : a bit vector fingerprint (ExplicitBitVect in C++ and Python)
-###
-# morgan_fp(mol,int default 2) : returns an sfp which is the count-based Morgan fingerprint for a molecule using connectivity invariants. The second argument provides the radius. This is an ECFP-like fingerprint.
-# morganbv_fp(mol,int default 2) : returns a bfp which is the bit vector Morgan fingerprint for a molecule using connectivity invariants. The second argument provides the radius. This is an ECFP-like fingerprint.
-# featmorgan_fp(mol,int default 2) : returns an sfp which is the count-based Morgan fingerprint for a molecule using chemical-feature invariants. The second argument provides the radius. This is an FCFP-like fingerprint.
-# featmorganbv_fp(mol,int default 2) : returns a bfp which is the bit vector Morgan fingerprint for a molecule using chemical-feature invariants. The second argument provides the radius. This is an FCFP-like fingerprint.
-# rdkit_fp(mol) : returns a bfp which is the RDKit fingerprint for a molecule. This is a daylight-fingerprint using hashed molecular subgraphs.
-###
 psql -d $DBNAME -c "ALTER TABLE mols ADD COLUMN fp BFP"
 psql -d $DBNAME -c "ALTER TABLE mols ADD COLUMN mfp BFP"
 psql -d $DBNAME -c "ALTER TABLE mols ADD COLUMN ffp BFP"
 psql -d $DBNAME -c "ALTER TABLE mols ADD COLUMN torsionbv BFP"
-psql -d $DBNAME -c "UPDATE mols SET fp = rdkit_fp(mol)"
-psql -d $DBNAME -c "UPDATE mols SET mfp = morganbv_fp(mol)"
-psql -d $DBNAME -c "UPDATE mols SET ffp = featmorganbv_fp(mol)"
-psql -d $DBNAME -c "UPDATE mols SET torsionbv = torsionbv_fp(mol)"
+psql -d $DBNAME -c "UPDATE mols SET fp = rdkit_fp(molecule)"
+psql -d $DBNAME -c "UPDATE mols SET mfp = morganbv_fp(molecule)"
+psql -d $DBNAME -c "UPDATE mols SET ffp = featmorganbv_fp(molecule)"
+psql -d $DBNAME -c "UPDATE mols SET torsionbv = torsionbv_fp(molecule)"
 #
 psql -d $DBNAME -c "CREATE INDEX fps_fp_idx ON mols USING gist(fp)"
 psql -d $DBNAME -c "CREATE INDEX fps_mfp_idx ON mols USING gist(mfp)"
@@ -122,7 +174,7 @@ psql -d $DBNAME -c "CREATE INDEX fps_ttbv_idx ON mols USING gist(torsionbv)"
 psql -d $DBNAME <<__EOF__
 CREATE OR REPLACE FUNCTION
 	rdk_simsearch(smiles TEXT)
-RETURNS TABLE(pubchem_cid INT, mol MOL, similarity double precision) AS
+RETURNS TABLE(pubchem_cid INT, molecule MOL, similarity double precision) AS
 	\$\$
 	SELECT
 		refmet.mol_id,

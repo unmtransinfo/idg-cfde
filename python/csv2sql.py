@@ -161,9 +161,9 @@ def CleanName(name, keywords):
 
 #############################################################################
 def CleanNames(colnames, prefix, keywords):
-  colnames_clean = colnames[:]
-  for j in range(len(colnames_clean)):
-    colnames_clean[j] = CleanName(prefix+colnames_clean[j] if prefix else colnames_clean[j], keywords)
+  colnames_clean = []
+  for colname in colnames:
+    colnames_clean.append(CleanName(prefix+colname if prefix else colname, keywords))
   return colnames_clean
 
 #############################################################################
