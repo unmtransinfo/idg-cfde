@@ -198,3 +198,16 @@ X <- list(
 	LINCS = SM_LINCS_CIDs)
 display_venn(X, fill = c("#0073C2FF", "#EFC000FF", "#868686FF", "pink"), main="LINCS and RTECS-ReproTox chemical datasets by CID")
 ```
+
+## Merge into combo file for CFChemDb.
+
+```{r}
+LS_Pubchem <- read_delim(paste0(Sys.getenv()["HOME"], "/../data/CFDE/ReproTox/LS_Mapping_PubChem.tsv"), "\t", col_types = cols(.default = col_character()))
+setDT(LS_Pubchem)
+setnames(LS_Pubchem, new=c("CID", "SMILES", "LS_ID"))
+ReproTox_data <- rbindlist(list(unique(ReproTox_data_Blood[, .(CAS_RN=Name, CID=CID, TERM="Blood")]), unique(ReproTox_data_CNS[, .(CAS_RN=Name, CID=CID, TERM="CNS")]), unique(ReproTox_data_CV[, .(CAS_RN=Name, CID=CID, TERM="CV")])))
+ReproTox_data <- merge(ReproTox_data, LS_Pubchem, by="CID", all.x=T, all.y=F)
+ReproTox_data <- ReproTox_data[!is.na(LS_ID), .(LS_ID, CAS_RN, CID, SMILES, TERM)]
+write_delim(ReproTox_data, paste0(Sys.getenv()["HOME"], "/../data/CFDE/ReproTox/ReproTox_export.tsv"), delim="\t")
+```
+

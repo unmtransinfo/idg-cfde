@@ -45,18 +45,18 @@ __EOF__
 ###
 # LOAD LINCS:
 # https://s3.amazonaws.com/lincs-dcic/sigcom-lincs-metadata/LINCS_small_molecules.tsv
-LINCS_DIR="$(cd $HOME/../data/LINCS/data; pwd)"
-lincs_csvfile="$LINCS_DIR/LINCS_small_molecules.tsv"
+SRCDATADIR="$(cd $HOME/../data/LINCS/data; pwd)"
+csvfile="$SRCDATADIR/LINCS_small_molecules.tsv"
 TNAME="lincs"
 #pert_name, target, moa, canonical_smiles, inchi_key, compound_aliases, sig_count
-cat $lincs_csvfile \
+cat $csvfile \
 	|${cwd}/../python/csv2sql.py create --tsv \
 		--tablename "${TNAME}" --fixtags --maxchar 2000 \
 		--colnames "id,pert_name,target,moa,smiles,inchi_key,compound_aliases,sig_count" \
 		--coltypes "CHAR,CHAR,CHAR,CHAR,CHAR,CHAR,CHAR,INT" \
 	|psql -d $DBNAME
 #
-cat $lincs_csvfile \
+cat $csvfile \
 	|${cwd}/../python/csv2sql.py insert --tsv \
 		--tablename "${TNAME}" --fixtags --maxchar 2000 \
 		--colnames "id,pert_name,target,moa,smiles,inchi_key,compound_aliases,sig_count" \

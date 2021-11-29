@@ -43,39 +43,30 @@ __EOF__
 }
 #
 ###
-# LOAD RefMet:
-###
-# Columns in refmet.csv.gz:
-# 1. "refmet_name"
-# 2. "super_class"
-# 3. "main_class"
-# 4. "sub_class"
-# 5. "formula"
-# 6. "exactmass"
-# 7. "inchi_key"
-# 8. "smiles"
-# 9. "pubchem_cid"
-SRCDATADIR="$(cd $HOME/../data/RefMet; pwd)"
-csvfile="$SRCDATADIR/refmet.csv.gz"
-#
-TNAME="refmet"
-gunzip -c $csvfile \
-	|${cwd}/../python/csv2sql.py create \
+# LOAD IDG (compounds):
+SRCDATADIR="$(cd $HOME/../data/TCRD/data; pwd)"
+csvfile="$SRCDATADIR/tcrd_compounds.tsv"
+TNAME="idg"
+#cmpd_pubchem_cid,smiles,target_count,activity_count
+cat $csvfile \
+	|${cwd}/../python/csv2sql.py create --tsv \
 		--tablename "${TNAME}" --fixtags --maxchar 2000 \
-		--coltypes "CHAR,CHAR,CHAR,CHAR,CHAR,CHAR,CHAR,CHAR,INT" \
+		--colnames "pubchem_cid,smiles,target_count,activity_count" \
+		--coltypes "CHAR,CHAR,INT,INT" \
 	|psql -d $DBNAME
 #
-gunzip -c $csvfile \
-	|${cwd}/../python/csv2sql.py insert \
+cat $csvfile \
+	|${cwd}/../python/csv2sql.py insert --tsv \
 		--tablename "${TNAME}" --fixtags --maxchar 2000 \
-		--coltypes "CHAR,CHAR,CHAR,CHAR,CHAR,CHAR,CHAR,CHAR,INT" \
+		--colnames "pubchem_cid,smiles,target_count,activity_count" \
+		--coltypes "CHAR,CHAR,INT,INT" \
 	|psql -q -d $DBNAME
 #
-psql -d $DBNAME -c "COMMENT ON TABLE ${TNAME} IS 'RefMet: A Reference list of Metabolite names, from the Metabolomics Workbench'";
+psql -d $DBNAME -c "COMMENT ON TABLE ${TNAME} IS 'IDG-TCRD: Compounds with bioactivity against protein targets'";
 #
-COLS="smiles refmet_name inchi_key"
+COLS="pubchem_cid smiles"
 for col in $COLS ; do
-	psql -d $DBNAME -c "UPDATE ${TNAME} SET $col = NULL WHERE $col = ''";
+	psql -d $DBNAME -c "UPDATE ${TNAME} SET $col = NULL WHERE $col = '' OR $col = '-'";
 done
 #
 AddCansmiColumn $DBNAME $TNAME
@@ -84,11 +75,10 @@ AddMols $DBNAME $TNAME
 psql -d $DBNAME -c "ALTER TABLE ${TNAME} ADD COLUMN mol_id INT"
 psql -d $DBNAME -c "UPDATE ${TNAME} SET mol_id = m.id FROM mols m WHERE ${TNAME}.cansmi = m.cansmi"
 #
-printf "REFMET: N_name:\t%6d\n" $(psql -d $DBNAME -qAc "SELECT COUNT(DISTINCT refmet_name) FROM ${TNAME}" |grep '^[0-9]')
-printf "REFMET: N_cid:\t%6d\n" $(psql -d $DBNAME -qAc "SELECT COUNT(DISTINCT pubchem_cid) FROM ${TNAME}" |grep '^[0-9]')
-printf "REFMET: N_cansmi:\t%6d\n" $(psql -d $DBNAME -qAc "SELECT COUNT(DISTINCT cansmi) FROM ${TNAME}" |grep '^[0-9]')
+printf "IDG: N_cansmi:\t%6d\n" $(psql -d $DBNAME -qAc "SELECT COUNT(DISTINCT cansmi) FROM ${TNAME}" |grep '^[0-9]')
+printf "IDG: N_pubchem_cid:\t%6d\n" $(psql -d $DBNAME -qAc "SELECT COUNT(DISTINCT pubchem_cid) FROM ${TNAME}" |grep '^[0-9]')
 #
-# DONE LOADING REFMET.
+# DONE LOADING IDG.
 ###
 #
 printf "Elapsed time: %ds\n" "$[$(date +%s) - ${T0}]"
