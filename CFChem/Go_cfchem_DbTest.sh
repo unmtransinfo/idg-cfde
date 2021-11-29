@@ -1,7 +1,7 @@
 #!/bin/bash
 ###
 #
-DBNAME="refmet"
+DBNAME="cfchemdb"
 DBSCHEMA="public"
 DBHOST="localhost"
 #
@@ -12,18 +12,21 @@ DBHOST="localhost"
 #	m.mol @= 'CNC[C@H](O)c1ccc(O)c(O)c1'
 #
 psql -d $DBNAME <<__EOF__
-SELECT
-	m.id,
+SELECT DISTINCT
+	mols.id,
+	mols.name,
+	lincs.pert_name,
+	lincs.sig_count,
 	refmet.pubchem_cid,
-	refmet.refmet_name,
-	refmet.smiles,
-	m.cansmi
+	refmet.refmet_name
 FROM
-	mols m
+	mols
 JOIN
-	refmet ON (refmet.mol_id = m.id)
+	lincs ON (lincs.mol_id = mols.id)
+JOIN
+	refmet ON (refmet.mol_id = mols.id)
 WHERE
-	m.mol = 'NCCc1ccc(O)c(O)c1'
+	mols.molecule = 'NCCc1ccc(O)c(O)c1'
 	;
 __EOF__
 #
@@ -31,17 +34,20 @@ __EOF__
 #
 psql -d $DBNAME <<__EOF__
 SELECT
-	m.id,
+	mols.id,
+	mols.name,
+	lincs.pert_name,
+	lincs.sig_count,
 	refmet.pubchem_cid,
-	refmet.refmet_name,
-	refmet.smiles,
-	m.cansmi
+	refmet.refmet_name
 FROM
-	mols m
+	mols
 JOIN
-	refmet ON (refmet.mol_id = m.id)
+	lincs ON (lincs.mol_id = mols.id)
+JOIN
+	refmet ON (refmet.mol_id = mols.id)
 WHERE
-	m.mol @> 'C12CCCC1CCC1C2CCC2=CCCCC12'
+	mols.molecule @> 'C12CCCC1CCC1C2CCC2=CCCCC12'
 	;
 __EOF__
 #
@@ -49,16 +55,21 @@ __EOF__
 #
 psql -d $DBNAME <<__EOF__
 SELECT
-	m.id,
+	mols.id,
+	mols.name,
+	lincs.pert_name,
+	lincs.sig_count,
 	refmet.pubchem_cid,
 	refmet.refmet_name,
-	m.cansmi,
-	ROUND(tanimoto_sml(rdkit_fp(mol_from_smiles('NCCc1ccc(O)c(O)c1'::cstring)), m.fp)::NUMERIC, 2) similarity
+	ROUND(tanimoto_sml(rdkit_fp(mol_from_smiles('NCCc1ccc(O)c(O)c1'::cstring)), mols.fp)::NUMERIC, 2) similarity
 FROM
-	mols m
-	JOIN refmet ON (refmet.mol_id = m.id)
+	mols
+JOIN
+	lincs ON (lincs.mol_id = mols.id)
+JOIN
+	refmet ON (refmet.mol_id = mols.id)
 WHERE
-	rdkit_fp(mol_from_smiles('NCCc1ccc(O)c(O)c1'::cstring))%m.fp
+	rdkit_fp(mol_from_smiles('NCCc1ccc(O)c(O)c1'::cstring))%mols.fp
 ORDER BY
 	similarity DESC
 	;
