@@ -56,16 +56,19 @@ __EOF__
 # 8. "smiles"
 # 9. "pubchem_cid"
 SRCDATADIR="$(cd $HOME/../data/RefMet; pwd)"
-csvfile="$SRCDATADIR/refmet.csv.gz"
+csvfile="$SRCDATADIR/refmet.csv"
+if [ ! -e "${csvfile}" ]; then
+	wget -O refmet.csv https://www.metabolomicsworkbench.org/databases/refmet/refmet_download.php
+fi
 #
 TNAME="refmet"
-gunzip -c $csvfile \
+cat $csvfile \
 	|${cwd}/../python/csv2sql.py create \
 		--tablename "${TNAME}" --fixtags --maxchar 2000 \
 		--coltypes "CHAR,CHAR,CHAR,CHAR,CHAR,CHAR,CHAR,CHAR,INT" \
 	|psql -d $DBNAME
 #
-gunzip -c $csvfile \
+cat $csvfile \
 	|${cwd}/../python/csv2sql.py insert \
 		--tablename "${TNAME}" --fixtags --maxchar 2000 \
 		--coltypes "CHAR,CHAR,CHAR,CHAR,CHAR,CHAR,CHAR,CHAR,INT" \

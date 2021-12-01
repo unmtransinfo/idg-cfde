@@ -46,6 +46,12 @@ __EOF__
 # LOAD ReproTox (compounds):
 SRCDATADIR="$(cd $HOME/../data/CFDE/ReproTox; pwd)"
 csvfile="$SRCDATADIR/ReproTox_export.tsv"
+#
+if [ ! -e "${csvfile}" ]; then
+	printf "ERROR: file not found: %s (generate with ReproTox_compounds.Rmd)\n" "${csvfile}"
+	exit
+fi
+#
 #LS_ID	CAS_RN	CID	SMILES	TERM
 TNAME="reprotox"
 psql -d $DBNAME -c "DROP TABLE IF EXISTS ${TNAME}"
