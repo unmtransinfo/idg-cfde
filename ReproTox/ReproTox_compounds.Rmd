@@ -28,11 +28,11 @@ base::date()
 ```{r echo=FALSE, message=FALSE, results="hide"}
 library(readr)
 library(data.table)
+library(rcdk)
 require(grid)
 require(futile.logger)
 library(VennDiagram)
-flog.appender(appender.console(), name='VennDiagram') #VennDiagram log messages to console.
-library(rcdk)
+futile.logger::flog.threshold(futile.logger::ERROR, name = "VennDiagramLogger") #Avoid annoying logfiles.
 ```
 
 ```{r echo=FALSE, message=FALSE, results="hide"}

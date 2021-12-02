@@ -80,6 +80,13 @@ printf "IDG: N_pubchem_cid:\t%6d\n" $(psql -d $DBNAME -qAc "SELECT COUNT(DISTINC
 #
 # DONE LOADING IDG.
 ###
+cat $csvfile |sed '1d' |awk -F '\t' '{print $1}' |sort -nu \
+	>$SRCDATADIR/tcrd_compounds.cid
+python3 -m BioClients.pubchem.Client get_cid2nicename \
+	--i $SRCDATADIR/tcrd_compounds.cid \
+	--o $SRCDATADIR/tcrd_compounds_names.tsv
+#
+###
 #
 printf "Elapsed time: %ds\n" "$[$(date +%s) - ${T0}]"
 #
