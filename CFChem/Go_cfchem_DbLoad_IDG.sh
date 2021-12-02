@@ -46,6 +46,11 @@ __EOF__
 # LOAD IDG (compounds):
 SRCDATADIR="$(cd $HOME/../data/TCRD/data; pwd)"
 csvfile="$SRCDATADIR/tcrd_compounds.tsv"
+#
+if [ ! -e "${csvfile}" ]; then
+	python3 -m BioClients.idg.tcrd.Client listCompounds --o ${csvfile}
+fi
+#
 TNAME="idg"
 #cmpd_pubchem_cid,smiles,target_count,activity_count
 cat $csvfile \

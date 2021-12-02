@@ -47,6 +47,11 @@ __EOF__
 # https://s3.amazonaws.com/lincs-dcic/sigcom-lincs-metadata/LINCS_small_molecules.tsv
 SRCDATADIR="$(cd $HOME/../data/LINCS/data; pwd)"
 csvfile="$SRCDATADIR/LINCS_small_molecules.tsv"
+#
+if [ ! -e "${csvfile}" ]; then
+	wget -O ${csvfile} https://s3.amazonaws.com/lincs-dcic/sigcom-lincs-metadata/LINCS_small_molecules.tsv
+fi
+#
 TNAME="lincs"
 #pert_name, target, moa, canonical_smiles, inchi_key, compound_aliases, sig_count
 cat $csvfile \
