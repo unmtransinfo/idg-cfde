@@ -52,6 +52,9 @@ if [ ! -e "${csvfile}" ]; then
 fi
 #
 TNAME="idg"
+#
+psql -d $DBNAME -c "DROP TABLE IF EXISTS $TNAME"
+#
 #cmpd_pubchem_cid,smiles,target_count,activity_count
 cat $csvfile \
 	|${cwd}/../python/csv2sql.py create --tsv \

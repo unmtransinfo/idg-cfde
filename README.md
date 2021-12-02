@@ -25,3 +25,8 @@ The IDG CFDE team is led by PI's Tudor Oprea, MD, PhD, of UNM, and Avi Ma'ayan, 
   * [NIH-CFDE.org](https://www.nih-cfde.org/)
   * [GitHub:NIH-CFDE](https://github.com/nih-cfde)
 
+## CFChem
+
+CFDE Cheminformatics Db and Development System.
+
+  * See [README.md](CFChem/README.md)

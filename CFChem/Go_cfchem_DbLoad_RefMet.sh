@@ -58,10 +58,13 @@ __EOF__
 SRCDATADIR="$(cd $HOME/../data/RefMet; pwd)"
 csvfile="$SRCDATADIR/refmet.csv"
 if [ ! -e "${csvfile}" ]; then
-	wget -O refmet.csv https://www.metabolomicsworkbench.org/databases/refmet/refmet_download.php
+	wget -O ${csvfile} https://www.metabolomicsworkbench.org/databases/refmet/refmet_download.php
 fi
 #
 TNAME="refmet"
+#
+psql -d $DBNAME -c "DROP TABLE IF EXISTS $TNAME"
+#
 cat $csvfile \
 	|${cwd}/../python/csv2sql.py create \
 		--tablename "${TNAME}" --fixtags --maxchar 2000 \

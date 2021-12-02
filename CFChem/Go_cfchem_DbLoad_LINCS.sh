@@ -53,6 +53,9 @@ if [ ! -e "${csvfile}" ]; then
 fi
 #
 TNAME="lincs"
+#
+psql -d $DBNAME -c "DROP TABLE IF EXISTS $TNAME"
+#
 #pert_name, target, moa, canonical_smiles, inchi_key, compound_aliases, sig_count
 cat $csvfile \
 	|${cwd}/../python/csv2sql.py create --tsv \

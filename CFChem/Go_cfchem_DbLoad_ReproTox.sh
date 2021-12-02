@@ -54,7 +54,9 @@ fi
 #
 #LS_ID	CAS_RN	CID	SMILES	TERM
 TNAME="reprotox"
-psql -d $DBNAME -c "DROP TABLE IF EXISTS ${TNAME}"
+#
+psql -d $DBNAME -c "DROP TABLE IF EXISTS $TNAME"
+#
 cat $csvfile \
 	|${cwd}/../python/csv2sql.py create --tsv \
 		--tablename "${TNAME}" --fixtags --maxchar 2000 \
