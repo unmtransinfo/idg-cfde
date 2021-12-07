@@ -96,6 +96,14 @@ X <- list(
 display_venn(X, fill=c("pink", "#0073C2FF", "#EFC000FF", "#868686FF"), main="LINCS and RTECS-ReproTox chemical datasets by CFDE-RDKit-Cansmi")
 ```
 
+## Export ReproTox-LINCS compounds.
+```{r}
+ReproTox_LINCS <- merge(rbindlist(list(LS_Blood[!is.na(CANSMI)], LS_CV[!is.na(CANSMI)], LS_CNS[!is.na(CANSMI)])), 
+                        LINCS_Cansmi[!is.na(CANSMI)], by="CANSMI", all.x=F, all.y=F)
+message(sprintf("ReproTox_LINCS: unique CANSMIs: %d; LS_ID: %d; LCS_ID: %d", ReproTox_LINCS[, uniqueN(CANSMI)], ReproTox_LINCS[, uniqueN(LS_ID)], ReproTox_LINCS[, uniqueN(LCS_ID)]))
+write_delim(ReproTox_LINCS, paste0(Sys.getenv()["HOME"], "/../data/CFDE/ReproTox/ReproTox_LINCS_export.tsv"), delim="\t")
+```
+
 ## View chemical structures
 
 Using RCDK R package (Chemistry Dev Kit)
