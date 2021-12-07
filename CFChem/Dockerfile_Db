@@ -1,0 +1,50 @@
+#
+FROM ubuntu:20.04
+WORKDIR /home/app
+ENV DEBIAN_FRONTEND noninteractive
+RUN apt-get update
+RUN apt-get install -y sudo
+RUN apt-get install -y apt-utils
+ENV TZ=America/Denver
+RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ >/etc/timezone
+RUN apt-get install -y tzdata
+RUN echo "=== Done installing Ubuntu."
+#
+###
+RUN apt-get install -y postgresql-12
+RUN apt-cache policy postgresql-12
+RUN apt-get install -y postgresql-server-dev-12
+RUN apt-get install -y postgresql-12-rdkit
+COPY conf/postgresql/pg_hba.conf /etc/postgresql/12/main/
+RUN chmod 640 /etc/postgresql/12/main/pg_hba.conf 
+RUN chown postgres /etc/postgresql/12/main/pg_hba.conf 
+COPY conf/postgresql/postgresql.conf /etc/postgresql/12/main/
+RUN chmod 644 /etc/postgresql/12/main/postgresql.conf
+RUN chown postgres /etc/postgresql/12/main/postgresql.conf
+RUN echo "=== Done installing PostgreSQL."
+#
+RUN mkdir -p /home/data/CFChemDb
+COPY data/cfchemdb.pgdump /home/data/CFChemDb
+RUN echo "=== Done copying db data."
+#
+# Note that user postgres must start db differently than user root.
+USER postgres
+RUN pg_config
+ENV dbname=cfchemdb
+ENV dbusr=commoner
+ENV dbpw=foobar
+RUN /etc/init.d/postgresql start && \
+	psql -c "CREATE ROLE ${dbusr} WITH LOGIN PASSWORD '${dbpw}'" && \
+	createdb -O postgres ${dbname} && \
+	pg_restore -v --schema public -d ${dbname} /home/data/CFChemDb/cfchemdb.pgdump && \
+	psql -d ${dbname} -c "GRANT SELECT ON ALL TABLES IN SCHEMA public TO ${dbusr}" && \
+	psql -d ${dbname} -c "GRANT SELECT ON ALL SEQUENCES IN SCHEMA public TO ${dbusr}" && \
+	psql -d ${dbname} -c "GRANT EXECUTE ON ALL FUNCTIONS IN SCHEMA public TO ${dbusr}" && \
+	psql -l
+USER root
+RUN service postgresql stop
+RUN echo "=== Done instantiating and loading db."
+#
+# CMD must be in foreground.
+CMD ["sudo", "-u", "postgres", "/usr/lib/postgresql/12/bin/postgres", "-D", "/var/lib/postgresql/12/main", "-c", "config_file=/etc/postgresql/12/main/postgresql.conf"]
+#
