@@ -12,17 +12,22 @@ fi
 #
 cwd=$(pwd)
 #
+DBNAME="cfchemdb"
+#
 docker version
 #
-INAME="cfchemdb_db"
+INAME="${DBNAME}_db"
 TAG="latest"
 #
 if [ ! -e "${cwd}/data" ]; then
 	mkdir ${cwd}/data/
 fi
 #
-#sudo -u postgres pg_dump --no-privileges -Fc -d cfchemdb >/home/data/CARLSBAD/cfchemdb.pgdump 
-cp /home/data/CARLSBAD/cfchemdb.pgdump ${cwd}/data/
+dumpfile="/home/data/CFDE/CFChemDb/${DBNAME}.pgdump"
+if [ ! -e "${dumpfile}" ]; then
+	sudo -u postgres pg_dump --no-owner --no-privileges --format=custom -d ${DBNAME} >${dumpfile}
+fi
+cp ${dumpfile} ${cwd}/data/
 #
 T0=$(date +%s)
 #
@@ -33,7 +38,7 @@ docker build -f ${dockerfile} -t ${INAME}:${TAG} .
 #
 printf "Elapsed time: %ds\n" "$[$(date +%s) - ${T0}]"
 #
-rm -f ${cwd}/data/cfchemdb.pgdump
+rm -f ${cwd}/data/${DBNAME}.pgdump
 #
 docker images
 #

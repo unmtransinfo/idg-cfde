@@ -36,6 +36,7 @@ ENV dbpw=foobar
 RUN /etc/init.d/postgresql start && \
 	psql -c "CREATE ROLE ${dbusr} WITH LOGIN PASSWORD '${dbpw}'" && \
 	createdb -O postgres ${dbname} && \
+	psql -d ${dbname} -c "CREATE EXTENSION rdkit" && \
 	pg_restore -v --schema public -d ${dbname} /home/data/CFChemDb/cfchemdb.pgdump && \
 	psql -d ${dbname} -c "GRANT SELECT ON ALL TABLES IN SCHEMA public TO ${dbusr}" && \
 	psql -d ${dbname} -c "GRANT SELECT ON ALL SEQUENCES IN SCHEMA public TO ${dbusr}" && \

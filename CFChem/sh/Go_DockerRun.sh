@@ -19,8 +19,8 @@ VTAG="v1.0.0"
 # PostgreSQL db
 INAME_DB="cfchemdb_db"
 #
-DOCKERPORT_DB=5050
 APPPORT_DB=5432
+DOCKERPORT_DB=5442
 #
 docker run -dit \
 	--name "${INAME_DB}_container" \
