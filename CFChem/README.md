@@ -7,7 +7,7 @@ Common Fund projects and datasets.
 ## Dependencies
 
 * [RDKit](https://www.rdkit.org/)
-* [GitHub:rdkit-tools](https://github.com/jeremyjyang/rdkit-tools) 
+* [GitHub:rdkit-tools](https://github.com/jeremyjyang/rdkit-tools)
 * [PostgreSql](https://www.postgresql.org/)
 
 ## CFChemDb Workflow
@@ -26,17 +26,18 @@ The CFChemDb can be built with the following workflow.
 
 The database is Dockerized, for flexible deployment and reuse.
 
-See
-
 * [Go\_DockerBuild\_Db.sh](sh/Go_DockerBuild_Db.sh)
 * [Go\_DockerClean.sh](sh/Go_DockerClean.sh)
 * [Go\_DockerHubPull.sh](sh/Go_DockerHubPull.sh)
 * [Go\_DockerHubPullRun.sh](sh/Go_DockerHubPullRun.sh)
 * [Go\_DockerHubPush.sh](sh/Go_DockerHubPush.sh)
 * [Go\_DockerRun.sh](sh/Go_DockerRun.sh)
-
-* [DockerHub:cfchemdb\_db](https://hub.docker.com/repository/docker/unmtransinfo/cfchemdb_db]
+* [DockerHub:cfchemdb\_db](https://hub.docker.com/repository/docker/unmtransinfo/cfchemdb_db)
 
 ## Testing
 
 * [Go\_cfchem\_DbTest.sh](sh/Go_cfchem_DbTest.sh)
+
+## Demo notebook
+
+* [CFChemDb_Demo.ipynb](https://github.com/jeremyjyang/rdkit-tools/blob/master/python/CFChemDb_Demo.ipynb)
