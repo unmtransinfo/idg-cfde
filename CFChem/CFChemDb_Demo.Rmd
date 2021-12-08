@@ -1,0 +1,119 @@
+---
+title: "CFChemDb demo"
+author: "Jeremy Yang"
+output:
+  html_document:
+    fig_caption: yes
+    number_sections: yes
+    toc: yes
+  pdf_document:
+    toc: yes
+editor_options:
+  chunk_output_type: console
+---
+
+# Introduction
+
+CFDE Chemical Db.
+
+```{r echo=FALSE, message=FALSE}
+knitr::opts_chunk$set(echo=FALSE, message=FALSE)
+base::date() 
+```          
+             
+```{r echo=FALSE, message=FALSE, results="hide"}
+library(readr)
+library(data.table)
+library(RPostgreSQL, quietly=T)
+#library(plotly, quietly=T)
+library(rcdk)
+require(grid)
+require(futile.logger)
+library(VennDiagram)
+futile.logger::flog.threshold(futile.logger::ERROR, name = "VennDiagramLogger") #Avoid annoying logfiles.
+```
+
+```{r echo=FALSE, message=FALSE, results="hide"}
+display_venn <- function(x, ...) {
+  grid.newpage()
+  venn_object <- venn.diagram(x, filename=NULL, ...)
+  grid.draw(venn_object)
+}
+```
+
+# Connect to db
+
+```{r}
+dbcon <- dbConnect(PostgreSQL(), host="unmtid-dbs.net", port=5442, dbname="cfchemdb", user="commoner", password="easement")
+```
+
+# Db tables and columns
+
+## Db columns
+
+```{r}
+dbcols <- dbGetQuery(dbcon, "SELECT table_name,column_name,data_type FROM information_schema.columns WHERE table_schema='public' ORDER BY table_name,column_name")
+setDT(dbcols)
+knitr::kable(dbcols)
+```
+
+## Db table sizes
+
+```{r}
+tsizes <- c()
+tnames <- ordered(unique(dbcols[, table_name]))
+for (tname in tnames) {
+  tsizes <- c(tsizes, dbGetQuery(dbcon, sprintf("SELECT COUNT(*) FROM %s", tname))$count)
+}
+knitr::kable(data.table(table=tnames, rowcount=tsizes))
+```
+
+# Compound sets by Canonical SMILES
+
+Canonical SMILES are not globally canonical, thus must be canonicalized via the same algorithm, in this case the RDKit-based CFDE Cheminformatics Db.
+
+```{r}
+mols <- dbGetQuery(dbcon, "SELECT id,cansmi FROM mols")
+setDT(mols)
+```
+
+## IDG, LINCS
+
+```{r}
+lincs <- dbGetQuery(dbcon, "SELECT DISTINCT id,cansmi FROM lincs")
+setDT(lincs)
+idg <- dbGetQuery(dbcon, "SELECT DISTINCT pubchem_cid,cansmi FROM idg")
+setDT(idg)
+X <- list(
+	LINCS = lincs[!is.na(cansmi), cansmi], 
+	IDG = idg[!is.na(cansmi), cansmi])
+display_venn(X, fill=c("pink", "cyan"), main="IDG and LINCS chemical datasets by CFDE-RDKit-Cansmi")
+```
+
+
+## View chemical structures
+
+Using RCDK R package (Chemistry Dev Kit)
+
+```{r}
+depictor <- get.depictor(style='cow')
+img_w <- 640
+img_h <- 400
+n_row <- 5
+n_col <- 7
+moldata <- mols[sample(nrow(mols), n_row*n_col)] #random sample
+plot(c(0,1e3), c(0,1e3), pch=1, col="white", axes=FALSE, xlab="", ylab="")
+title(main=sprintf("CFChemDb sample compounds (%d/%d)", nrow(moldata), nrow(mols[!is.na(cansmi)])), line = -3, sub="Depicted with RCDK", cex.main=2)
+plot.window(xlim=c(0, img_w*n_col), ylim=c(0, img_h*n_row), asp=1.0)
+for (i in 1:n_row) {
+  for (j in 1:n_col) {
+    mol <- parse.smiles(moldata[(i-1)*n_row+(j), cansmi])
+    img <- view.image.2d(mol[[1]], depictor=depictor)
+    rasimg <- rasterImage(img, xleft=(j-1)*img_w, xright=j*img_w, ybottom=(i-2)*img_h, ytop=(i-1)*img_h)
+  }
+}
+rasimg
+```
+
+
+
