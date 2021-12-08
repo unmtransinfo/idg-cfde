@@ -32,7 +32,7 @@ USER postgres
 RUN pg_config
 ENV dbname=cfchemdb
 ENV dbusr=commoner
-ENV dbpw=foobar
+ENV dbpw=easement
 RUN /etc/init.d/postgresql start && \
 	psql -c "CREATE ROLE ${dbusr} WITH LOGIN PASSWORD '${dbpw}'" && \
 	createdb -O postgres ${dbname} && \
