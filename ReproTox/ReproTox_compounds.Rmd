@@ -14,7 +14,7 @@ editor_options:
 
 # Introduction
 
-Initial analysis of compound membership for Repro-Tox, using (1) Canonical SMILES or (2) PubChem CIDs as
+Initial analysis of compound membership for Repro-Tox, using canonical SMILES as
 unique compound identifier.
 
 RTECS-ReproTox: Reproductive and developmental toxicity dataset excerpted from CDC-RTECS, provided by LeadScope.
@@ -59,6 +59,9 @@ setDT(LS2DiseaseArea)
 ## LINCS, ReproTox-ALL
 
 ```{r}
+message(sprintf("ReproTox cansmi count: %d", LS_Cansmi[!is.na(CANSMI), uniqueN(CANSMI)]))
+message(sprintf("LINCS cansmi count: %d", LINCS_Cansmi[!is.na(CANSMI), uniqueN(CANSMI)]))
+message(sprintf("ReproTox_LINCS common cansmi: %d", length(intersect(LS_Cansmi[!is.na(CANSMI), CANSMI], LINCS_Cansmi[!is.na(CANSMI), CANSMI]))))
 X <- list(
 	LINCS = LINCS_Cansmi[!is.na(CANSMI), CANSMI], 
 	ReproTox = LS_Cansmi[!is.na(CANSMI), CANSMI])
@@ -104,6 +107,30 @@ message(sprintf("ReproTox_LINCS: unique CANSMIs: %d; LS_ID: %d; LCS_ID: %d", Rep
 write_delim(ReproTox_LINCS, paste0(Sys.getenv()["HOME"], "/../data/CFDE/ReproTox/ReproTox_LINCS_export.tsv"), delim="\t")
 ```
 
+## Merge into combo file for CFChemDb.
+
+```{r}
+ReproTox_data_Blood <- read_delim(paste0(Sys.getenv()["HOME"], "/../data/CFDE/ReproTox/ReproTox_data-Blood_PubChem_cas2cid.tsv"), "\t", col_types = cols(.default = col_character()))
+setDT(ReproTox_data_Blood)
+
+ReproTox_data_CV <- read_delim(paste0(Sys.getenv()["HOME"], "/../data/CFDE/ReproTox/ReproTox_data-CV_PubChem_cas2cid.tsv"), "\t", col_types = cols(.default = col_character()))
+setDT(ReproTox_data_CV)
+
+ReproTox_data_CNS <- read_delim(paste0(Sys.getenv()["HOME"], "/../data/CFDE/ReproTox/ReproTox_data-CNS_PubChem_cas2cid.tsv"), "\t", col_types = cols(.default = col_character()))
+setDT(ReproTox_data_CNS)
+```
+
+
+```{r}
+LS_Pubchem <- read_delim(paste0(Sys.getenv()["HOME"], "/../data/CFDE/ReproTox/LS_Mapping_PubChem.tsv"), "\t", col_types = cols(.default = col_character()))
+setDT(LS_Pubchem)
+setnames(LS_Pubchem, new=c("CID", "SMILES", "LS_ID"))
+ReproTox_data <- rbindlist(list(unique(ReproTox_data_Blood[, .(CAS_RN=Name, CID=CID, TERM="Blood")]), unique(ReproTox_data_CNS[, .(CAS_RN=Name, CID=CID, TERM="CNS")]), unique(ReproTox_data_CV[, .(CAS_RN=Name, CID=CID, TERM="CV")])))
+ReproTox_data <- merge(ReproTox_data, LS_Pubchem, by="CID", all.x=T, all.y=F)
+ReproTox_data <- ReproTox_data[!is.na(LS_ID), .(LS_ID, CAS_RN, CID, SMILES, TERM)]
+write_delim(ReproTox_data, paste0(Sys.getenv()["HOME"], "/../data/CFDE/ReproTox/ReproTox_export.tsv"), delim="\t")
+```
+
 ## View chemical structures
 
 Using RCDK R package (Chemistry Dev Kit)
@@ -129,93 +156,3 @@ for (i in 1:n_row) {
 }
 rasimg
 ```
-
-
-
-```{r}
-#view.molecule.2d(mols)
-#view.table is fragile.  Needs non-NA strings.
-
-#
-#view.table(parse.smiles(moldata$CANSMI), moldata)
-```
-
-
-# Compound sets by PubChem CID.
-
-* SMILES to CIDs via PubChem REST API.
-* CAS Registry Numbers mapped to CIDs via PubChem REST API.
-* LINCS compounds (almost) all have CIDs.
-
-Why LINCS cpds with no CIDs? (~1%)
-
-```{r warning=FALSE}
-SM_LINCS <- read_delim(paste0(Sys.getenv()["HOME"], "/../data/CFDE/ReproTox/SM_LINCS_10272021.tsv"), "\t", col_types = cols(.default = col_character()))
-setDT(SM_LINCS)
-SM_LINCS_CIDs <- unique(SM_LINCS[!is.na(SM_PubChem_CID), SM_PubChem_CID])
-message(sprintf("SM_LINCS with CID: %d / %d (%.1f%%)", 
-	nrow(SM_LINCS[!is.na(SM_PubChem_CID)]),
-	nrow(SM_LINCS),
-	100*nrow(SM_LINCS[!is.na(SM_PubChem_CID)]) / nrow(SM_LINCS)))
-```
-
-
-
-```{r}
-ReproTox_data_Blood <- read_delim(paste0(Sys.getenv()["HOME"], "/../data/CFDE/ReproTox/ReproTox_data-Blood_PubChem_cas2cid.tsv"), "\t", col_types = cols(.default = col_character()))
-setDT(ReproTox_data_Blood)
-ReproTox_data_Blood_CIDs <- unique(ReproTox_data_Blood[, CID])
-
-ReproTox_data_CV <- read_delim(paste0(Sys.getenv()["HOME"], "/../data/CFDE/ReproTox/ReproTox_data-CV_PubChem_cas2cid.tsv"), "\t", col_types = cols(.default = col_character()))
-setDT(ReproTox_data_CV)
-ReproTox_data_CV_CIDs <- unique(ReproTox_data_CV[, CID])
-
-ReproTox_data_CNS <- read_delim(paste0(Sys.getenv()["HOME"], "/../data/CFDE/ReproTox/ReproTox_data-CNS_PubChem_cas2cid.tsv"), "\t", col_types = cols(.default = col_character()))
-setDT(ReproTox_data_CNS)
-ReproTox_data_CNS_CIDs <- unique(ReproTox_data_CNS[, CID])
-```
-
-## LINCS, ReproTox-ALL
-
-```{r}
-X <- list(
-	LINCS = SM_LINCS_CIDs,
-	ReproTox_ALL = unique(c(ReproTox_data_Blood_CIDs, ReproTox_data_CV_CIDs, ReproTox_data_CNS_CIDs))
-)
-display_venn(X, fill = c("pink", "cyan"), main="(1) LINCS and (2) RTECS-ReproTox chemical datasets (combined) by CID")
-```
-
-## ReproTox-Blood, ReproTox-CV, ReproTox-CNS
-
-```{r}
-X <- list(
-	ReproTox_Blood = ReproTox_data_Blood_CIDs, 
-	ReproTox_CV = ReproTox_data_CV_CIDs, 
-	ReproTox_CNS = ReproTox_data_CNS_CIDs)
-display_venn(X, fill=c("#0073C2FF", "#EFC000FF", "#868686FF"), main="RTECS-ReproTox chemical datasets by CID")
-```
-
-
-## LINCS, ReproTox-Blood, ReproTox-CV, ReproTox-CNS
-
-```{r}
-X <- list(
-	ReproTox_Blood = ReproTox_data_Blood_CIDs, 
-	ReproTox_CV = ReproTox_data_CV_CIDs, 
-	ReproTox_CNS = ReproTox_data_CNS_CIDs,
-	LINCS = SM_LINCS_CIDs)
-display_venn(X, fill = c("#0073C2FF", "#EFC000FF", "#868686FF", "pink"), main="LINCS and RTECS-ReproTox chemical datasets by CID")
-```
-
-## Merge into combo file for CFChemDb.
-
-```{r}
-LS_Pubchem <- read_delim(paste0(Sys.getenv()["HOME"], "/../data/CFDE/ReproTox/LS_Mapping_PubChem.tsv"), "\t", col_types = cols(.default = col_character()))
-setDT(LS_Pubchem)
-setnames(LS_Pubchem, new=c("CID", "SMILES", "LS_ID"))
-ReproTox_data <- rbindlist(list(unique(ReproTox_data_Blood[, .(CAS_RN=Name, CID=CID, TERM="Blood")]), unique(ReproTox_data_CNS[, .(CAS_RN=Name, CID=CID, TERM="CNS")]), unique(ReproTox_data_CV[, .(CAS_RN=Name, CID=CID, TERM="CV")])))
-ReproTox_data <- merge(ReproTox_data, LS_Pubchem, by="CID", all.x=T, all.y=F)
-ReproTox_data <- ReproTox_data[!is.na(LS_ID), .(LS_ID, CAS_RN, CID, SMILES, TERM)]
-write_delim(ReproTox_data, paste0(Sys.getenv()["HOME"], "/../data/CFDE/ReproTox/ReproTox_export.tsv"), delim="\t")
-```
-
