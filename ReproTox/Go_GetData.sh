@@ -8,7 +8,7 @@ DATADIR="$(cd $HOME/../data/CFDE/ReproTox; pwd)"
 #
 ###
 python3 -m BioClients.pubchem.Client get_smi2cid \
-	--i ${DATADIR}/LS_Mapping_UMiami.smiles \
+	--i ${DATADIR}/LS_Mapping.smiles \
 	--o ${DATADIR}/LS_Mapping_PubChem.tsv
 # INFO:Input IDs: 856
 # INFO:SMIs: 856; CIDs out: 743

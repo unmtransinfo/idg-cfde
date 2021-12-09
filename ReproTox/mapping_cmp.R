@@ -3,7 +3,7 @@
 library(readr)
 library(data.table)
 
-fname_um <- "LS_Mapping_UMiami.smiles"
+fname_um <- "LS_Mapping.smiles"
 LS_UM <- read_delim(paste0(Sys.getenv()["HOME"], "/../data/CFDE/ReproTox/", fname_um), "\t", col_names = c("SMILES", "LS_ID"))
 setDT(LS_UM)
 message(sprintf("%s: rows: %d; SMILES: %d; unique(SMILES): %d; missing SMILES: %d; LS_ID: %d; unique(LS_ID): %d", fname_um, nrow(LS_UM),

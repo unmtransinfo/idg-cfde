@@ -48,7 +48,7 @@ display_venn <- function(x, ...) {
 Canonical SMILES are not globally canonical, thus must be canonicalized via the same algorithm, in this case the RDKit-based CFDE Cheminformatics Db and DevEnv.
 
 ```{r}
-LS_Cansmi <- read_delim(paste0(Sys.getenv()["HOME"], "/../data/CFDE/ReproTox/LS_Mapping_UMiami_std_can.smi"), "\t", col_names=c("CANSMI", "LS_ID"))
+LS_Cansmi <- read_delim(paste0(Sys.getenv()["HOME"], "/../data/CFDE/ReproTox/LS_Mapping_std_can.smi"), "\t", col_names=c("CANSMI", "LS_ID"))
 setDT(LS_Cansmi)
 LINCS_Cansmi <- read_delim(paste0(Sys.getenv()["HOME"], "/../data/CFDE/ReproTox/SM_LINCS_10272021_std_can.smi"), "\t", col_names=c("CANSMI", "LCS_ID"))
 setDT(LINCS_Cansmi)

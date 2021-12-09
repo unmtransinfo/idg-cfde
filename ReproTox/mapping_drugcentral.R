@@ -17,7 +17,7 @@ cdkmol2cansmi <- function(mol) {
   ifelse(!is.na(mol) & length(mol)>0, get.smiles(mol, smiles.flavors(c("Canonical", "Generic"))), NA) #Generic is non-isomeric
 }
 #
-reprotox <- read_delim(paste0(Sys.getenv()["HOME"], "/../data/CFDE/ReproTox/LS_Mapping_UMiami_std_can.smi"), "\t", col_names=c("CANSMI", "LS_ID"), show_col_types=F)
+reprotox <- read_delim(paste0(Sys.getenv()["HOME"], "/../data/CFDE/ReproTox/LS_Mapping_std_can.smi"), "\t", col_names=c("CANSMI", "LS_ID"), show_col_types=F)
 setDT(reprotox)
 #reprotox[, cdk_mol := parse.smiles(CANSMI, kekulise=T, smiles.parser=smiparser)] #Works but to list not mol.
 reprotox[["cdk_mol"]] <- lapply(reprotox[, CANSMI], cdksmi2mol)

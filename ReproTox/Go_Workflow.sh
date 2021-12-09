@@ -8,20 +8,20 @@ DATADIR="$(cd $HOME/../data/CFDE/ReproTox; pwd)"
 ###
 source $(dirname $(which conda))/../bin/activate rdkit
 python3 -m rdktools.standard.App standardize \
-	--i ${DATADIR}/LS_Mapping_UMiami.smiles --smilesColumn 0 --nameColumn 1 \
-	--o ${DATADIR}/LS_Mapping_UMiami_std.smi
+	--i ${DATADIR}/LS_Mapping.smiles --smilesColumn 0 --nameColumn 1 \
+	--o ${DATADIR}/LS_Mapping_std.smi
 # INFO:Mols in: 856; empty mols in: 75; mols out: 856; empty mols out: 75; errors: 3
 ###
 python3 -m rdktools.util.Cansmi canonicalize \
-	--i ${DATADIR}/LS_Mapping_UMiami_std.smi \
-	--o ${DATADIR}/LS_Mapping_UMiami_std_can.smi
+	--i ${DATADIR}/LS_Mapping_std.smi \
+	--o ${DATADIR}/LS_Mapping_std_can.smi
 # INFO:Mols in: 856; mols out: 856; empty mols: 75
 # INFO:Unique CANONICAL SMILES: 771
 # INFO:Errors: 0
 conda deactivate
 ###
 python3 -m BioClients.pubchem.Client get_smi2cid \
-	--i ${DATADIR}/LS_Mapping_UMiami.smiles \
+	--i ${DATADIR}/LS_Mapping.smiles \
 	--o ${DATADIR}/LS_Mapping_PubChem.tsv
 # INFO:Input IDs: 856
 # INFO:SMIs: 856; CIDs out: 743
