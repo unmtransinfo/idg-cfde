@@ -23,6 +23,13 @@ if [ ! -e "${cwd}/data" ]; then
 	mkdir ${cwd}/data/
 fi
 #
+sudo -u postgres psql -d ${DBNAME} -c "ALTER TABLE idg OWNER TO postgres"
+sudo -u postgres psql -d ${DBNAME} -c "ALTER TABLE drugcentral OWNER TO postgres"
+sudo -u postgres psql -d ${DBNAME} -c "ALTER TABLE lincs OWNER TO postgres"
+sudo -u postgres psql -d ${DBNAME} -c "ALTER TABLE refmet OWNER TO postgres"
+sudo -u postgres psql -d ${DBNAME} -c "ALTER TABLE glygen OWNER TO postgres"
+sudo -u postgres psql -d ${DBNAME} -c "ALTER TABLE reprotox OWNER TO postgres"
+#
 dumpfile="/home/data/CFDE/CFChemDb/${DBNAME}.pgdump"
 if [ ! -e "${dumpfile}" ]; then
 	sudo -u postgres pg_dump --no-owner --no-privileges --format=custom -d ${DBNAME} >${dumpfile}
