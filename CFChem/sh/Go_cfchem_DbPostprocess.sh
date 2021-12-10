@@ -26,11 +26,11 @@ psql -d $DBNAME -c "ALTER TABLE mols ADD COLUMN fp BFP"
 psql -d $DBNAME -c "UPDATE mols SET fp = rdkit_fp(molecule)"
 psql -d $DBNAME -c "CREATE INDEX fps_fp_idx ON mols USING gist(fp)"
 #
-# Morgan (Circular) Fingerprints (with radius=2 like ECFP4).
-#psql -d $DBNAME -c "ALTER TABLE mols DROP COLUMN IF EXISTS mfp"
-#psql -d $DBNAME -c "ALTER TABLE mols ADD COLUMN mfp BFP"
-#psql -d $DBNAME -c "UPDATE mols SET mfp = morganbv_fp(molecule)"
-#psql -d $DBNAME -c "CREATE INDEX fps_mfp_idx ON mols USING gist(mfp)"
+# Morgan (Circular) Fingerprints (with radius=2 ECFP4-like).
+psql -d $DBNAME -c "ALTER TABLE mols DROP COLUMN IF EXISTS ecfp"
+psql -d $DBNAME -c "ALTER TABLE mols ADD COLUMN ecfp BFP"
+psql -d $DBNAME -c "UPDATE mols SET ecfp = morganbv_fp(molecule)"
+psql -d $DBNAME -c "CREATE INDEX fps_ecfp_idx ON mols USING gist(ecfp)"
 #
 ###
 # Names?

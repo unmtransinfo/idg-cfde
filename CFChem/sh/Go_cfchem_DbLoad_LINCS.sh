@@ -87,18 +87,18 @@ TNAME="lincs"
 #
 psql -d $DBNAME -c "DROP TABLE IF EXISTS $TNAME"
 #
-#lcs_id pert_name target moa inchi_key compound_aliases sig_count cansmi
+#lcs_id pert_name target moa inchi_key compound_aliases sig_count smiles
 cat $csvfile_std \
 	|${cwd}/../python/csv2sql.py create --tsv \
 		--tablename "${TNAME}" --fixtags --maxchar 2000 \
-		--colnames "lcs_id,pert_name,target,moa,inchi_key,compound_aliases,sig_count,cansmi" \
+		--colnames "lcs_id,pert_name,target,moa,inchi_key,compound_aliases,sig_count,smiles" \
 		--coltypes "CHAR,CHAR,CHAR,CHAR,CHAR,CHAR,INT,CHAR" \
 	|psql -d $DBNAME
 #
 cat $csvfile_std \
 	|${cwd}/../python/csv2sql.py insert --tsv \
 		--tablename "${TNAME}" --fixtags --maxchar 2000 \
-		--colnames "lcs_id,pert_name,target,moa,inchi_key,compound_aliases,sig_count,cansmi" \
+		--colnames "lcs_id,pert_name,target,moa,inchi_key,compound_aliases,sig_count,smiles" \
 		--coltypes "CHAR,CHAR,CHAR,CHAR,CHAR,CHAR,INT,CHAR" \
 	|psql -q -d $DBNAME
 #
