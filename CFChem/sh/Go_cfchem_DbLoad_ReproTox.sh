@@ -44,6 +44,7 @@ __EOF__
 #
 ###
 # LOAD ReproTox (compounds):
+# Pre-STANDARDIZED!
 SRCDATADIR="$(cd $HOME/../data/CFDE/ReproTox; pwd)"
 csvfile="$SRCDATADIR/ReproTox_export.tsv"
 #

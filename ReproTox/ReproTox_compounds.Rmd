@@ -135,28 +135,4 @@ ReproTox_data <- ReproTox_data[!is.na(LS_ID), .(LS_ID, CAS_RN, CID, SMILES, TERM
 write_delim(ReproTox_data, paste0(Sys.getenv()["HOME"], "/../data/CFDE/ReproTox/ReproTox_export.tsv"), delim="\t")
 ```
 
-## View chemical structures
 
-Using RCDK R package (Chemistry Dev Kit)
-
-```{r}
-moldata <- LS_CV[!is.na(CANSMI)]
-depictor <- get.depictor(style='cow')
-img_w <- 640
-img_h <- 400
-n_row <- 5
-n_col <- 7
-moldata <- moldata[sample(nrow(moldata), n_row*n_col)] #random sample
-#par(mar=c(0,0,-.5,0)) #bottom, left, top, right
-plot(c(0,1e3), c(0,1e3), pch=1, col="white", axes=FALSE, xlab="", ylab="")
-title(main=sprintf("ReproTox-CV sample compounds (%d/%d)", nrow(moldata), nrow(LS_CV[!is.na(CANSMI)])), line = -3, sub="Depicted with RCDK", cex.main=2)
-plot.window(xlim=c(0, img_w*n_col), ylim=c(0, img_h*n_row), asp=1.0)
-for (i in 1:n_row) {
-  for (j in 1:n_col) {
-    mol <- parse.smiles(moldata[(i-1)*n_row+(j), CANSMI])
-    img <- view.image.2d(mol[[1]], depictor=depictor)
-    rasimg <- rasterImage(img, xleft=(j-1)*img_w, xright=j*img_w, ybottom=(i-2)*img_h, ytop=(i-1)*img_h)
-  }
-}
-rasimg
-```
