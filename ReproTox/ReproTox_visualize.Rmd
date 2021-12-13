@@ -1,0 +1,127 @@
+---
+title: "ReproTox visualization"
+author: "Jeremy Yang"
+output:
+  html_document:
+    fig_caption: yes
+    number_sections: yes
+    toc: yes
+  pdf_document:
+    toc: yes
+editor_options:
+  chunk_output_type: console
+---
+
+# Introduction
+
+Initial analysis of compound membership for Repro-Tox, using canonical SMILES as
+unique compound identifier.
+
+RTECS-ReproTox: Reproductive and developmental toxicity dataset excerpted from CDC-RTECS, provided by LeadScope.
+RTECS = Registry of Toxic Effects of Chemical Substances (https://cdc.gov/niosh/rtecs).
+
+```{r echo=FALSE, message=FALSE}
+knitr::opts_chunk$set(echo=FALSE, message=FALSE)
+base::date() 
+```          
+             
+```{r echo=FALSE, message=FALSE, results="hide"}
+library(readr)
+library(data.table)
+library(rcdk)
+require(grid)
+require(futile.logger)
+library(VennDiagram)
+futile.logger::flog.threshold(futile.logger::ERROR, name = "VennDiagramLogger") #Avoid annoying logfiles.
+```
+
+```{r echo=FALSE, message=FALSE, results="hide"}
+display_venn <- function(x, ...) {
+  grid.newpage()
+  venn_object <- venn.diagram(x, filename=NULL, ...)
+  grid.draw(venn_object)
+}
+```
+
+# Compound sets by CFDE-RDKit Canonical SMILES
+
+Canonical SMILES are not globally canonical, thus must be canonicalized via the same algorithm, in this case the RDKit-based CFDE Cheminformatics Db and DevEnv.
+
+```{r}
+LS_Cansmi <- read_delim(paste0(Sys.getenv()["HOME"], "/../data/CFDE/ReproTox/LS_Mapping_std_can.smi"), "\t", col_names=c("CANSMI", "LS_ID"))
+setDT(LS_Cansmi)
+LINCS_Cansmi <- read_delim(paste0(Sys.getenv()["HOME"], "/../data/CFDE/ReproTox/SM_LINCS_10272021_std_can.smi"), "\t", col_names=c("CANSMI", "LCS_ID"))
+setDT(LINCS_Cansmi)
+LS2DiseaseArea <- read_delim(paste0(Sys.getenv()["HOME"], "/../data/CFDE/ReproTox/LS_mapping_MSSM.tsv"), "\t", col_names=c("LS_ID", "DiseaseArea"))
+setDT(LS2DiseaseArea)
+```
+
+## LINCS, ReproTox-ALL
+
+```{r}
+message(sprintf("ReproTox cansmi count: %d", LS_Cansmi[!is.na(CANSMI), uniqueN(CANSMI)]))
+message(sprintf("LINCS cansmi count: %d", LINCS_Cansmi[!is.na(CANSMI), uniqueN(CANSMI)]))
+message(sprintf("ReproTox_LINCS common cansmi: %d", length(intersect(LS_Cansmi[!is.na(CANSMI), CANSMI], LINCS_Cansmi[!is.na(CANSMI), CANSMI]))))
+X <- list(
+	LINCS = LINCS_Cansmi[!is.na(CANSMI), CANSMI], 
+	ReproTox = LS_Cansmi[!is.na(CANSMI), CANSMI])
+display_venn(X, fill=c("pink", "cyan"), main="RTECS-ReproTox and LINCS chemical datasets by CFDE-RDKit-Cansmi")
+```
+
+## ReproTox-Blood, ReproTox-CV, ReproTox-CNS
+
+CV = Cardiovascular, CNS = Central Nervous System
+
+```{r}
+LS_Blood <- LS2DiseaseArea[DiseaseArea=="Blood"]
+LS_Blood <- merge(LS_Blood, LS_Cansmi, by="LS_ID", all.x=T, all.y=F)
+LS_CV <- LS2DiseaseArea[DiseaseArea=="CV"]
+LS_CV <- merge(LS_CV, LS_Cansmi, by="LS_ID", all.x=T, all.y=F)
+LS_CNS <- LS2DiseaseArea[DiseaseArea=="CNS"]
+LS_CNS <- merge(LS_CNS, LS_Cansmi, by="LS_ID", all.x=T, all.y=F)
+X <- list(
+	ReproTox_Blood = LS_Blood[!is.na(CANSMI), CANSMI],
+	ReproTox_CV = LS_CV[!is.na(CANSMI), CANSMI],
+	ReproTox_CNS = LS_CNS[!is.na(CANSMI), CANSMI]
+	)
+display_venn(X, fill=c("#0073C2FF", "#EFC000FF", "#868686FF"), main="RTECS-ReproTox chemical datasets by CFDE-RDKit-Cansmi")
+```
+
+## LINCS, ReproTox-Blood, ReproTox-CV, ReproTox-CNS
+
+```{r}
+X <- list(
+  LINCS = LINCS_Cansmi[!is.na(CANSMI), CANSMI],
+	ReproTox_Blood = LS_Blood[!is.na(CANSMI), CANSMI],
+	ReproTox_CV = LS_CV[!is.na(CANSMI), CANSMI],
+	ReproTox_CNS = LS_CNS[!is.na(CANSMI), CANSMI]
+	)
+display_venn(X, fill=c("pink", "#0073C2FF", "#EFC000FF", "#868686FF"), main="LINCS and RTECS-ReproTox chemical datasets by CFDE-RDKit-Cansmi")
+```
+
+
+## View chemical structures
+
+Using RCDK R package (Chemistry Dev Kit)
+
+```{r}
+moldata <- LS_CV[!is.na(CANSMI)]
+depictor <- get.depictor(style='cow')
+img_w <- 640
+img_h <- 400
+n_row <- 5
+n_col <- 7
+moldata <- moldata[sample(nrow(moldata), n_row*n_col)] #random sample
+#par(mar=c(0,0,-.5,0)) #bottom, left, top, right
+plot(c(0,1e3), c(0,1e3), pch=1, col="white", axes=FALSE, xlab="", ylab="")
+title(main=sprintf("ReproTox-CV sample compounds (%d/%d)", nrow(moldata), nrow(LS_CV[!is.na(CANSMI)])), line = -3, sub="Depicted with RCDK", cex.main=2)
+plot.window(xlim=c(0, img_w*n_col), ylim=c(0, img_h*n_row), asp=1.0)
+for (i in 1:n_row) {
+  for (j in 1:n_col) {
+    mol <- parse.smiles(moldata[(i-1)*n_row+(j), CANSMI])
+    img <- view.image.2d(mol[[1]], depictor=depictor)
+    rasimg <- rasterImage(img, xleft=(j-1)*img_w, xright=j*img_w, ybottom=(i-2)*img_h, ytop=(i-1)*img_h)
+  }
+}
+rasimg
+```
