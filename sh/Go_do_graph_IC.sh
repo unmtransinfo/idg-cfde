@@ -1,4 +1,11 @@
 #!/bin/bash
+###
+# Information Content (IC) in an ontology graph refers to the specificity of 
+# a node, measured by the fraction of a graph included by its subclasses.
+# Thus a Maximally Informative Common Ancestor between two nodes is the 
+# shared superclass, possibly among several, with greatest specificity, and
+# smallest subclass-subgraph.
+###
 #
 cwd=$(pwd)
 #
