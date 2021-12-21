@@ -86,14 +86,31 @@ psql -d $DBNAME -c "UPDATE ${TNAME} SET mol_id = m.id FROM mols m WHERE ${TNAME}
 printf "IDG: N_cansmi:\t%6d\n" $(psql -d $DBNAME -qAc "SELECT COUNT(DISTINCT cansmi) FROM ${TNAME}" |grep '^[0-9]')
 printf "IDG: N_pubchem_cid:\t%6d\n" $(psql -d $DBNAME -qAc "SELECT COUNT(DISTINCT pubchem_cid) FROM ${TNAME}" |grep '^[0-9]')
 #
-# DONE LOADING IDG.
 ###
-cat $csvfile |sed '1d' |awk -F '\t' '{print $1}' |sort -nu \
-	>$SRCDATADIR/tcrd_compounds.cid
-python3 -m BioClients.pubchem.Client get_cid2nicename \
-	--i $SRCDATADIR/tcrd_compounds.cid \
-	--o $SRCDATADIR/tcrd_compounds_names.tsv
+# Names
+# (SLOW, ~1 week)
+namefile="$SRCDATADIR/tcrd_compounds_names.tsv"
+if [ ! -e "${namefile}" ]; then
+	cat $csvfile |sed '1d' |awk -F '\t' '{print $1}' |sort -nu \
+		>$SRCDATADIR/tcrd_compounds.cid
+	python3 -m BioClients.pubchem.Client get_cid2nicename \
+		--i $SRCDATADIR/tcrd_compounds.cid \
+		--o ${namefile}
+fi
 #
+psql -d $DBNAME -c "ALTER TABLE ${TNAME} ADD COLUMN name VARCHAR(80)"
+N=$[$(cat ${namefile} |wc -l)-1]
+i="0"
+while [ $i -lt $N ]; do
+	i=$[$i + 1]
+	line=$(cat ${namefile} |sed '1d' |sed "${i}q;d")
+	cid=$(echo "$line" |awk -F '\t' '{print $1}')
+	name=$(echo "$line" |awk -F '\t' '{print $2}')
+	printf "${i}. CID=${cid}\tName=\"${name}\"\n"
+	psql -d $DBNAME -c "UPDATE ${TNAME} SET name = '${name}' WHERE pubchem_cid = '${cid}'"
+done
+###
+# DONE LOADING IDG.
 ###
 #
 printf "Elapsed time: %ds\n" "$[$(date +%s) - ${T0}]"
