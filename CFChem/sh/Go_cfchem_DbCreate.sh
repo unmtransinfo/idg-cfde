@@ -29,6 +29,14 @@ CREATE TABLE mols (
 	);
 __EOF__
 #
+# Metadata table:
+psql -d $DBNAME <<__EOF__
+CREATE TABLE meta (
+	field VARCHAR(18) PRIMARY KEY,
+	value VARCHAR(100),
+	description VARCHAR(2000)
+	);
+__EOF__
 ###
 #
 printf "Elapsed time: %ds\n" "$[$(date +%s) - ${T0}]"

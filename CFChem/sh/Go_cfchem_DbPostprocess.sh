@@ -33,9 +33,14 @@ psql -d $DBNAME -c "UPDATE mols SET ecfp = morganbv_fp(molecule)"
 psql -d $DBNAME -c "CREATE INDEX fps_ecfp_idx ON mols USING gist(ecfp)"
 #
 ###
-# Names?
-#psql -d $DBNAME -c "UPDATE mols SET name = refmet.refmet_name FROM refmet WHERE refmet.cansmi = mols.cansmi AND mols.cansmi IS NOT NULL"
+# Names (from PubChem)
+psql -d $DBNAME -c "UPDATE mols SET name = idg.name FROM idg WHERE idg.mol_id = mols.id"
+#
 ###
+# Version/timestamp:
+psql -d $DBNAME -c "INSERT INTO meta (field, value, description) VALUES ('timestamp', CURRENT_DATE::VARCHAR, 'Date of build.')"
+###
+# Create user:
 psql -d $DBNAME -c "CREATE ROLE www WITH LOGIN PASSWORD 'foobar'"
 psql -d $DBNAME -c "GRANT SELECT ON ALL TABLES IN SCHEMA ${DBSCHEMA} TO www"
 psql -d $DBNAME -c "GRANT SELECT ON ALL SEQUENCES IN SCHEMA ${DBSCHEMA} TO www"
