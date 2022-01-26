@@ -1,1 +1,2 @@
-id	name	description
+id	name	description	synonyms
+OBI:0000366	metabolite profiling assay	An assay that detects and identifies chemical entities resulting from biochemical and cellular metabolism	["metabolite assay","metabolomic assay"]

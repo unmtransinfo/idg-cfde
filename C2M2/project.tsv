@@ -1,6 +1,2 @@
 id_namespace	local_id	persistent_id	creation_time	abbreviation	name	description
-https://www.druggablegenome.net/	Harmonizome	https://maayanlab.cloud/Harmonizome/	3/30/21		Harmonizome	A collection of information about genes and proteins from 114 datasets provided by 66 online resources.
-https://www.druggablegenome.net/	TCRD	idg_targetpages	3/30/21	tgtpgs	TCRD	IDG TCRD target pages
-https://www.druggablegenome.net/	IDG	https://www.druggablegenome.net/	3/30/21	IDG	IDG	The goal of IDG is to improve our understanding of understudied proteins from the three most commonly drug-targeted protein families: G-protein coupled receptors, ion channels, and protein kinases.
-https://www.druggablegenome.net/	Drugmonizome	https://maayanlab.cloud/Drugmonizome/			Drugmonizome	A web portal for querying sets of known drugs and computing significant biomedical terms that drugs in the set share.
-https://www.druggablegenome.net/	DrugCentral	https://drugcentral.org/			DrugCentral	DrugCentral drug pages.
+tag:hmpdacc.org,2021-10-04:	HMP			HMP	Human Microbiome Project	The Human Microbiome Project (HMP) was a Common Fund program that produced analysis data, tools, and protocols for the comprehensive characterization of the human microbiome and its role in human health and disease. It was carried out in two phases, Human Microbiome Project 1 (HMP1) and Integrative Human Microbiome Project (iHMP).

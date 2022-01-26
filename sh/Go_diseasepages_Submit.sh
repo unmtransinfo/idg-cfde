@@ -1,11 +1,16 @@
 #!/bin/bash
 ###
 # https://docs.nih-cfde.org/en/latest/cfde-submit/docs/
-#
+###
 set -e
 #set -x
 #
-#conda activate cfde
+###
+# From https://docs.nih-cfde.org/en/latest/cfde-submit/docs/install/:
+#	conda create --name cfde python
+#	conda activate cfde
+#	pip3 install --upgrade pip
+#	pip3 install cfde-submit
 ###
 if [ ! $(which cfde-submit) ]; then
 	echo "ERROR: cfde-submit not found. Maybe \"conda activate cfde\"?"
@@ -18,7 +23,8 @@ fi
 TCRD_VERSION="6110"
 #
 cwd=$(pwd)
-DATADIR="${cwd}/data/diseasepages${TCRD_VERSION}"
+#
+DATADIR="$(cd $HOME/../data/CFDE/data/diseasepages${TCRD_VERSION}; pwd)"
 DATAPATH="${DATADIR}/submission"
 #
 if [ ! -e "$DATAPATH" ]; then
@@ -31,7 +37,7 @@ fi
 #
 ###
 # Headers (blank tables) for all C2M2 TSVs!
-# https://osf.io/rdeks/
+# Download from https://osf.io/rdeks/ (manual download only?)
 i=0
 for f in $(ls ${cwd}/C2M2/*.tsv); do
 	i=$(($i + 1))
@@ -111,10 +117,16 @@ printf "id\tname\tdescription\n" >${DATAPATH}/file_format.tsv
 printf "${FILE_FORMAT}\tJSON\tJavaScript Object Notation\n" >>${DATAPATH}/file_format.tsv
 ###
 #cfde-submit run --help
+#
+###
+# Login available via Google, ORCID, or Globus.
 cfde-submit login
+#
+#
 cfde-submit run $DATAPATH \
 	--dcc-id cfde_registry_dcc:idg \
 	--output-dir $DATADIR/submission_output \
+	--dry-run \
 	--verbose
 #
 #	--dry-run \

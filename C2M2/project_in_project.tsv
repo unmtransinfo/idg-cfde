@@ -1,5 +1,2 @@
 parent_project_id_namespace	parent_project_local_id	child_project_id_namespace	child_project_local_id
-https://www.druggablegenome.net/	IDG	https://www.druggablegenome.net/	Harmonizome
-https://www.druggablegenome.net/	IDG	https://www.druggablegenome.net/	TCRD
-https://www.druggablegenome.net/	IDG	https://www.druggablegenome.net/	Drugmonizome
-https://www.druggablegenome.net/	IDG	https://www.druggablegenome.net/	DrugCentral
+tag:hmpdacc.org,2021-10-04:	HMP	tag:hmpdacc.org,2021-10-04:	HMP1

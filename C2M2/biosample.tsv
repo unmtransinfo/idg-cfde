@@ -1,1 +1,2 @@
-id_namespace	local_id	project_id_namespace	project_local_id	persistent_id	creation_time	anatomy
+id_namespace	local_id	project_id_namespace	project_local_id	persistent_id	creation_time	assay_type	anatomy
+tag:hmpdacc.org,2021-10-04:	SRS011105	tag:hmpdacc.org,2021-10-04:	HHS				UBERON:2001427

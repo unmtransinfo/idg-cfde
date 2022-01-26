@@ -1,1 +1,2 @@
-id	clade	name	description
+id	clade	name	description	synonyms
+NCBI:txid9606	species	Homo sapiens	man	["man"]
