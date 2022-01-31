@@ -8,19 +8,32 @@
 set -e
 #set -x
 #
-#conda activate cfde
 ###
+# From https://docs.nih-cfde.org/en/latest/cfde-submit/docs/install/:
+#       conda create --name cfde python
+#       conda activate cfde
+#       pip3 install --upgrade pip
+#       pip3 install cfde-submit
+###
+if [ ! "$CONDA_EXE" ]; then
+        CONDA_EXE=$(which conda)
+fi
+if [ ! "$CONDA_EXE" -o ! -e "$CONDA_EXE" ]; then
+        echo "ERROR: conda not found."
+        exit
+fi
+source $(dirname $CONDA_EXE)/../bin/activate cfde
 if [ ! $(which cfde-submit) ]; then
-	echo "ERROR: cfde-submit not found. Maybe \"conda activate cfde\"?"
-	conda env list
-	exit
+        echo "ERROR: cfde-submit not found."
+        exit
 else
-	printf "cfde-submit EXE: $(which cfde-submit)\n"
+        printf "cfde-submit EXE: $(which cfde-submit)\n"
 fi
 #
+DC_VERSION="2021"
 #
 cwd=$(pwd)
-DATADIR="${cwd}/data/drugpages2020"
+DATADIR="${cwd}/data/drugpages${DC_VERSION}"
 DATAPATH="${DATADIR}/submission"
 #
 if [ ! -e "$DATAPATH" ]; then
@@ -126,9 +139,12 @@ cfde-submit run $DATAPATH \
 	--dcc-id cfde_registry_dcc:idg \
 	--output-dir $DATADIR/submission_output \
 	--delete-dir \
+	--dry-run \
 	--verbose
 #
 #	--dry-run \
 #
 cfde-submit status
+#
+conda deactivate
 #

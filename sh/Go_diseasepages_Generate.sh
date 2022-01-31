@@ -7,7 +7,8 @@ date
 
 T0=$(date +%s)
 
-TCRD_VERSION="6110"
+#TCRD_VERSION="6110"
+TCRD_VERSION="6124"
 
 cwd=$(pwd)
 
@@ -34,7 +35,7 @@ while [ $I -lt $N ]; do
 	did=$(cat $DATADIR/tcrd_diseases.did |sed "${I}q;d")
 	DID=$(echo "${did}" |sed 's/:/_/')
 	FILENAME="tcrd_disease_${DID}.json"
-	printf "${I}. DID=${did}; FILE=${FILENAME}\n"
+	printf "${I}/${N}. DID=${did}; FILE=${FILENAME}\n"
 	ofile=${DATADIR}/${FILENAME}
 	python3 -m BioClients.idg.tcrd.Client getDiseaseAssociationsPage --ids "${did}" --o $ofile
 done

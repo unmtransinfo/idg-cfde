@@ -6,7 +6,7 @@ date
 
 T0=$(date +%s)
 
-TCRD_VERSION="684"
+TCRD_VERSION="6124"
 
 cwd=$(pwd)
 
@@ -32,7 +32,7 @@ while [ $I -lt $N ]; do
 	tid=$(cat $DATADIR/tcrd_targets.tid |sed "${I}q;d")
 	TID=$(printf "%05d" ${tid})
 	FILENAME="tcrd_target_${TID}.json"
-	printf "${I}. TID=${tid}; FILE=${FILENAME}\n"
+	printf "${I}/${N}. TID=${tid}; FILE=${FILENAME}\n"
 	ofile=${DATADIR}/${FILENAME}
 	python3 -m BioClients.idg.tcrd.Client getTargetPage --ids "${tid}" --o $ofile
 done
