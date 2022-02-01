@@ -1,15 +1,15 @@
 #!/bin/bash
 # Create DrugCentral drug page files.
 ###
-
+#
 date
-
+#
 T0=$(date +%s)
-
+#
 DC_VERSION="2021"
-
+#
 cwd=$(pwd)
-
+#
 DATADIR="${cwd}/data/drugpages${DC_VERSION}"
 if [ ! -f ${DATADIR} ]; then
 	mkdir -p ${DATADIR}

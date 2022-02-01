@@ -27,27 +27,26 @@ else
         printf "cfde-submit EXE: $(which cfde-submit)\n"
 fi
 #
+TCRD_VERSION="6124"
+#
 cwd=$(pwd)
-DATADIR="${cwd}/data/targetpages684"
+DATADIR="${cwd}/data/targetpages${TCRD_VERSION}"
 DATAPATH="${DATADIR}/submission"
 #
 if [ ! -e "$DATAPATH" ]; then
 	mkdir -p $DATAPATH
 fi
 #
-if [ ! "$DATAPATH/C2M2_datapackage.json" ]; then
-	wget -O - 'https://osf.io/e5tc2/download' >$DATAPATH/C2M2_datapackage.json
-fi
-#
 ###
 # Headers (blank tables) for all C2M2 TSVs!
-# https://osf.io/rdeks/
-i=0
-for f in $(ls ${cwd}/C2M2/*.tsv); do
-	i=$(($i + 1))
-	printf "%d. Copying C2M2 TSV header: %s\n" "$i" "$(basename $f)"
-	cp $f $DATAPATH
-done
+# Download files from https://osf.io/rdeks/.
+# Download containing folder as zip: https://osf.io/rdeks/files/.
+# Scriptable via https://github.com/osfclient/osfclient
+# (pip install osfclient). Project is c8txv.
+###
+# Also download schema JSON: C2M2_datapackage.json
+###
+${cwd}/sh/Go_c2m2_DownloadSampleTables.sh $DATAPATH
 #
 ###
 metadatafile="${DATADIR}/tcrd_targetpages_c2m2.tsv"
@@ -76,7 +75,6 @@ else
 fi
 #
 #
-TCRD_VERSION="684"
 #
 PROJECT_ID_NAMESPACE="cfde_idg_tcrd"
 PROJECT_LOCAL_ID="idgtcrd"
@@ -125,6 +123,7 @@ cfde-submit login
 cfde-submit run $DATAPATH \
 	--dcc-id cfde_registry_dcc:idg \
 	--output-dir $DATADIR/submission_output \
+	--dry-run \
 	--verbose
 #
 #	--dry-run \

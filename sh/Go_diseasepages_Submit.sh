@@ -38,10 +38,6 @@ if [ ! -e "$DATAPATH" ]; then
 	mkdir -p $DATAPATH
 fi
 #
-if [ ! "$DATAPATH/C2M2_datapackage.json" ]; then
-	wget -O - 'https://osf.io/e5tc2/download' >$DATAPATH/C2M2_datapackage.json
-fi
-#
 ###
 # Headers (blank tables) for all C2M2 TSVs!
 # Download files from https://osf.io/rdeks/.
@@ -49,39 +45,9 @@ fi
 # Scriptable via https://github.com/osfclient/osfclient
 # (pip install osfclient). Project is c8txv.
 ###
-# This works:
-wget -O - 'https://osf.io/hj9br/download' >$DATAPATH/anatomy.tsv
-wget -O - 'https://osf.io/zhs7u/download' >$DATAPATH/assay_type.tsv
-wget -O - 'https://osf.io/r5hp9/download' >$DATAPATH/biosample.tsv
-wget -O - 'https://osf.io/phxzg/download' >$DATAPATH/biosample_disease.tsv
-wget -O - 'https://osf.io/rscbg/download' >$DATAPATH/biosample_from_subject.tsv
-wget -O - 'https://osf.io/2hx4u/download' >$DATAPATH/biosample_gene.tsv
-wget -O - 'https://osf.io/4vybx/download' >$DATAPATH/biosample_in_collection.tsv
-wget -O - 'https://osf.io/ea6j8/download' >$DATAPATH/biosample_substance.tsv
-wget -O - 'https://osf.io/3v2dt/download' >$DATAPATH/collection.tsv
-wget -O - 'https://osf.io/724sj/download' >$DATAPATH/collection_defined_by_project.tsv
-wget -O - 'https://osf.io/fm8ca/download' >$DATAPATH/collection_in_collection.tsv
-wget -O - 'https://osf.io/2qjmr/download' >$DATAPATH/compound.tsv
-wget -O - 'https://osf.io/8qbsz/download' >$DATAPATH/data_type.tsv
-wget -O - 'https://osf.io/uvw9a/download' >$DATAPATH/dcc.tsv
-wget -O - 'https://osf.io/u4fsh/download' >$DATAPATH/disease.tsv
-wget -O - 'https://osf.io/qjeb5/download' >$DATAPATH/file.tsv
-wget -O - 'https://osf.io/bneza/download' >$DATAPATH/file_describes_biosample.tsv
-wget -O - 'https://osf.io/6tmv8/download' >$DATAPATH/file_describes_collection.tsv
-wget -O - 'https://osf.io/wf7vh/download' >$DATAPATH/file_describes_subject.tsv
-wget -O - 'https://osf.io/9yzck/download' >$DATAPATH/file_format.tsv
-wget -O - 'https://osf.io/84jfy/download' >$DATAPATH/file_in_collection.tsv
-wget -O - 'https://osf.io/7t2pz/download' >$DATAPATH/gene.tsv
-wget -O - 'https://osf.io/6gahk/download' >$DATAPATH/id_namespace.tsv
-wget -O - 'https://osf.io/2k8a6/download' >$DATAPATH/ncbi_taxonomy.tsv
-wget -O - 'https://osf.io/ns4zf/download' >$DATAPATH/project.tsv
-wget -O - 'https://osf.io/pt2md/download' >$DATAPATH/project_in_project.tsv
-wget -O - 'https://osf.io/ag9b5/download' >$DATAPATH/subject.tsv
-wget -O - 'https://osf.io/27f9m/download' >$DATAPATH/subject_disease.tsv
-wget -O - 'https://osf.io/w28fs/download' >$DATAPATH/subject_in_collection.tsv
-wget -O - 'https://osf.io/d3evt/download' >$DATAPATH/subject_race.tsv
-wget -O - 'https://osf.io/ucb82/download' >$DATAPATH/subject_role_taxonomy.tsv
-wget -O - 'https://osf.io/v7b5q/download' >$DATAPATH/subject_substance.tsv
+# Also download schema JSON: C2M2_datapackage.json
+###
+${cwd}/sh/Go_c2m2_DownloadSampleTables.sh $DATAPATH
 #
 ###
 metadatafile="${DATADIR}/tcrd_diseasepages_c2m2.tsv"
