@@ -90,12 +90,13 @@ ASSAY_TYPE=""
 MIME_TYPE="application/json"
 #
 # DCID is DrugCentral structure ID.
+N=$(ls $DATADIR/drugcentral_drug_*.json |wc -l)
 I=0
 for ofile in $(ls $DATADIR/drugcentral_drug_*.json) ; do
 	I=$[$I + 1]
 	FILENAME=$(basename $ofile)
 	DCID=$(echo "$ofile" |sed 's/^.*_\([0-9]*\)\.json$/\1/')
-        printf "${I}. DCID=${DCID}; FILE=${FILENAME}\n"
+        printf "${I}/${N}. DCID=${DCID}; FILE=${FILENAME}\n"
 	LOCAL_ID="DCSTRUCT_ID_${DCID}"
         PERSISTENT_ID="${ID_NAMESPACE}.${DRUGCENTRAL_VERSION}.${LOCAL_ID}"
         SIZE_IN_BYTES=$(cat $ofile |wc -c)

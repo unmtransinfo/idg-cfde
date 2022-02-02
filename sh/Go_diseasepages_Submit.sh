@@ -86,12 +86,13 @@ DATA_TYPE=""
 ASSAY_TYPE=""
 MIME_TYPE="application/json"
 #
+N=$(ls $DATADIR/tcrd_disease_*.json |wc -l)
 I=0
 for ofile in $(ls $DATADIR/tcrd_disease_*.json) ; do
 	I=$[$I + 1]
 	FILENAME=$(basename $ofile)
 	DOID=$(echo "$ofile" |sed 's/^.*_\([0-9]*\)\.json$/\1/')
-        printf "${I}. DOID:${DOID}; FILE=${FILENAME}\n"
+        printf "${I}/${N}. DOID:${DOID}; FILE=${FILENAME}\n"
 	LOCAL_ID="DISEASE_DOID_${DOID}"
         PERSISTENT_ID="${ID_NAMESPACE}.${TCRD_VERSION}.${LOCAL_ID}"
         SIZE_IN_BYTES=$(cat $ofile |wc -c)

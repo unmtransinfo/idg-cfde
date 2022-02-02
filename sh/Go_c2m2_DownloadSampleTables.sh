@@ -48,7 +48,8 @@ printf "Downloaded: ${n_download}/${N}; exists: ${n_exist}/${N}\n"
 if [ -e "$DATADIR/C2M2_datapackage.json" ]; then
 	printf "Exists: $DATADIR/C2M2_datapackage.json\n"
 else
-	wget -O - 'https://osf.io/e5tc2/download' >$DATADIR/C2M2_datapackage.json
+	#wget -O - 'https://osf.io/e5tc2/download' >$DATADIR/C2M2_datapackage.json
+	wget -O - 'https://osf.io/vzgx9/download' >$DATADIR/C2M2_datapackage.json
 	printf "Downloaded: $DATADIR/C2M2_datapackage.json\n"
 fi
 #
