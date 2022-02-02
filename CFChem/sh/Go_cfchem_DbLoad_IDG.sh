@@ -106,7 +106,7 @@ while [ $i -lt $N ]; do
 	line=$(cat ${namefile} |sed '1d' |sed "${i}q;d")
 	cid=$(echo "$line" |awk -F '\t' '{print $1}')
 	name=$(echo "$line" |awk -F '\t' '{print $2}')
-	printf "${i}. CID=${cid}\tName=\"${name}\"\n"
+	printf "${i}/${N}. CID=${cid}\tName=\"${name}\"\n"
 	psql -d $DBNAME -c "UPDATE ${TNAME} SET name = '${name}' WHERE pubchem_cid = '${cid}'"
 done
 ###
