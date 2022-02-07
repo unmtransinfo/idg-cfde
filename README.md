@@ -2,7 +2,7 @@
 
 Illuminating the Druggable Genome (IDG) code, tools, and workflows for integration, harmonization and FAIRification in the Common Fund Data Ecosystem (CFDE).
 
-The IDG CFDE team is led by PI's Tudor Oprea, MD, PhD, of UNM, and Avi Ma'ayan, PhD, of ISMMS. 
+The IDG CFDE team is led by PI's Christophe Lambert, PhD, of UNM, and Avi Ma'ayan, PhD, of ISMMS. 
 
 ## Manifests
 
@@ -24,9 +24,4 @@ The IDG CFDE team is led by PI's Tudor Oprea, MD, PhD, of UNM, and Avi Ma'ayan, 
 
   * [NIH-CFDE.org](https://www.nih-cfde.org/)
   * [GitHub:NIH-CFDE](https://github.com/nih-cfde)
-
-## CFChem
-
-CFDE Cheminformatics Db and Development System.
-
-  * See [README.md](CFChem/README.md)
+  * [CFChemDb: CFDE Chemical Db and Development System](https://github.com/unmtransinfo/CFChemDb)
