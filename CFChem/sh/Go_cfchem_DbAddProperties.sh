@@ -34,6 +34,7 @@ fi
 ###
 psql -e -d $DBNAME -c "DROP TABLE IF EXISTS $TNAME"
 psql -e -d $DBNAME -c "CREATE TABLE $TNAME AS SELECT id FROM mols"
+psql -e -d $DBNAME -c "ALTER TABLE $TNAME RENAME id TO mol_id"
 #
 #####################################################################
 # Descriptors:
@@ -71,7 +72,7 @@ while [ $i -lt $N ]; do
 	vals=$(echo $line |awk '{$1=$2=""; print $0}')
 	vals=$(echo $vals |sed "s/\s/', '/g" |sed "s/^\(.*\)$/'\1'/")
 	printf "${i}/${N}. mol_id=${mol_id} (${N_props} properties added)\n"
-	psql -d $DBNAME -c "UPDATE $TNAME SET ($(echo $propnames |sed 's/\s/, /g')) = ROW(${vals}) WHERE id = ${mol_id}"
+	psql -d $DBNAME -c "UPDATE $TNAME SET ($(echo $propnames |sed 's/\s/, /g')) = ROW(${vals}) WHERE mol_id = ${mol_id}"
 done
 #
 #
