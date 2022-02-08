@@ -17,7 +17,7 @@ if [ ! -e "$obofile" ]; then
 fi
 #
 #tags id,name,is_a
-${cwd}/python/obo2csv.py --i $obofile \
+python3 -m BioClients.util.obo.App --i $obofile \
 	|awk -F '\t' '{print $1 "\t" $2 "\t" $9}' \
 	>$DATADIR/doid.tsv
 #
@@ -64,18 +64,23 @@ __EOF__
 #
 ###
 #
-python3 -m BioClients.util.igraph.Utils summary --i $DATADIR/doid.graphml
+python3 -m BioClients.util.igraph.App summary --i $DATADIR/doid.graphml
 #
-python3 -m BioClients.util.igraph.Utils rootnodes --i $DATADIR/doid.graphml -v -v
+python3 -m BioClients.util.igraph.App rootnodes --i $DATADIR/doid.graphml -v -v
 #
-python3 -m BioClients.util.igraph.Utils shortest_path \
+python3 -m BioClients.util.igraph.App shortest_path \
 	--i $DATADIR/doid.graphml \
 	--nidA "DOID:0014667" \
 	--nidB "DOID:0050179"
 #
 ###
 #
-python3 -m BioClients.util.igraph.dag_ic computeIC -v -v \
+python3 -m BioClients.util.igraph.App ic_computeIC -v -v \
 	--i $DATADIR/doid.graphml \
 	--o $DATADIR/doid_ic.graphml
+#
+###
+# Step towards auto-slim algorithm.
+python3 -m BioClients.util.igraph.App topnodes --depth 2 \
+	--i $DATADIR/doid.graphml
 #
