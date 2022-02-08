@@ -82,5 +82,6 @@ python3 -m BioClients.util.igraph.App ic_computeIC -v -v \
 ###
 # Step towards auto-slim algorithm.
 python3 -m BioClients.util.igraph.App topnodes --depth 2 \
-	--i $DATADIR/doid.graphml
+	--i $DATADIR/doid.graphml \
+	--o $DATADIR/doid_topnodes_depth2_out.graphml
 #
