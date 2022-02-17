@@ -103,23 +103,47 @@ for ofile in $(ls $DATADIR/tcrd_disease_*.json) ; do
 done
 #
 ###
-#Overwrite file.tsv
-cp $metadatafile ${DATAPATH}/file.tsv
+# CREATE file.tsv (overwrite sample).
 ###
-# Required per:
-# https://github.com/nih-cfde/published-documentation/wiki/C2M2-Table-Summary
+cp $metadatafile ${DATAPATH}/file.tsv
+#
+###
+# CREATE id_namespace.tsv (overwrite sample).
+###
 printf "id\tabbreviation\tname\tdescription\n" >${DATAPATH}/id_namespace.tsv
 printf "${PROJECT_ID_NAMESPACE}\tIDGTCRD\tIDG TCRD\tIDG Target Central Resource Database\n" >>${DATAPATH}/id_namespace.tsv
 ###
-printf "contact_email\tcontact_name\tproject_id_namespace\tproject_local_id\tdcc_abbreviation\tdcc_name\tdcc_description\tdcc_url\n" >${DATAPATH}/primary_dcc_contact.tsv
-printf "jjyang@salud.unm.edu\tJeremy Yang\t${PROJECT_ID_NAMESPACE}\t${PROJECT_LOCAL_ID}\tidg\tIDG\tIlluminating the Druggable Genome (IDG)\thttps://druggablegenome.net/\n" >>${DATAPATH}/primary_dcc_contact.tsv
+# CREATE dcc.tsv (overwrite sample).
+###
+echo "*** TO DO ***: CREATE dcc.tsv"
+###
+# "contact_email\tcontact_name\tproject_id_namespace\tproject_local_id\tdcc_abbreviation\tdcc_name\tdcc_description\tdcc_url\n"
+printf "id\tdcc_name\tdcc_abbreviation\tdcc_description\tcontact_email\tcontact_name\tdcc_url\tproject_id_namespace\tproject_local_id\n" >${DATAPATH}/dcc.tsv
+printf "idg\tIlluminating the Druggable Genome (IDG)\tIDG\tThe goal of the Illuminating the Druggable Genome (IDG) program is to improve our understanding of the properties and functions of proteins that are currently unannotated within the three most commonly drug-targeted protein families: G-protein coupled receptors, ion channels, and protein kinases.\tjjyang@salud.unm.edu\tJeremy Yang\thttps://druggablegenome.net/\t${PROJECT_ID_NAMESPACE}\t${PROJECT_LOCAL_ID}\n" >>${DATAPATH}/dcc.tsv
+###
+# CREATE project.tsv (overwrite sample).
 ###
 printf "id_namespace\tlocal_id\tpersistent_id\tcreation_time\tabbreviation\tname\tdescription\n" >${DATAPATH}/project.tsv
 printf "${PROJECT_ID_NAMESPACE}\t${PROJECT_LOCAL_ID}\tidg_diseasepages\t${CREATION_TIME}\ttgtpgs\tidg_diseasepages\tIDG
 TCRD disease pages\n" >>${DATAPATH}/project.tsv
 ###
+###
+# CREATE file_format.tsv (overwrite sample).
+###
 printf "id\tname\tdescription\n" >${DATAPATH}/file_format.tsv
 printf "${FILE_FORMAT}\tJSON\tJavaScript Object Notation\n" >>${DATAPATH}/file_format.tsv
+###
+# CREATE file_in_collection.tsv (overwrite sample).
+echo "*** TO DO ***: CREATE file_in_collection.tsv"
+###
+# CREATE disease.tsv (overwrite sample).
+echo "*** TO DO ***: CREATE disease.tsv"
+###
+# CREATE collection_disease.tsv (overwrite sample).
+echo "*** TO DO ***: CREATE collection_disease.tsv"
+###
+# CREATE collection_defined_by_project.tsv (overwrite sample).
+echo "*** TO DO ***: CREATE collection_defined_by_project.tsv"
 ###
 #cfde-submit run --help
 #

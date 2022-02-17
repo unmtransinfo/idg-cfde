@@ -2,6 +2,10 @@
 # Create TCRD disease page files (with associations).
 # Currently only handling DOIDs.
 ###
+# Jan 2022?, New table: collection_disease
+# New association: collection_describes_disease
+# https://github.com/nih-cfde/published-documentation/wiki/TableInfo:-collection_disease.tsv
+###
 
 date
 
