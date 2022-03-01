@@ -78,7 +78,6 @@ fi
 # https://github.com/nih-cfde/published-documentation/wiki/TableInfo:-file.tsv
 # https://osf.io/qjeb5/
 echo "CREATE file.tsv (overwrite sample)."
-###
 printf "id_namespace\tlocal_id\tproject_id_namespace\tproject_local_id\tpersistent_id\tcreation_time\tsize_in_bytes\tuncompressed_size_in_bytes\tsha256\tmd5\tfilename\tfile_format\tdata_type\tassay_type\tmime_type\n" >${DATAPATH}/file.tsv
 ###
 # https://github.com/nih-cfde/published-documentation/wiki/TableInfo:-collection.tsv
@@ -165,14 +164,12 @@ done
 # https://github.com/nih-cfde/published-documentation/wiki/TableInfo:-id_namespace.tsv
 # https://osf.io/6gahk/
 echo "CREATE id_namespace.tsv (overwrite sample)."
-###
 printf "id\tabbreviation\tname\tdescription\n" >${DATAPATH}/id_namespace.tsv
 printf "${PROJECT_ID_NAMESPACE}\tIDGTCRD\tIDG TCRD\tIDG Target Central Resource Database\n" >>${DATAPATH}/id_namespace.tsv
 ###
 # https://github.com/nih-cfde/published-documentation/wiki/TableInfo:-dcc.tsv
 # https://osf.io/uvw9a/
 echo "CREATE dcc.tsv (overwrite sample)"
-###
 # "contact_email\tcontact_name\tproject_id_namespace\tproject_local_id\tdcc_abbreviation\tdcc_name\tdcc_description\tdcc_url\n"
 printf "id\tdcc_name\tdcc_abbreviation\tdcc_description\tcontact_email\tcontact_name\tdcc_url\tproject_id_namespace\tproject_local_id\n" >${DATAPATH}/dcc.tsv
 printf "idg\tIlluminating the Druggable Genome (IDG)\tIDG\tThe goal of the Illuminating the Druggable Genome (IDG) program is to improve our understanding of the properties and functions of proteins that are currently unannotated within the three most commonly drug-targeted protein families: G-protein coupled receptors, ion channels, and protein kinases.\tjjyang@salud.unm.edu\tJeremy Yang\thttps://druggablegenome.net/\t${PROJECT_ID_NAMESPACE}\t${PROJECT_LOCAL_ID}\n" >>${DATAPATH}/dcc.tsv
@@ -180,7 +177,6 @@ printf "idg\tIlluminating the Druggable Genome (IDG)\tIDG\tThe goal of the Illum
 # https://github.com/nih-cfde/published-documentation/wiki/TableInfo:-project.tsv
 # https://osf.io/ns4zf/
 echo "CREATE project.tsv (overwrite sample)."
-###
 printf "id_namespace\tlocal_id\tpersistent_id\tcreation_time\tabbreviation\tname\tdescription\n" >${DATAPATH}/project.tsv
 printf "${PROJECT_ID_NAMESPACE}\t${PROJECT_LOCAL_ID}\tidg_diseasepages\t${CREATION_TIME}\ttgtpgs\tidg_diseasepages\tIDG TCRD disease pages\n" >>${DATAPATH}/project.tsv
 ###
@@ -188,7 +184,6 @@ printf "${PROJECT_ID_NAMESPACE}\t${PROJECT_LOCAL_ID}\tidg_diseasepages\t${CREATI
 # https://github.com/nih-cfde/published-documentation/wiki/TableInfo:-file_format.tsv
 # https://osf.io/9yzck/
 echo "CREATE file_format.tsv (overwrite sample)."
-###
 printf "id\tname\tdescription\n" >${DATAPATH}/file_format.tsv
 printf "${FILE_FORMAT}\tJSON\tJavaScript Object Notation\n" >>${DATAPATH}/file_format.tsv
 #
@@ -200,6 +195,7 @@ printf "${FILE_FORMAT}\tJSON\tJavaScript Object Notation\n" >>${DATAPATH}/file_f
 # Login available via Google, ORCID, or Globus.
 cfde-submit login
 #
+rm -rf $DATADIR/submission_output
 #
 cfde-submit run $DATAPATH \
 	--dcc-id cfde_registry_dcc:idg \
