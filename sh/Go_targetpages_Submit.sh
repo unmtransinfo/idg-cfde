@@ -3,7 +3,6 @@
 # https://docs.nih-cfde.org/en/latest/cfde-submit/docs/
 #
 set -e
-#set -x
 #
 ###
 # From https://docs.nih-cfde.org/en/latest/cfde-submit/docs/install/:
@@ -48,12 +47,6 @@ fi
 ###
 ${cwd}/sh/Go_c2m2_DownloadSampleTables.sh $DATAPATH
 #
-###
-metadatafile="${DATADIR}/tcrd_targetpages_c2m2.tsv"
-printf "id_namespace\tlocal_id\tproject_id_namespace\tproject_local_id\tpersistent_id\tcreation_time\tsize_in_bytes\tuncompressed_size_in_bytes\tsha256\tmd5\tfilename\tfile_format\tdata_type\tassay_type\tmime_type\n" >$metadatafile
-#
-###
-ID_NAMESPACE="cfde_idg_tcrd"
 #
 if [ "$(which sha256sum)" ]; then
 	SHA_EXE="sha256sum"
@@ -74,10 +67,41 @@ else
 	exit
 fi
 #
+###
+# https://github.com/nih-cfde/published-documentation/wiki/TableInfo:-file.tsv
+# https://osf.io/qjeb5/
+echo "CREATE file.tsv (overwrite sample)."
+printf "id_namespace\tlocal_id\tproject_id_namespace\tproject_local_id\tpersistent_id\tcreation_time\tsize_in_bytes\tuncompressed_size_in_bytes\tsha256\tmd5\tfilename\tfile_format\tdata_type\tassay_type\tmime_type\n" >${DATAPATH}/file.tsv
+###
+# https://github.com/nih-cfde/published-documentation/wiki/TableInfo:-collection.tsv
+# https://osf.io/3v2dt/
+# Currently one file per collection this datapackage.
+echo "CREATE collection.tsv (overwrite sample)."
+printf "id_namespace\tlocal_id\tpersistent_id\tcreation_time\tabbreviation\tname\tdescription\n" >${DATAPATH}/collection.tsv
+###
+# https://github.com/nih-cfde/published-documentation/wiki/TableInfo:-file_in_collection.tsv
+# https://osf.io/84jfy/
+# Currently one file per collection this datapackage.
+echo "CREATE file_in_collection.tsv (overwrite sample)."
+printf "file_id_namespace\tfile_local_id\tcollection_id_namespace\tcollection_local_id\n" >${DATAPATH}/file_in_collection.tsv
+###
+# https://github.com/nih-cfde/published-documentation/wiki/TableInfo:-collection_defined_by_project.tsv
+# https://osf.io/724sj/
+echo "CREATE collection_defined_by_project.tsv (overwrite sample)."
+printf "collection_id_namespace\tcollection_local_id\tproject_id_namespace\tproject_local_id\n" >${DATAPATH}/collection_defined_by_project.tsv
 #
+###
+# https://github.com/nih-cfde/published-documentation/wiki/TableInfo:-gene.tsv
+# EnsEMBL gene ID (& name?) required.
+echo "CREATE gene.tsv (overwrite sample)."
+printf "id\tname\tdescription\tsynonyms\torganism\n" >${DATAPATH}/gene.tsv
 #
+###
 PROJECT_ID_NAMESPACE="cfde_idg_tcrd"
 PROJECT_LOCAL_ID="idgtcrd"
+FILE_ID_NAMESPACE=$PROJECT_ID_NAMESPACE
+COLLECTION_ID_NAMESPACE=$PROJECT_ID_NAMESPACE
+#
 CREATION_TIME=$(date +'%Y-%m-%d')
 # http://edamontology.org/format_3464
 FILE_FORMAT="format:3464"
@@ -92,35 +116,73 @@ for ofile in $(ls $DATADIR/tcrd_target_*.json) ; do
 	FILENAME=$(basename $ofile)
 	TID=$(echo "$ofile" |sed 's/^.*_\([0-9]*\)\.json$/\1/')
         printf "${I}/${N}. TID=${TID}; FILE=${FILENAME}\n"
-	LOCAL_ID="TARGET_ID_${TID}"
-        PERSISTENT_ID="${ID_NAMESPACE}.${TCRD_VERSION}.${LOCAL_ID}"
-        SIZE_IN_BYTES=$(cat $ofile |wc -c)
-        UNCOMPRESSED_SIZE_IN_BYTES=${SIZE_IN_BYTES}
+	FILE_LOCAL_ID="TARGET_ID_${TID}"
+        FILE_PERSISTENT_ID="${FILE_ID_NAMESPACE}.${TCRD_VERSION}.${FILE_LOCAL_ID}"
+        FILE_SIZE_IN_BYTES=$(cat $ofile |wc -c)
+        FILE_UNCOMPRESSED_SIZE_IN_BYTES=${FILE_SIZE_IN_BYTES}
         SHA256=$(cat $ofile |$SHA_EXE |sed 's/ .*$//')
         MD5=$(cat $ofile |$MD5_EXE |sed 's/ .*$//')
-        printf "${ID_NAMESPACE}\t${LOCAL_ID}\t${PROJECT_ID_NAMESPACE}\t${PROJECT_LOCAL_ID}\t${PERSISTENT_ID}\t${CREATION_TIME}\t${SIZE_IN_BYTES}\t${UNCOMPRESSED_SIZE_IN_BYTES}\t${SHA256}\t${MD5}\t${FILENAME}\t${FILE_FORMAT}\t${DATA_TYPE}\t${ASSAY_TYPE}\t${MIME_TYPE}\n" >>$metadatafile
+	###
+	# file.tsv
+        printf "${FILE_ID_NAMESPACE}\t${FILE_LOCAL_ID}\t${PROJECT_ID_NAMESPACE}\t${PROJECT_LOCAL_ID}\t${FILE_PERSISTENT_ID}\t${CREATION_TIME}\t${FILE_SIZE_IN_BYTES}\t${FILE_UNCOMPRESSED_SIZE_IN_BYTES}\t${SHA256}\t${MD5}\t${FILENAME}\t${FILE_FORMAT}\t${DATA_TYPE}\t${ASSAY_TYPE}\t${MIME_TYPE}\n" >>${DATAPATH}/file.tsv
+	###
+	# collection.tsv
+	GENE_NAME=$(cat $ofile |grep target_name |sed 's/^.*: "\(.*\)",/\1/')
+	NCBI_GENE_ID=$(cat $ofile |grep protein_geneid |sed 's/^.*: \(.*\),/\1/')
+	COLLECTION_ABBREVIATION="${FILENAME}_collection"
+	COLLECTION_NAME="TargetPage Collection: DOID:${DOID}"
+	COLLECTION_DESCRIPTION="TargetPage Collection: ${GENE_NAME} (TID:${TID}; NCBI_GENE_ID:${GENE_ID}, FILE=${FILENAME})"
+	COLLECTION_LOCAL_ID=$FILE_LOCAL_ID
+        COLLECTION_PERSISTENT_ID="${COLLECTION_ID_NAMESPACE}.${TCRD_VERSION}.${COLLECTION_LOCAL_ID}"
+        printf "${COLLECTION_ID_NAMESPACE}\t${COLLECTION_LOCAL_ID}\t${COLLECTION_PERSISTENT_ID}\t${CREATION_TIME}\t${COLLECTION_ABBREVIATION}\t${COLLECTION_NAME}\t${COLLECTION_DESCRIPTION}\n" >>${DATAPATH}/collection.tsv
+	###
+	# file_in_collection.tsv
+        printf "${FILE_ID_NAMESPACE}\t${FILE_LOCAL_ID}\t${COLLECTION_ID_NAMESPACE}\t${COLLECTION_LOCAL_ID}\n" >>${DATAPATH}/file_in_collection.tsv
+	###
+	# collection_defined_by_project.tsv
+        printf "${COLLECTION_ID_NAMESPACE}\t${COLLECTION_LOCAL_ID}\t${PROJECT_ID_NAMESPACE}\t${PROJECT_LOCAL_ID}\n" >>${DATAPATH}/collection_defined_by_project.tsv
+	###
+	# gene.tsv
+
+	###
+	# gene_disease.tsv
+
+	#
 done
 #
 ###
-#Overwrite file.tsv
-cp $metadatafile ${DATAPATH}/file.tsv
-###
-# Required per:
-# https://github.com/nih-cfde/published-documentation/wiki/C2M2-Table-Summary
+# https://github.com/nih-cfde/published-documentation/wiki/TableInfo:-id_namespace.tsv
+# https://osf.io/6gahk/
+echo "CREATE id_namespace.tsv (overwrite sample)."
 printf "id\tabbreviation\tname\tdescription\n" >${DATAPATH}/id_namespace.tsv
 printf "${PROJECT_ID_NAMESPACE}\tIDGTCRD\tIDG TCRD\tIDG Target Central Resource Database\n" >>${DATAPATH}/id_namespace.tsv
 ###
-printf "contact_email\tcontact_name\tproject_id_namespace\tproject_local_id\tdcc_abbreviation\tdcc_name\tdcc_description\tdcc_url\n" >${DATAPATH}/primary_dcc_contact.tsv
-printf "jjyang@salud.unm.edu\tJeremy Yang\t${PROJECT_ID_NAMESPACE}\t${PROJECT_LOCAL_ID}\tidg\tIDG\tIlluminating the Druggable Genome (IDG)\thttps://druggablegenome.net/\n" >>${DATAPATH}/primary_dcc_contact.tsv
+# https://github.com/nih-cfde/published-documentation/wiki/TableInfo:-dcc.tsv
+# https://osf.io/uvw9a/
+echo "CREATE dcc.tsv (overwrite sample)"
+# "contact_email\tcontact_name\tproject_id_namespace\tproject_local_id\tdcc_abbreviation\tdcc_name\tdcc_description\tdcc_url\n"
+printf "id\tdcc_name\tdcc_abbreviation\tdcc_description\tcontact_email\tcontact_name\tdcc_url\tproject_id_namespace\tproject_local_id\n" >${DATAPATH}/dcc.tsv
+printf "idg\tIlluminating the Druggable Genome (IDG)\tIDG\tThe goal of the Illuminating the Druggable Genome (IDG) program is to improve our understanding of the properties and functions of proteins that are currently unannotated within the three most commonly drug-targeted protein families: G-protein coupled receptors, ion channels, and protein kinases.\tjjyang@salud.unm.edu\tJeremy Yang\thttps://druggablegenome.net/\t${PROJECT_ID_NAMESPACE}\t${PROJECT_LOCAL_ID}\n" >>${DATAPATH}/dcc.tsv
 ###
+# https://github.com/nih-cfde/published-documentation/wiki/TableInfo:-project.tsv
+# https://osf.io/ns4zf/
+echo "CREATE project.tsv (overwrite sample)."
 printf "id_namespace\tlocal_id\tpersistent_id\tcreation_time\tabbreviation\tname\tdescription\n" >${DATAPATH}/project.tsv
-printf "${PROJECT_ID_NAMESPACE}\t${PROJECT_LOCAL_ID}\tidg_targetpages\t${CREATION_TIME}\ttgtpgs\tidg_targetpages\tIDG TCRD target pages\n" >>${DATAPATH}/project.tsv
+printf "${PROJECT_ID_NAMESPACE}\t${PROJECT_LOCAL_ID}\tidg_diseasepages\t${CREATION_TIME}\ttgtpgs\tidg_diseasepages\tIDG TCRD disease pages\n" >>${DATAPATH}/project.tsv
 ###
+# https://github.com/nih-cfde/published-documentation/wiki/TableInfo:-file_format.tsv
+# https://osf.io/9yzck/
+echo "CREATE file_format.tsv (overwrite sample)."
 printf "id\tname\tdescription\n" >${DATAPATH}/file_format.tsv
 printf "${FILE_FORMAT}\tJSON\tJavaScript Object Notation\n" >>${DATAPATH}/file_format.tsv
+#
 ###
 #cfde-submit run --help
+#
 cfde-submit login
+#
+rm -rf $DATADIR/submission_output
+#
 cfde-submit run $DATAPATH \
 	--dcc-id cfde_registry_dcc:idg \
 	--output-dir $DATADIR/submission_output \
