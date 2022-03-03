@@ -23,7 +23,7 @@ zipfile="$DATADIR/C2M2_SampleTables.zip"
 wget -O - "https://files.osf.io/v1/resources/rdeks/providers/osfstorage/?zip=" >$zipfile
 N=$(zipinfo -1 $zipfile |wc -l)
 printf "C2M2 SampleTables (TSVs): ${N}\n"
-(cd $DATADIR; rm *.tsv; unzip -o $zipfile)
+(cd $DATADIR; rm -f *.tsv; unzip -o $zipfile)
 #
 ###
 wget -O - 'https://osf.io/vzgx9/download' >$DATADIR/C2M2_datapackage.json

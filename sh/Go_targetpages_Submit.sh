@@ -29,7 +29,7 @@ fi
 TCRD_VERSION="6124"
 #
 cwd=$(pwd)
-DATADIR="${cwd}/data/targetpages${TCRD_VERSION}"
+DATADIR="$(cd $HOME/../data/CFDE; pwd))/data/targetpages${TCRD_VERSION}"
 DATAPATH="${DATADIR}/submission"
 #
 if [ ! -e "$DATAPATH" ]; then
@@ -45,8 +45,24 @@ fi
 ###
 # Also download schema JSON: C2M2_datapackage.json
 ###
+###
 ${cwd}/sh/Go_c2m2_DownloadSampleTables.sh $DATAPATH
 #
+# Zipfile:5.3GB !!!
+CV_REF_DIR="${cwd}/data/CvRefDir"
+zipfile=$CV_REF_DIR/external_CV_reference_files.zip
+wget -O - 'https://files.osf.io/v1/resources/bq6k9/providers/osfstorage/611e9cf92dab24014f25ba63/?zip=' >$zipfile
+N=$(zipinfo -1 $zipfile |wc -l)
+printf "C2M2 External CV Reference Files: ${N}\n"
+(cd $CV_REF_DIR; rm *; unzip -o $zipfile)
+#
+wget -O - 'https://osf.io/c67sp/download' \
+	|perl -pe "s#^cvRefDir =.*\$#cvRefDir = '${CV_REF_DIR}'#" \
+	|perl -pe "s#^submissionDraftDir =.*\$#submissionDraftDir = '${DATAPATH}'#" \
+	|perl -pe "s#^outDir =.*\$#outDir = '${DATAPATH}'#" \
+	>${DATADIR}/prepare_C2M2_submission.py
+#
+chmod +x ${DATADIR}/prepare_C2M2_submission.py
 #
 if [ "$(which sha256sum)" ]; then
 	SHA_EXE="sha256sum"
@@ -127,8 +143,6 @@ for ofile in $(ls $DATADIR/tcrd_target_*.json) ; do
         printf "${FILE_ID_NAMESPACE}\t${FILE_LOCAL_ID}\t${PROJECT_ID_NAMESPACE}\t${PROJECT_LOCAL_ID}\t${FILE_PERSISTENT_ID}\t${CREATION_TIME}\t${FILE_SIZE_IN_BYTES}\t${FILE_UNCOMPRESSED_SIZE_IN_BYTES}\t${SHA256}\t${MD5}\t${FILENAME}\t${FILE_FORMAT}\t${DATA_TYPE}\t${ASSAY_TYPE}\t${MIME_TYPE}\n" >>${DATAPATH}/file.tsv
 	###
 	# collection.tsv
-	GENE_NAME=$(cat $ofile |grep target_name |sed 's/^.*: "\(.*\)",/\1/')
-	NCBI_GENE_ID=$(cat $ofile |grep protein_geneid |sed 's/^.*: \(.*\),/\1/')
 	COLLECTION_ABBREVIATION="${FILENAME}_collection"
 	COLLECTION_NAME="TargetPage Collection: DOID:${DOID}"
 	COLLECTION_DESCRIPTION="TargetPage Collection: ${GENE_NAME} (TID:${TID}; NCBI_GENE_ID:${GENE_ID}, FILE=${FILENAME})"
@@ -142,14 +156,22 @@ for ofile in $(ls $DATADIR/tcrd_target_*.json) ; do
 	# collection_defined_by_project.tsv
         printf "${COLLECTION_ID_NAMESPACE}\t${COLLECTION_LOCAL_ID}\t${PROJECT_ID_NAMESPACE}\t${PROJECT_LOCAL_ID}\n" >>${DATAPATH}/collection_defined_by_project.tsv
 	###
-	# gene.tsv
-
+	# collection_gene.tsv
+	#GENE_NAME=$(cat $ofile |grep target_name |sed 's/^.*: "\(.*\)",/\1/')
+	#GENE_SYMB=$(cat $ofile |grep protein_sym |sed 's/^.*: "\(.*\)",/\1/')
+	#NCBI_GENE_ID=$(cat $ofile |grep protein_geneid |sed 's/^.*: \(.*\),/\1/')
+	ENSEMBL_GENE_ID=$(cat $ofile |grep ensemblGeneId |sed 's/^.*: "\(.*\)",/\1/')
+        printf "${COLLECTION_ID_NAMESPACE}\t${COLLECTION_LOCAL_ID}\t${ENSEMBL_GENE_ID}\n" >>${DATAPATH}/collection_gene.tsv
 	###
-	# gene_disease.tsv
-
+	# gene.tsv
+	# Auto-generate via prepare_C2M2_submission.py (https://osf.io/c67sp/download)
 	#
 done
 #
+###
+# https://github.com/nih-cfde/published-documentation/wiki/C2M2-Table-Summary
+# Generate derived ("Built by script") TSVs:
+${DATADIR}/prepare_C2M2_submission.py
 ###
 # https://github.com/nih-cfde/published-documentation/wiki/TableInfo:-id_namespace.tsv
 # https://osf.io/6gahk/
