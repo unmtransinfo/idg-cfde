@@ -29,7 +29,7 @@ fi
 TCRD_VERSION="6124"
 #
 cwd=$(pwd)
-DATADIR="$(cd $HOME/../data/CFDE; pwd))/data/targetpages${TCRD_VERSION}"
+DATADIR="$(cd $HOME/../data/CFDE; pwd)/data/targetpages${TCRD_VERSION}"
 DATAPATH="${DATADIR}/submission"
 #
 if [ ! -e "$DATAPATH" ]; then
@@ -48,20 +48,14 @@ fi
 ###
 ${cwd}/sh/Go_c2m2_DownloadSampleTables.sh $DATAPATH
 #
-# Zipfile:5.3GB !!!
-CV_REF_DIR="${cwd}/data/CvRefDir"
-zipfile=$CV_REF_DIR/external_CV_reference_files.zip
-wget -O - 'https://files.osf.io/v1/resources/bq6k9/providers/osfstorage/611e9cf92dab24014f25ba63/?zip=' >$zipfile
-N=$(zipinfo -1 $zipfile |wc -l)
-printf "C2M2 External CV Reference Files: ${N}\n"
-(cd $CV_REF_DIR; rm *; unzip -o $zipfile)
+CV_REF_DIR="$(cd $HOME/../data/CFDE; pwd)/data/CvRefDir"
+${cwd}/sh/Go_c2m2_DownloadCVRefFiles.sh $CV_REF_DIR
 #
 wget -O - 'https://osf.io/c67sp/download' \
 	|perl -pe "s#^cvRefDir =.*\$#cvRefDir = '${CV_REF_DIR}'#" \
 	|perl -pe "s#^submissionDraftDir =.*\$#submissionDraftDir = '${DATAPATH}'#" \
 	|perl -pe "s#^outDir =.*\$#outDir = '${DATAPATH}'#" \
 	>${DATADIR}/prepare_C2M2_submission.py
-#
 chmod +x ${DATADIR}/prepare_C2M2_submission.py
 #
 if [ "$(which sha256sum)" ]; then
