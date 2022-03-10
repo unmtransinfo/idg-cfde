@@ -50,9 +50,16 @@ fi
 ###
 ${cwd}/sh/Go_c2m2_DownloadSampleTables.sh $DATAPATH
 #
-###
+CV_REF_DIR="$(cd $HOME/../data/CFDE; pwd)/data/CvRefDir"
+${cwd}/sh/Go_c2m2_DownloadCVRefFiles.sh $CV_REF_DIR
+CV_REF_DOID_FILE="${CV_REF_DIR}/doid.version_2021-10-12.obo"
 #
-###
+wget -O - 'https://osf.io/c67sp/download' \
+	|perl -pe "s#^cvRefDir =.*\$#cvRefDir = '${CV_REF_DIR}'#" \
+	|perl -pe "s#^submissionDraftDir =.*\$#submissionDraftDir = '${DATAPATH}'#" \
+	|perl -pe "s#^outDir =.*\$#outDir = '${DATAPATH}'#" \
+	>${DATADIR}/prepare_C2M2_submission.py
+chmod +x ${DATADIR}/prepare_C2M2_submission.py
 #
 if [ "$(which sha256sum)" ]; then
 	SHA_EXE="sha256sum"
@@ -78,7 +85,7 @@ fi
 # https://github.com/nih-cfde/published-documentation/wiki/TableInfo:-file.tsv
 # https://osf.io/qjeb5/
 echo "CREATE file.tsv (overwrite sample)."
-printf "id_namespace\tlocal_id\tproject_id_namespace\tproject_local_id\tpersistent_id\tcreation_time\tsize_in_bytes\tuncompressed_size_in_bytes\tsha256\tmd5\tfilename\tfile_format\tdata_type\tassay_type\tmime_type\n" >${DATAPATH}/file.tsv
+printf "id_namespace\tlocal_id\tproject_id_namespace\tproject_local_id\tpersistent_id\tcreation_time\tsize_in_bytes\tuncompressed_size_in_bytes\tsha256\tmd5\tfilename\tfile_format\tcompression_format\tdata_type\tassay_type\tanalysis_type\tmime_type\tbundle_collection_id_namespace\tbundle_collection_local_id\n" >${DATAPATH}/file.tsv
 ###
 # https://github.com/nih-cfde/published-documentation/wiki/TableInfo:-collection.tsv
 # https://osf.io/3v2dt/
@@ -91,11 +98,6 @@ printf "id_namespace\tlocal_id\tpersistent_id\tcreation_time\tabbreviation\tname
 # Currently one file per collection this datapackage.
 echo "CREATE file_in_collection.tsv (overwrite sample)."
 printf "file_id_namespace\tfile_local_id\tcollection_id_namespace\tcollection_local_id\n" >${DATAPATH}/file_in_collection.tsv
-###
-# https://github.com/nih-cfde/published-documentation/wiki/TableInfo:-disease.tsv
-# Currently one disease per file this datapackage.
-echo "CREATE disease.tsv (overwrite sample)."
-printf "id\tname\tdescription\tsynonyms\n" >${DATAPATH}/disease.tsv
 ###
 # https://github.com/nih-cfde/published-documentation/wiki/TableInfo:-collection_disease.tsv
 # https://osf.io/r4uwa/
@@ -126,16 +128,29 @@ for ofile in $(ls $DATADIR/tcrd_disease_*.json) ; do
 	I=$[$I + 1]
 	FILENAME=$(basename $ofile)
 	DOID=$(echo "$ofile" |sed 's/^.*_\([0-9]*\)\.json$/\1/')
+	# Check if DOID in CV file?
+	if [ !  "$(cat ${CV_REF_DOID_FILE} |grep "^id: DOID:${DOID}$")" ]; then
+		if [ "$(cat ${CV_REF_DOID_FILE} |grep "^alt_id: DOID:${DOID}$")" ]; then
+        		printf "${I}/${N}. ERROR: DOID:${DOID} alt_id in ${CV_REF_DOID_FILE}; skipping.\n"
+		else
+        		printf "${I}/${N}. ERROR: DOID:${DOID} not found in ${CV_REF_DOID_FILE}; skipping.\n"
+		fi
+		continue
+	fi
         printf "${I}/${N}. DOID:${DOID}; FILE=${FILENAME}\n"
 	FILE_LOCAL_ID="DISEASE_DOID_${DOID}"
-        FILE_PERSISTENT_ID="${FILE_ID_NAMESPACE}.${TCRD_VERSION}.${FILE_LOCAL_ID}"
+        FILE_PERSISTENT_ID="${FILE_ID_NAMESPACE}.${TCRD_VERSION}.file_${FILE_LOCAL_ID}"
         FILE_SIZE_IN_BYTES=$(cat $ofile |wc -c)
         FILE_UNCOMPRESSED_SIZE_IN_BYTES=${FILE_SIZE_IN_BYTES}
-        SHA256=$(cat $ofile |$SHA_EXE |sed 's/ .*$//')
-        MD5=$(cat $ofile |$MD5_EXE |sed 's/ .*$//')
+        FILE_SHA256=$(cat $ofile |$SHA_EXE |sed 's/ .*$//')
+        FILE_MD5=$(cat $ofile |$MD5_EXE |sed 's/ .*$//')
+	FILE_COMPRESSION_FORMAT=""
+	FILE_ANALYSIS_TYPE=""
+	FILE_BUNDLE_COLLECTION_ID_NAMESPACE=""
+	FILE_BUNDLE_COLLECTION_LOCAL_ID=""
 	###
 	# file.tsv
-        printf "${FILE_ID_NAMESPACE}\t${FILE_LOCAL_ID}\t${PROJECT_ID_NAMESPACE}\t${PROJECT_LOCAL_ID}\t${FILE_PERSISTENT_ID}\t${CREATION_TIME}\t${FILE_SIZE_IN_BYTES}\t${FILE_UNCOMPRESSED_SIZE_IN_BYTES}\t${SHA256}\t${MD5}\t${FILENAME}\t${FILE_FORMAT}\t${DATA_TYPE}\t${ASSAY_TYPE}\t${MIME_TYPE}\n" >>${DATAPATH}/file.tsv
+        printf "${FILE_ID_NAMESPACE}\t${FILE_LOCAL_ID}\t${PROJECT_ID_NAMESPACE}\t${PROJECT_LOCAL_ID}\t${FILE_PERSISTENT_ID}\t${CREATION_TIME}\t${FILE_SIZE_IN_BYTES}\t${FILE_UNCOMPRESSED_SIZE_IN_BYTES}\t${FILE_SHA256}\t${FILE_MD5}\t${FILENAME}\t${FILE_FORMAT}\t${FILE_COMPRESSION_FORMAT}\t${DATA_TYPE}\t${ASSAY_TYPE}\t${FILE_ANALYSIS_TYPE}\t${MIME_TYPE}\t${FILE_BUNDLE_COLLECTION_ID_NAMESPACE}\t${FILE_BUNDLE_COLLECTION_LOCAL_ID}\n" >>${DATAPATH}/file.tsv
 	###
 	# collection.tsv
 	DISEASE_NAME=$(cat $ofile |grep diseaseName |sed 's/^.*: "\(.*\)",/\1/')
@@ -143,23 +158,25 @@ for ofile in $(ls $DATADIR/tcrd_disease_*.json) ; do
 	COLLECTION_NAME="DiseasePage Collection: DOID:${DOID}"
 	COLLECTION_DESCRIPTION="DiseasePage Collection: ${DISEASE_NAME} (DOID:${DOID}, FILE=${FILENAME})"
 	COLLECTION_LOCAL_ID=$FILE_LOCAL_ID
-        COLLECTION_PERSISTENT_ID="${COLLECTION_ID_NAMESPACE}.${TCRD_VERSION}.${COLLECTION_LOCAL_ID}"
+        COLLECTION_PERSISTENT_ID="${COLLECTION_ID_NAMESPACE}.${TCRD_VERSION}.collection_${COLLECTION_LOCAL_ID}"
         printf "${COLLECTION_ID_NAMESPACE}\t${COLLECTION_LOCAL_ID}\t${COLLECTION_PERSISTENT_ID}\t${CREATION_TIME}\t${COLLECTION_ABBREVIATION}\t${COLLECTION_NAME}\t${COLLECTION_DESCRIPTION}\n" >>${DATAPATH}/collection.tsv
 	###
 	# file_in_collection.tsv
         printf "${FILE_ID_NAMESPACE}\t${FILE_LOCAL_ID}\t${COLLECTION_ID_NAMESPACE}\t${COLLECTION_LOCAL_ID}\n" >>${DATAPATH}/file_in_collection.tsv
 	###
-	# disease.tsv
-	DISEASE_SYNONYMS="${DISEASE_NAME}"
-        printf "DOID:${DOID}\t${DISEASE_NAME}\t${DISEASE_DESCRIPTION}\t${DISEASE_SYNONYMS}\n" >>${DATAPATH}/disease.tsv
+	# collection_defined_by_project.tsv
+        printf "${COLLECTION_ID_NAMESPACE}\t${COLLECTION_LOCAL_ID}\t${PROJECT_ID_NAMESPACE}\t${PROJECT_LOCAL_ID}\n" >>${DATAPATH}/collection_defined_by_project.tsv
 	###
 	# collection_disease.tsv
         printf "${COLLECTION_ID_NAMESPACE}\t${COLLECTION_LOCAL_ID}\tDOID:${DOID}\n" >>${DATAPATH}/collection_disease.tsv
-	###
-	# collection_defined_by_project.tsv
-        printf "${COLLECTION_ID_NAMESPACE}\t${COLLECTION_LOCAL_ID}\t${PROJECT_ID_NAMESPACE}\t${PROJECT_LOCAL_ID}\n" >>${DATAPATH}/collection_defined_by_project.tsv
 done
 #
+###
+# Generate: disease.tsv, ...
+# https://github.com/nih-cfde/published-documentation/wiki/C2M2-Table-Summary
+# Generate derived ("Built by script") TSVs:
+echo "RUNNING: ${DATADIR}/prepare_C2M2_submission.py"
+${DATADIR}/prepare_C2M2_submission.py
 ###
 # https://github.com/nih-cfde/published-documentation/wiki/TableInfo:-id_namespace.tsv
 # https://osf.io/6gahk/
@@ -187,16 +204,13 @@ echo "CREATE file_format.tsv (overwrite sample)."
 printf "id\tname\tdescription\n" >${DATAPATH}/file_format.tsv
 printf "${FILE_FORMAT}\tJSON\tJavaScript Object Notation\n" >>${DATAPATH}/file_format.tsv
 #
-#exit #DEBUG
-###
-#cfde-submit run --help
-#
 ###
 # Login available via Google, ORCID, or Globus.
 cfde-submit login
 #
 rm -rf $DATADIR/submission_output
 #
+#cfde-submit run --help
 cfde-submit run $DATAPATH \
 	--dcc-id cfde_registry_dcc:idg \
 	--output-dir $DATADIR/submission_output \

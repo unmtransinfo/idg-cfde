@@ -51,6 +51,7 @@ ${cwd}/sh/Go_c2m2_DownloadSampleTables.sh $DATAPATH
 CV_REF_DIR="$(cd $HOME/../data/CFDE; pwd)/data/CvRefDir"
 ${cwd}/sh/Go_c2m2_DownloadCVRefFiles.sh $CV_REF_DIR
 #
+# Auto-generate via prepare_C2M2_submission.py (https://osf.io/c67sp/download)
 wget -O - 'https://osf.io/c67sp/download' \
 	|perl -pe "s#^cvRefDir =.*\$#cvRefDir = '${CV_REF_DIR}'#" \
 	|perl -pe "s#^submissionDraftDir =.*\$#submissionDraftDir = '${DATAPATH}'#" \
@@ -101,10 +102,10 @@ echo "CREATE collection_defined_by_project.tsv (overwrite sample)."
 printf "collection_id_namespace\tcollection_local_id\tproject_id_namespace\tproject_local_id\n" >${DATAPATH}/collection_defined_by_project.tsv
 #
 ###
-# https://github.com/nih-cfde/published-documentation/wiki/TableInfo:-gene.tsv
-# EnsEMBL gene ID (& name?) required.
-echo "CREATE gene.tsv (overwrite sample)."
-printf "id\tname\tdescription\tsynonyms\torganism\n" >${DATAPATH}/gene.tsv
+# https://github.com/nih-cfde/published-documentation/wiki/TableInfo:-collection_gene.tsv
+# EnsEMBL gene ID required.
+echo "CREATE collection_gene.tsv (overwrite sample)."
+printf "collection_id_namespace\tcollection_local_id\tgene\n" >${DATAPATH}/collection_gene.tsv
 #
 ###
 PROJECT_ID_NAMESPACE="cfde_idg_tcrd"
@@ -151,18 +152,13 @@ for ofile in $(ls $DATADIR/tcrd_target_*.json) ; do
         printf "${COLLECTION_ID_NAMESPACE}\t${COLLECTION_LOCAL_ID}\t${PROJECT_ID_NAMESPACE}\t${PROJECT_LOCAL_ID}\n" >>${DATAPATH}/collection_defined_by_project.tsv
 	###
 	# collection_gene.tsv
-	#GENE_NAME=$(cat $ofile |grep target_name |sed 's/^.*: "\(.*\)",/\1/')
-	#GENE_SYMB=$(cat $ofile |grep protein_sym |sed 's/^.*: "\(.*\)",/\1/')
-	#NCBI_GENE_ID=$(cat $ofile |grep protein_geneid |sed 's/^.*: \(.*\),/\1/')
 	ENSEMBL_GENE_ID=$(cat $ofile |grep ensemblGeneId |sed 's/^.*: "\(.*\)",/\1/')
         printf "${COLLECTION_ID_NAMESPACE}\t${COLLECTION_LOCAL_ID}\t${ENSEMBL_GENE_ID}\n" >>${DATAPATH}/collection_gene.tsv
 	###
-	# gene.tsv
-	# Auto-generate via prepare_C2M2_submission.py (https://osf.io/c67sp/download)
-	#
 done
 #
 ###
+# Generate: gene.tsv, ...
 # https://github.com/nih-cfde/published-documentation/wiki/C2M2-Table-Summary
 # Generate derived ("Built by script") TSVs:
 ${DATADIR}/prepare_C2M2_submission.py
@@ -193,12 +189,12 @@ printf "id\tname\tdescription\n" >${DATAPATH}/file_format.tsv
 printf "${FILE_FORMAT}\tJSON\tJavaScript Object Notation\n" >>${DATAPATH}/file_format.tsv
 #
 ###
-#cfde-submit run --help
-#
+# Login available via Google, ORCID, or Globus.
 cfde-submit login
 #
 rm -rf $DATADIR/submission_output
 #
+#cfde-submit run --help
 cfde-submit run $DATAPATH \
 	--dcc-id cfde_registry_dcc:idg \
 	--output-dir $DATADIR/submission_output \
