@@ -84,31 +84,31 @@ fi
 ###
 # https://github.com/nih-cfde/published-documentation/wiki/TableInfo:-file.tsv
 # https://osf.io/qjeb5/
-echo "CREATE file.tsv (overwrite sample)."
-printf "id_namespace\tlocal_id\tproject_id_namespace\tproject_local_id\tpersistent_id\tcreation_time\tsize_in_bytes\tuncompressed_size_in_bytes\tsha256\tmd5\tfilename\tfile_format\tcompression_format\tdata_type\tassay_type\tanalysis_type\tmime_type\tbundle_collection_id_namespace\tbundle_collection_local_id\n" >${DATAPATH}/file.tsv
+echo "CREATE file.tsv (overwrite sample with header only)."
+cat ${DATAPATH}/file.tsv |head -1 >${DATAPATH}/file.tsv
 ###
 # https://github.com/nih-cfde/published-documentation/wiki/TableInfo:-collection.tsv
 # https://osf.io/3v2dt/
 # Currently one file per collection this datapackage.
-echo "CREATE collection.tsv (overwrite sample)."
-printf "id_namespace\tlocal_id\tpersistent_id\tcreation_time\tabbreviation\tname\tdescription\n" >${DATAPATH}/collection.tsv
+echo "CREATE collection.tsv (overwrite sample with header only)."
+cat ${DATAPATH}/collection.tsv |head -1 >${DATAPATH}/collection.tsv
 ###
 # https://github.com/nih-cfde/published-documentation/wiki/TableInfo:-file_in_collection.tsv
 # https://osf.io/84jfy/
 # Currently one file per collection this datapackage.
-echo "CREATE file_in_collection.tsv (overwrite sample)."
-printf "file_id_namespace\tfile_local_id\tcollection_id_namespace\tcollection_local_id\n" >${DATAPATH}/file_in_collection.tsv
+echo "CREATE file_in_collection.tsv (overwrite sample with header only)."
+cat ${DATAPATH}/file_in_collection.tsv |head -1 >${DATAPATH}/file_in_collection.tsv
+###
+# https://github.com/nih-cfde/published-documentation/wiki/TableInfo:-collection_defined_by_project.tsv
+# https://osf.io/724sj/
+echo "CREATE collection_defined_by_project.tsv (overwrite sample with header only)."
+cat ${DATAPATH}/collection_defined_by_project.tsv |head -1 >${DATAPATH}/collection_defined_by_project.tsv
 ###
 # https://github.com/nih-cfde/published-documentation/wiki/TableInfo:-collection_disease.tsv
 # https://osf.io/r4uwa/
 # Currently one collection per disease this datapackage.
-echo "CREATE collection_disease.tsv (overwrite sample)."
-printf "collection_id_namespace\tcollection_local_id\tdisease\n" >${DATAPATH}/collection_disease.tsv
-###
-# https://github.com/nih-cfde/published-documentation/wiki/TableInfo:-collection_defined_by_project.tsv
-# https://osf.io/724sj/
-echo "CREATE collection_defined_by_project.tsv (overwrite sample)."
-printf "collection_id_namespace\tcollection_local_id\tproject_id_namespace\tproject_local_id\n" >${DATAPATH}/collection_defined_by_project.tsv
+echo "CREATE collection_disease.tsv (overwrite sample with header only)."
+cat ${DATAPATH}/collection_disease.tsv |head -1 >${DATAPATH}/collection_disease.tsv
 #
 PROJECT_ID_NAMESPACE="cfde_idg_tcrd"
 PROJECT_LOCAL_ID="idgtcrd"

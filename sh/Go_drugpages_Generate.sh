@@ -24,7 +24,7 @@ cat $DATADIR/drugcentral_structures.tsv |sed '1d' \
 #
 N=$(cat $DATADIR/drugcentral_structures.struct_id |wc -l)
 #
-printf "N_drugs = %d\n" "$N"
+printf "N_drugs = ${N}\n" 
 #
 I=0
 while [ $I -lt $N ]; do
