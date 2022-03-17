@@ -21,10 +21,14 @@ printf "CV_REF_DIR: ${CV_REF_DIR}\n"
 ###
 # Zipfile:5.3GB !!!
 zipfile=${CV_REF_DIR}/external_CV_reference_files.zip
-wget -O - 'https://files.osf.io/v1/resources/bq6k9/providers/osfstorage/611e9cf92dab24014f25ba63/?zip=' >$zipfile
+if [ ! -e "${zipfile}" ]; then
+	wget -O - 'https://files.osf.io/v1/resources/bq6k9/providers/osfstorage/611e9cf92dab24014f25ba63/?zip=' >$zipfile
+	(cd $CV_REF_DIR; unzip -o $zipfile)
+else
+	echo "${zipfile} exists; not re-downloading."
+fi
 N=$(zipinfo -1 $zipfile |wc -l)
 printf "C2M2 External CV Reference Files: ${N}\n"
-(cd $CV_REF_DIR; unzip -o $zipfile)
 #
 #
 ###

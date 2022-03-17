@@ -87,7 +87,10 @@ function Tsv2HeaderOnly {
 	f=$(basename $1)
 	echo "CREATE ${f} (overwrite with header only)."
 	printf "${f} columns: %s\n" $(cat ${d}/${f} |head -1 |sed 's/\t/,/g')
-	cat ${d}/${f} |head -1 >${d}/${f}
+	tmpfile=$(mktemp)
+	cat ${1} |head -1 >${tmpfile}
+	cp ${tmpfile} ${1}
+	rm ${tmpfile}
 }
 ###
 # https://github.com/nih-cfde/published-documentation/wiki/TableInfo:-file.tsv
@@ -136,7 +139,7 @@ for ofile in $(ls $DATADIR/drugcentral_drug_*.json) ; do
 	COMPOUND_PUBCHEM_CID=$(cat $ofile |${cwd}/python/drugpage2pubchem_cid.py)
 	printf "${I}/${N}. DCID=${DCID}; FILE=${FILENAME}\n"
 	FILE_LOCAL_ID="DCSTRUCT_ID_${DCID}"
-	FILE_PERSISTENT_ID="${FILE_ID_NAMESPACE}.${DC_VERSION}.${FILE_LOCAL_ID}"
+	FILE_PERSISTENT_ID="${FILE_ID_NAMESPACE}.${DC_VERSION}.file_${FILE_LOCAL_ID}"
 	FILE_SIZE_IN_BYTES=$(cat $ofile |wc -c)
 	FILE_UNCOMPRESSED_SIZE_IN_BYTES=${FILE_SIZE_IN_BYTES}
 	FILE_SHA256=$(cat $ofile |$SHA_EXE |sed 's/ .*$//')

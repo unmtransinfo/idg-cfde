@@ -10,8 +10,8 @@ set -e
 # From https://docs.nih-cfde.org/en/latest/cfde-submit/docs/install/:
 #	conda create --name cfde python
 #	conda activate cfde
-#	pip3 install --upgrade pip
-#	pip3 install cfde-submit
+#	pip install --upgrade pip
+#	pip install --upgrade cfde-submit
 ###
 if [ ! "$CONDA_EXE" ]; then
 	CONDA_EXE=$(which conda)
@@ -87,14 +87,16 @@ function Tsv2HeaderOnly {
 	f=$(basename $1)
 	echo "CREATE ${f} (overwrite with header only)."
 	printf "${f} columns: %s\n" $(cat ${d}/${f} |head -1 |sed 's/\t/,/g')
-	cat ${d}/${f} |head -1 >${d}/${f}
+	tmpfile=$(mktemp)
+	cat ${1} |head -1 >${tmpfile}
+	cp ${tmpfile} ${1}
+	rm ${tmpfile}
 }
 ###
 # https://github.com/nih-cfde/published-documentation/wiki/TableInfo:-file.tsv
 # https://osf.io/qjeb5/
 echo "CREATE file.tsv (overwrite sample with header only)."
 Tsv2HeaderOnly $DATAPATH/file.tsv
-
 ###
 # https://github.com/nih-cfde/published-documentation/wiki/TableInfo:-collection.tsv
 # https://osf.io/3v2dt/

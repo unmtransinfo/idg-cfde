@@ -84,7 +84,10 @@ function Tsv2HeaderOnly {
 	f=$(basename $1)
 	echo "CREATE ${f} (overwrite with header only)."
 	printf "${f} columns: %s\n" $(cat ${d}/${f} |head -1 |sed 's/\t/,/g')
-	cat ${d}/${f} |head -1 >${d}/${f}
+	tmpfile=$(mktemp)
+	cat ${1} |head -1 >${tmpfile}
+	cp ${tmpfile} ${1}
+	rm ${tmpfile}
 }
 ###
 # https://github.com/nih-cfde/published-documentation/wiki/TableInfo:-file.tsv
@@ -131,7 +134,7 @@ for ofile in $(ls $DATADIR/tcrd_target_*.json) ; do
 	TID=$(echo "$ofile" |sed 's/^.*_\([0-9]*\)\.json$/\1/')
         printf "${I}/${N}. TID=${TID}; FILE=${FILENAME}\n"
 	FILE_LOCAL_ID="TARGET_ID_${TID}"
-        FILE_PERSISTENT_ID="${FILE_ID_NAMESPACE}.${TCRD_VERSION}.${FILE_LOCAL_ID}"
+        FILE_PERSISTENT_ID="${FILE_ID_NAMESPACE}.${TCRD_VERSION}.file_${FILE_LOCAL_ID}"
         FILE_SIZE_IN_BYTES=$(cat $ofile |wc -c)
         FILE_UNCOMPRESSED_SIZE_IN_BYTES=${FILE_SIZE_IN_BYTES}
         FILE_SHA256=$(cat $ofile |$SHA_EXE |sed 's/ .*$//')
@@ -149,7 +152,7 @@ for ofile in $(ls $DATADIR/tcrd_target_*.json) ; do
 	COLLECTION_NAME="TargetPage Collection: DOID:${DOID}"
 	COLLECTION_DESCRIPTION="TargetPage Collection: ${GENE_NAME} (TID:${TID}; NCBI_GENE_ID:${GENE_ID}, FILE=${FILENAME})"
 	COLLECTION_LOCAL_ID=$FILE_LOCAL_ID
-        COLLECTION_PERSISTENT_ID="${COLLECTION_ID_NAMESPACE}.${TCRD_VERSION}.${COLLECTION_LOCAL_ID}"
+        COLLECTION_PERSISTENT_ID="${COLLECTION_ID_NAMESPACE}.${TCRD_VERSION}.collection_${COLLECTION_LOCAL_ID}"
         printf "${COLLECTION_ID_NAMESPACE}\t${COLLECTION_LOCAL_ID}\t${COLLECTION_PERSISTENT_ID}\t${CREATION_TIME}\t${COLLECTION_ABBREVIATION}\t${COLLECTION_NAME}\t${COLLECTION_DESCRIPTION}\n" >>${DATAPATH}/collection.tsv
 	###
 	# file_in_collection.tsv
