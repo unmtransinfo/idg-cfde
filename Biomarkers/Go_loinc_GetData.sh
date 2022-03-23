@@ -26,7 +26,7 @@ WHERE
 ORDER BY component, loinc_num
 "
 #
-psql -P pager=off -qAtF $'\t' -h $DBHOST -d $DBNAME -c "${sql}" \
+psql -P pager=off -qAF $'\t' -h $DBHOST -d $DBNAME -c "${sql}" \
 	>$DATADIR/loinc_chem_names.tsv
 #
 # Split relatednames2 into separate rows.
