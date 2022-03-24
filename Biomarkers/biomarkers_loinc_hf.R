@@ -1,22 +1,32 @@
+#!/usr/bin/env Rscript
+###
 library(readr)
 library(data.table)
 
 # LOINC codes for chemical tests
-loinc_chem <- read_delim("data/loinc_chem_names.tsv", "\t")
+loinc_file <- "data/loinc_chem_names.tsv"
+message(sprintf("LOINC codes for chemical tests: %s", loinc_file))
+loinc_chem <- read_delim(loinc_file, "\t")
 setDT(loinc_chem)
 message(sprintf("LOINC codes: %d", loinc_chem[, uniqueN(loinc_num)]))
 
 # NextMove LeadMine NER output using GeneAndProtein dictionary for columns "component" and "relatednames2".
-gene_NER_component <- read_delim("data/loinc_chem_names_2_NM_CFDictGeneAndProtein_leadmine.tsv", "\t")
+gene_NER_component_file <- "data/loinc_chem_names_2_NM_CFDictGeneAndProtein_leadmine.tsv"
+message(sprintf("NextMove NER for LOINC-component: %s", gene_NER_component_file))
+gene_NER_component <- read_delim(gene_NER_component_file, "\t")
 setDT(gene_NER_component)
 message(sprintf("LOINC codes mapped via component text to NER genes: %d", gene_NER_component[, uniqueN(DocName)]))
 
-gene_NER_relatednames <-  read_delim("data/loinc_chem_names_6_NM_CFDictGeneAndProtein_leadmine.tsv", "\t")
+gene_NER_relatednames_file <-  "data/loinc_chem_names_6_NM_CFDictGeneAndProtein_leadmine.tsv"
+message(sprintf("NextMove NER for LOINC-relatednames: %s", gene_NER_relatednames_file))
+gene_NER_relatednames <-  read_delim(gene_NER_relatednames_file, "\t")
 setDT(gene_NER_relatednames)
 message(sprintf("LOINC codes mapped via relatednames2 text to NER genes: %d", gene_NER_relatednames[, uniqueN(DocName)]))
 
 # Cerner HealthFacts 2019 counts of encounter_ids and patient_ids for all LOINC codes.
-hf_loinc_counts <- read_delim("data/hf_lab_loinc_counts_OUT.tsv", "\t")
+hf_loinc_counts_file <- "data/hf_lab_loinc_counts_OUT.tsv"
+message(sprintf("Cerner HealthFacts 2019 counts for all LOINC codes: %s", gene_NER_relatednames_file))
+hf_loinc_counts <- read_delim(hf_loinc_counts_file, "\t")
 setDT(hf_loinc_counts)
 message(sprintf("LOINC codes in HF encounters: %d", hf_loinc_counts[, uniqueN(loinc_code)]))
 
