@@ -37,8 +37,8 @@ I=0
 while [ $I -lt $N ]; do
 	I=$[$I + 1]
 	did=$(cat $DATADIR/tcrd_diseases.did |sed "${I}q;d")
-	DID=$(echo "${did}" |sed 's/:/_/')
-	FILENAME="tcrd_disease_${DID}.json"
+	DID=$(printf "%06d" $(echo "${did}" |sed 's/^DOID://' |sed 's/^0*//'))
+	FILENAME="tcrd_disease_DOID_${DID}.json"
 	printf "${I}/${N}. DID=${did}; FILE=${FILENAME}\n"
 	ofile=${DATADIR}/${FILENAME}
 	python3 -m BioClients.idg.tcrd.Client getDiseaseAssociationsPage --ids "${did}" --o $ofile

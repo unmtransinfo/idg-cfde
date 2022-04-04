@@ -54,12 +54,16 @@ CV_REF_DIR="$(cd $HOME/../data/CFDE; pwd)/data/CvRefDir"
 ${cwd}/sh/Go_c2m2_DownloadCVRefFiles.sh $CV_REF_DIR
 CV_REF_DOID_FILE="${CV_REF_DIR}/doid.version_2021-10-12.obo"
 #
-wget -O - 'https://osf.io/c67sp/download' \
-	|perl -pe "s#^cvRefDir =.*\$#cvRefDir = '${CV_REF_DIR}'#" \
-	|perl -pe "s#^submissionDraftDir =.*\$#submissionDraftDir = '${DATAPATH}'#" \
-	|perl -pe "s#^outDir =.*\$#outDir = '${DATAPATH}'#" \
-	>${DATADIR}/prepare_C2M2_submission.py
-chmod +x ${DATADIR}/prepare_C2M2_submission.py
+prepscript="${DATADIR}/prepare_C2M2_submission.py"
+if [ -f ${prepscript} ]; then
+	printf "File exists, not downloaded: %s (may be custom version)\n" "${prepscript}"
+else
+	wget -O - 'https://osf.io/c67sp/download' >${prepscript}
+fi
+perl -pi -e "s#^cvRefDir =.*\$#cvRefDir = '${CV_REF_DIR}'#" ${prepscript}
+perl -pi -e "s#^submissionDraftDir =.*\$#submissionDraftDir = '${DATAPATH}'#" ${prepscript}
+perl -pi -e "s#^outDir =.*\$#outDir = '${DATAPATH}'#"  ${prepscript}
+chmod +x ${prepscript}
 #
 if [ "$(which sha256sum)" ]; then
 	SHA_EXE="sha256sum"
@@ -181,8 +185,8 @@ done
 # Generate: disease.tsv, ...
 # https://github.com/nih-cfde/published-documentation/wiki/C2M2-Table-Summary
 # Generate derived ("Built by script") TSVs:
-echo "RUNNING: ${DATADIR}/prepare_C2M2_submission.py"
-${DATADIR}/prepare_C2M2_submission.py
+echo "RUNNING: ${prepscript}"
+python3 ${prepscript}
 ###
 # https://github.com/nih-cfde/published-documentation/wiki/TableInfo:-id_namespace.tsv
 # https://osf.io/6gahk/
