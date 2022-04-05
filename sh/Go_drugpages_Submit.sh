@@ -191,11 +191,9 @@ printf "idg\tIlluminating the Druggable Genome (IDG)\tIDG\tThe goal of the Illum
 Tsv2HeaderOnly $DATAPATH/project.tsv
 printf "${PROJECT_ID_NAMESPACE}\t${PROJECT_LOCAL_ID}\tidg_drugpages\t${CREATION_TIME}\tdrgpgs\tidg_drugpages\tIDG DrugCentral drug pages\n" >>${DATAPATH}/project.tsv
 ###
-# https://github.com/nih-cfde/published-documentation/wiki/TableInfo:-file_format.tsv
-# https://osf.io/9yzck/
-Tsv2HeaderOnly $DATAPATH/file_format.tsv
-printf "${FILE_FORMAT}\tJSON\tJavaScript Object Notation\n" >>${DATAPATH}/file_format.tsv
-#
+###
+# Header-only TSVs:
+###
 ###
 # Login available via Google, ORCID, or Globus.
 cfde-submit login

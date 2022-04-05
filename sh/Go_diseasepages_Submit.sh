@@ -137,7 +137,8 @@ I=0
 for ofile in $(ls $DATADIR/tcrd_disease_*.json) ; do
 	I=$[$I + 1]
 	FILENAME=$(basename $ofile)
-	DOID=$(echo "$ofile" |sed 's/^.*_\([0-9]*\)\.json$/\1/')
+	DOID=$(echo "$ofile" |sed 's/^.*_0*\([1-9][0-9]*\)\.json$/\1/')
+        printf "${I}/${N}. DOID:${DOID}; FILE=${FILENAME}\n"
 	# Check if DOID in CV file?
 	if [ !  "$(cat ${CV_REF_DOID_FILE} |grep "^id: DOID:${DOID}$")" ]; then
 		if [ "$(cat ${CV_REF_DOID_FILE} |grep "^alt_id: DOID:${DOID}$")" ]; then
@@ -148,7 +149,6 @@ for ofile in $(ls $DATADIR/tcrd_disease_*.json) ; do
 		continue
 	fi
 	DISEASE_NAME=$(cat $ofile |grep diseaseName |sed 's/^.*: "\(.*\)",/\1/')
-        printf "${I}/${N}. DOID:${DOID}; FILE=${FILENAME}\n"
 	FILE_LOCAL_ID="DISEASE_DOID_${DOID}"
         FILE_PERSISTENT_ID="${FILE_ID_NAMESPACE}.${TCRD_VERSION}.file_${FILE_LOCAL_ID}"
         FILE_SIZE_IN_BYTES=$(cat $ofile |wc -c)
@@ -203,13 +203,6 @@ printf "idg\tIlluminating the Druggable Genome (IDG)\tIDG\tThe goal of the Illum
 # https://osf.io/ns4zf/
 Tsv2HeaderOnly $DATAPATH/project.tsv
 printf "${PROJECT_ID_NAMESPACE}\t${PROJECT_LOCAL_ID}\tidg_diseasepages\t${CREATION_TIME}\ttgtpgs\tidg_diseasepages\tIDG TCRD disease pages\n" >>${DATAPATH}/project.tsv
-###
-###
-# https://github.com/nih-cfde/published-documentation/wiki/TableInfo:-file_format.tsv
-# https://osf.io/9yzck/
-Tsv2HeaderOnly $DATAPATH/file_format.tsv
-printf "${FILE_FORMAT}\tJSON\tJavaScript Object Notation\n" >>${DATAPATH}/file_format.tsv
-#
 ###
 # Login available via Google, ORCID, or Globus.
 cfde-submit login

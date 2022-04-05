@@ -5,6 +5,17 @@
 set -e
 #
 ###
+function Tsv2HeaderOnly {
+	d=$(dirname $1)
+	f=$(basename $1)
+	echo "CREATE ${f} (overwrite with header only)."
+	printf "${f} columns: %s\n" $(cat ${d}/${f} |head -1 |sed 's/\t/,/g')
+	tmpfile=$(mktemp)
+	cat ${1} |head -1 >${tmpfile}
+	cp ${tmpfile} ${1}
+	rm ${tmpfile}
+}
+###
 #
 if [ $# -ne 1 ]; then
 	printf "ERROR: Syntax %s DATADIR\n" $(basename $0)
@@ -48,6 +59,11 @@ substance.tsv
 for f in $BUILT_BY_SCRIPT_TSVS ; do
 	printf "Removing BUILT_BY_SCRIPT_TSV: ${f}\n"
 	rm $DATADIR/$f
+done
+###
+# Header-only TSVs (to be overwritten as needed):
+for f in $(ls $DATADIR/*.tsv) ; do
+	Tsv2HeaderOnly ${f}
 done
 ###
 wget -O - 'https://osf.io/vzgx9/download' >$DATADIR/C2M2_datapackage.json
