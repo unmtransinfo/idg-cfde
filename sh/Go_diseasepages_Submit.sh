@@ -4,7 +4,12 @@
 # https://github.com/nih-cfde/published-documentation/wiki (table descriptions)
 # https://osf.io/rdeks/ (sample, empty table TSVs)
 ###
+# New rule: Validation error in collection.tsv
+# field "abbreviation" at position "5" does not conform to a constraint: constraint "pattern" is "^[a-zA-Z0-9_]+$"
+###
 set -e
+#
+T0=$(date +%s)
 #
 ###
 # From https://docs.nih-cfde.org/en/latest/cfde-submit/docs/install/:
@@ -55,11 +60,12 @@ ${cwd}/sh/Go_c2m2_DownloadCVRefFiles.sh $CV_REF_DIR
 CV_REF_DOID_FILE="${CV_REF_DIR}/doid.version_2021-10-12.obo"
 #
 prepscript="${DATADIR}/prepare_C2M2_submission.py"
-if [ -f ${prepscript} ]; then
-	printf "File exists, not downloaded: %s (may be custom version)\n" "${prepscript}"
-else
-	wget -O - 'https://osf.io/c67sp/download' >${prepscript}
-fi
+wget -O - 'https://osf.io/c67sp/download' >${prepscript}
+#if [ -f ${prepscript} ]; then
+#	printf "File exists, not downloaded: %s (may be custom version)\n" "${prepscript}"
+#else
+#	wget -O - 'https://osf.io/c67sp/download' >${prepscript}
+#fi
 perl -pi -e "s#^cvRefDir =.*\$#cvRefDir = '${CV_REF_DIR}'#" ${prepscript}
 perl -pi -e "s#^submissionDraftDir =.*\$#submissionDraftDir = '${DATAPATH}'#" ${prepscript}
 perl -pi -e "s#^outDir =.*\$#outDir = '${DATAPATH}'#"  ${prepscript}
@@ -159,17 +165,19 @@ for ofile in $(ls $DATADIR/tcrd_disease_*.json) ; do
 	FILE_ANALYSIS_TYPE=""
 	FILE_BUNDLE_COLLECTION_ID_NAMESPACE=""
 	FILE_BUNDLE_COLLECTION_LOCAL_ID=""
+	FILE_DBGAP_STUDY_ID=""
 	###
 	# file.tsv
-        printf "${FILE_ID_NAMESPACE}\t${FILE_LOCAL_ID}\t${PROJECT_ID_NAMESPACE}\t${PROJECT_LOCAL_ID}\t${FILE_PERSISTENT_ID}\t${CREATION_TIME}\t${FILE_SIZE_IN_BYTES}\t${FILE_UNCOMPRESSED_SIZE_IN_BYTES}\t${FILE_SHA256}\t${FILE_MD5}\t${FILENAME}\t${FILE_FORMAT}\t${FILE_COMPRESSION_FORMAT}\t${DATA_TYPE}\t${ASSAY_TYPE}\t${FILE_ANALYSIS_TYPE}\t${MIME_TYPE}\t${FILE_BUNDLE_COLLECTION_ID_NAMESPACE}\t${FILE_BUNDLE_COLLECTION_LOCAL_ID}\n" >>${DATAPATH}/file.tsv
+        printf "${FILE_ID_NAMESPACE}\t${FILE_LOCAL_ID}\t${PROJECT_ID_NAMESPACE}\t${PROJECT_LOCAL_ID}\t${FILE_PERSISTENT_ID}\t${CREATION_TIME}\t${FILE_SIZE_IN_BYTES}\t${FILE_UNCOMPRESSED_SIZE_IN_BYTES}\t${FILE_SHA256}\t${FILE_MD5}\t${FILENAME}\t${FILE_FORMAT}\t${FILE_COMPRESSION_FORMAT}\t${DATA_TYPE}\t${ASSAY_TYPE}\t${FILE_ANALYSIS_TYPE}\t${MIME_TYPE}\t${FILE_BUNDLE_COLLECTION_ID_NAMESPACE}\t${FILE_BUNDLE_COLLECTION_LOCAL_ID}\t${FILE_DBGAP_STUDY_ID}\n" >>${DATAPATH}/file.tsv
 	###
 	# collection.tsv
-	COLLECTION_ABBREVIATION="${FILENAME}_collection"
+	COLLECTION_ABBREVIATION="$(echo ${FILENAME} |sed 's/\..*$//')_collection"
 	COLLECTION_NAME="DiseasePage Collection: DOID:${DOID}"
 	COLLECTION_DESCRIPTION="DiseasePage Collection: ${DISEASE_NAME} (DOID:${DOID}, FILE=${FILENAME})"
 	COLLECTION_LOCAL_ID=$FILE_LOCAL_ID
         COLLECTION_PERSISTENT_ID="${COLLECTION_ID_NAMESPACE}.${TCRD_VERSION}.collection_${COLLECTION_LOCAL_ID}"
-        printf "${COLLECTION_ID_NAMESPACE}\t${COLLECTION_LOCAL_ID}\t${COLLECTION_PERSISTENT_ID}\t${CREATION_TIME}\t${COLLECTION_ABBREVIATION}\t${COLLECTION_NAME}\t${COLLECTION_DESCRIPTION}\n" >>${DATAPATH}/collection.tsv
+	COLLECTION_HAS_TIME_SERIES_DATA=""
+        printf "${COLLECTION_ID_NAMESPACE}\t${COLLECTION_LOCAL_ID}\t${COLLECTION_PERSISTENT_ID}\t${CREATION_TIME}\t${COLLECTION_ABBREVIATION}\t${COLLECTION_NAME}\t${COLLECTION_DESCRIPTION}\t${COLLECTION_HAS_TIME_SERIES_DATA}\n" >>${DATAPATH}/collection.tsv
 	###
 	# file_in_collection.tsv
         printf "${FILE_ID_NAMESPACE}\t${FILE_LOCAL_ID}\t${COLLECTION_ID_NAMESPACE}\t${COLLECTION_LOCAL_ID}\n" >>${DATAPATH}/file_in_collection.tsv
@@ -196,8 +204,8 @@ printf "${PROJECT_ID_NAMESPACE}\tIDGTCRD\tIDG TCRD\tIDG Target Central Resource 
 # https://github.com/nih-cfde/published-documentation/wiki/TableInfo:-dcc.tsv
 # https://osf.io/uvw9a/
 Tsv2HeaderOnly $DATAPATH/dcc.tsv
-printf "id\tdcc_name\tdcc_abbreviation\tdcc_description\tcontact_email\tcontact_name\tdcc_url\tproject_id_namespace\tproject_local_id\n" >${DATAPATH}/dcc.tsv
-printf "idg\tIlluminating the Druggable Genome (IDG)\tIDG\tThe goal of the Illuminating the Druggable Genome (IDG) program is to improve our understanding of the properties and functions of proteins that are currently unannotated within the three most commonly drug-targeted protein families: G-protein coupled receptors, ion channels, and protein kinases.\tjjyang@salud.unm.edu\tJeremy Yang\thttps://druggablegenome.net/\t${PROJECT_ID_NAMESPACE}\t${PROJECT_LOCAL_ID}\n" >>${DATAPATH}/dcc.tsv
+DCC_ID="cfde_registry_dcc:idg"
+printf "${DCC_ID}\tIlluminating the Druggable Genome (IDG)\tIDG\tThe goal of the Illuminating the Druggable Genome (IDG) program is to improve our understanding of the properties and functions of proteins that are currently unannotated within the three most commonly drug-targeted protein families: G-protein coupled receptors, ion channels, and protein kinases.\tjjyang@salud.unm.edu\tJeremy Yang\thttps://druggablegenome.net/\t${PROJECT_ID_NAMESPACE}\t${PROJECT_LOCAL_ID}\n" >>${DATAPATH}/dcc.tsv
 ###
 # https://github.com/nih-cfde/published-documentation/wiki/TableInfo:-project.tsv
 # https://osf.io/ns4zf/
@@ -213,12 +221,20 @@ rm -rf $DATADIR/submission_output
 cfde-submit run $DATAPATH \
 	--dcc-id cfde_registry_dcc:idg \
 	--output-dir $DATADIR/submission_output \
-	--dry-run \
 	--verbose
 #
 #	--dry-run \
 #
-cfde-submit status
+while [ 1 ]; do
+	x=$(cfde-submit status)
+	echo ${x}
+	if [ ! "$(echo ${x} |grep 'still in progress')" ]; then
+		break
+	fi
+	sleep 10
+done
 #
 conda deactivate
+#
+printf "Elapsed time: %ds\n" "$[$(date +%s) - ${T0}]"
 #

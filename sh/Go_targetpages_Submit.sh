@@ -4,6 +4,8 @@
 #
 set -e
 #
+T0=$(date +%s)
+#
 ###
 # From https://docs.nih-cfde.org/en/latest/cfde-submit/docs/install/:
 #       conda create --name cfde python
@@ -50,14 +52,19 @@ ${cwd}/sh/Go_c2m2_DownloadSampleTables.sh $DATAPATH
 #
 CV_REF_DIR="$(cd $HOME/../data/CFDE; pwd)/data/CvRefDir"
 ${cwd}/sh/Go_c2m2_DownloadCVRefFiles.sh $CV_REF_DIR
+CV_REF_ENSEMBL_FILE="${CV_REF_DIR}/ensembl_genes.tsv"
 #
-# Auto-generate via prepare_C2M2_submission.py (https://osf.io/c67sp/download)
-wget -O - 'https://osf.io/c67sp/download' \
-	|perl -pe "s#^cvRefDir =.*\$#cvRefDir = '${CV_REF_DIR}'#" \
-	|perl -pe "s#^submissionDraftDir =.*\$#submissionDraftDir = '${DATAPATH}'#" \
-	|perl -pe "s#^outDir =.*\$#outDir = '${DATAPATH}'#" \
-	>${DATADIR}/prepare_C2M2_submission.py
-chmod +x ${DATADIR}/prepare_C2M2_submission.py
+prepscript="${DATADIR}/prepare_C2M2_submission.py"
+wget -O - 'https://osf.io/c67sp/download' >${prepscript}
+#if [ -f ${prepscript} ]; then
+#	printf "File exists, not downloaded: %s (may be custom version)\n" "${prepscript}"
+#else
+#	wget -O - 'https://osf.io/c67sp/download' >${prepscript}
+#fi
+perl -pi -e "s#^cvRefDir =.*\$#cvRefDir = '${CV_REF_DIR}'#" ${prepscript}
+perl -pi -e "s#^submissionDraftDir =.*\$#submissionDraftDir = '${DATAPATH}'#" ${prepscript}
+perl -pi -e "s#^outDir =.*\$#outDir = '${DATAPATH}'#"  ${prepscript}
+chmod +x ${prepscript}
 #
 if [ "$(which sha256sum)" ]; then
 	SHA_EXE="sha256sum"
@@ -127,12 +134,20 @@ ASSAY_TYPE=""
 MIME_TYPE="application/json"
 #
 N=$(ls $DATADIR/tcrd_target_*.json |wc -l)
+N_NOT_FOUND="0"
 I=0
 for ofile in $(ls $DATADIR/tcrd_target_*.json) ; do
 	I=$[$I + 1]
 	FILENAME=$(basename $ofile)
 	TID=$(echo "$ofile" |sed 's/^.*_\([0-9]*\)\.json$/\1/')
         printf "${I}/${N}. TID=${TID}; FILE=${FILENAME}\n"
+	ENSEMBL_GENE_ID=$(cat $ofile |grep ensemblGeneId |sed 's/^.*: "\(.*\)".*$/\1/')
+	# Check if ENSEMBL_GENE_ID in CV file?
+	if [ !  "$(cat ${CV_REF_ENSEMBL_FILE} |grep "^${ENSEMBL_GENE_ID}\s")" ]; then
+		printf "${I}/${N}. ERROR: ENSEMBL:${ENSEMBL_GENE_ID} not found in ${CV_REF_ENSEMBL_FILE}; skipping.\n"
+		N_NOT_FOUND=$[$N_NOT_FOUND + 1]
+		continue
+	fi
 	FILE_LOCAL_ID="TARGET_ID_${TID}"
         FILE_PERSISTENT_ID="${FILE_ID_NAMESPACE}.${TCRD_VERSION}.file_${FILE_LOCAL_ID}"
         FILE_SIZE_IN_BYTES=$(cat $ofile |wc -c)
@@ -143,17 +158,19 @@ for ofile in $(ls $DATADIR/tcrd_target_*.json) ; do
 	FILE_ANALYSIS_TYPE=""
 	FILE_BUNDLE_COLLECTION_ID_NAMESPACE=""
 	FILE_BUNDLE_COLLECTION_LOCAL_ID=""
+	FILE_DBGAP_STUDY_ID=""
 	###
 	# file.tsv
-        printf "${FILE_ID_NAMESPACE}\t${FILE_LOCAL_ID}\t${PROJECT_ID_NAMESPACE}\t${PROJECT_LOCAL_ID}\t${FILE_PERSISTENT_ID}\t${CREATION_TIME}\t${FILE_SIZE_IN_BYTES}\t${FILE_UNCOMPRESSED_SIZE_IN_BYTES}\t${FILE_SHA256}\t${FILE_MD5}\t${FILENAME}\t${FILE_FORMAT}\t${FILE_COMPRESSION_FORMAT}\t${DATA_TYPE}\t${ASSAY_TYPE}\t${FILE_ANALYSIS_TYPE}\t${MIME_TYPE}\t${FILE_BUNDLE_COLLECTION_ID_NAMESPACE}\t${FILE_BUNDLE_COLLECTION_LOCAL_ID}\n" >>${DATAPATH}/file.tsv
+        printf "${FILE_ID_NAMESPACE}\t${FILE_LOCAL_ID}\t${PROJECT_ID_NAMESPACE}\t${PROJECT_LOCAL_ID}\t${FILE_PERSISTENT_ID}\t${CREATION_TIME}\t${FILE_SIZE_IN_BYTES}\t${FILE_UNCOMPRESSED_SIZE_IN_BYTES}\t${FILE_SHA256}\t${FILE_MD5}\t${FILENAME}\t${FILE_FORMAT}\t${FILE_COMPRESSION_FORMAT}\t${DATA_TYPE}\t${ASSAY_TYPE}\t${FILE_ANALYSIS_TYPE}\t${MIME_TYPE}\t${FILE_BUNDLE_COLLECTION_ID_NAMESPACE}\t${FILE_BUNDLE_COLLECTION_LOCAL_ID}\t${FILE_DBGAP_STUDY_ID}\n" >>${DATAPATH}/file.tsv
 	###
 	# collection.tsv
-	COLLECTION_ABBREVIATION="${FILENAME}_collection"
+	COLLECTION_ABBREVIATION="$(echo ${FILENAME} |sed 's/\..*$//')_collection"
 	COLLECTION_NAME="TargetPage Collection: DOID:${DOID}"
 	COLLECTION_DESCRIPTION="TargetPage Collection: ${GENE_NAME} (TID:${TID}; NCBI_GENE_ID:${GENE_ID}, FILE=${FILENAME})"
 	COLLECTION_LOCAL_ID=$FILE_LOCAL_ID
         COLLECTION_PERSISTENT_ID="${COLLECTION_ID_NAMESPACE}.${TCRD_VERSION}.collection_${COLLECTION_LOCAL_ID}"
-        printf "${COLLECTION_ID_NAMESPACE}\t${COLLECTION_LOCAL_ID}\t${COLLECTION_PERSISTENT_ID}\t${CREATION_TIME}\t${COLLECTION_ABBREVIATION}\t${COLLECTION_NAME}\t${COLLECTION_DESCRIPTION}\n" >>${DATAPATH}/collection.tsv
+	COLLECTION_HAS_TIME_SERIES_DATA=""
+        printf "${COLLECTION_ID_NAMESPACE}\t${COLLECTION_LOCAL_ID}\t${COLLECTION_PERSISTENT_ID}\t${CREATION_TIME}\t${COLLECTION_ABBREVIATION}\t${COLLECTION_NAME}\t${COLLECTION_DESCRIPTION}\t${COLLECTION_HAS_TIME_SERIES_DATA}\n" >>${DATAPATH}/collection.tsv
 	###
 	# file_in_collection.tsv
         printf "${FILE_ID_NAMESPACE}\t${FILE_LOCAL_ID}\t${COLLECTION_ID_NAMESPACE}\t${COLLECTION_LOCAL_ID}\n" >>${DATAPATH}/file_in_collection.tsv
@@ -162,16 +179,17 @@ for ofile in $(ls $DATADIR/tcrd_target_*.json) ; do
         printf "${COLLECTION_ID_NAMESPACE}\t${COLLECTION_LOCAL_ID}\t${PROJECT_ID_NAMESPACE}\t${PROJECT_LOCAL_ID}\n" >>${DATAPATH}/collection_defined_by_project.tsv
 	###
 	# collection_gene.tsv
-	ENSEMBL_GENE_ID=$(cat $ofile |grep ensemblGeneId |sed 's/^.*: "\(.*\)",/\1/')
         printf "${COLLECTION_ID_NAMESPACE}\t${COLLECTION_LOCAL_ID}\t${ENSEMBL_GENE_ID}\n" >>${DATAPATH}/collection_gene.tsv
 	###
 done
 #
+printf "ENSEMBL IDs NOT FOUND IN ${CV_REF_ENSEMBL_FILE}: ${N_NOT_FOUND}/${N}\n"
 ###
 # Generate: gene.tsv, ...
 # https://github.com/nih-cfde/published-documentation/wiki/C2M2-Table-Summary
 # Generate derived ("Built by script") TSVs:
-${DATADIR}/prepare_C2M2_submission.py
+echo "RUNNING: ${prepscript}"
+python3 ${prepscript}
 ###
 # https://github.com/nih-cfde/published-documentation/wiki/TableInfo:-id_namespace.tsv
 # https://osf.io/6gahk/
@@ -181,7 +199,8 @@ printf "${PROJECT_ID_NAMESPACE}\tIDGTCRD\tIDG TCRD\tIDG Target Central Resource 
 # https://github.com/nih-cfde/published-documentation/wiki/TableInfo:-dcc.tsv
 # https://osf.io/uvw9a/
 Tsv2HeaderOnly $DATAPATH/dcc.tsv
-printf "idg\tIlluminating the Druggable Genome (IDG)\tIDG\tThe goal of the Illuminating the Druggable Genome (IDG) program is to improve our understanding of the properties and functions of proteins that are currently unannotated within the three most commonly drug-targeted protein families: G-protein coupled receptors, ion channels, and protein kinases.\tjjyang@salud.unm.edu\tJeremy Yang\thttps://druggablegenome.net/\t${PROJECT_ID_NAMESPACE}\t${PROJECT_LOCAL_ID}\n" >>${DATAPATH}/dcc.tsv
+DCC_ID="cfde_registry_dcc:idg"
+printf "${DCC_ID}\tIlluminating the Druggable Genome (IDG)\tIDG\tThe goal of the Illuminating the Druggable Genome (IDG) program is to improve our understanding of the properties and functions of proteins that are currently unannotated within the three most commonly drug-targeted protein families: G-protein coupled receptors, ion channels, and protein kinases.\tjjyang@salud.unm.edu\tJeremy Yang\thttps://druggablegenome.net/\t${PROJECT_ID_NAMESPACE}\t${PROJECT_LOCAL_ID}\n" >>${DATAPATH}/dcc.tsv
 ###
 # https://github.com/nih-cfde/published-documentation/wiki/TableInfo:-project.tsv
 # https://osf.io/ns4zf/
@@ -198,12 +217,20 @@ rm -rf $DATADIR/submission_output
 cfde-submit run $DATAPATH \
 	--dcc-id cfde_registry_dcc:idg \
 	--output-dir $DATADIR/submission_output \
-	--dry-run \
 	--verbose
 #
 #	--dry-run \
 #
-cfde-submit status
+while [ 1 ]; do
+	x=$(cfde-submit status)
+	echo ${x}
+	if [ ! "$(echo ${x} |grep 'still in progress')" ]; then
+		break
+	fi
+	sleep 10
+done
 #
 conda deactivate
+#
+printf "Elapsed time: %ds\n" "$[$(date +%s) - ${T0}]"
 #

@@ -7,6 +7,8 @@
 #
 set -e
 #
+T0=$(date +%s)
+#
 ###
 # From https://docs.nih-cfde.org/en/latest/cfde-submit/docs/install/:
 #       conda create --name cfde python
@@ -52,15 +54,20 @@ ${cwd}/sh/Go_c2m2_DownloadSampleTables.sh $DATAPATH
 #
 CV_REF_DIR="$(cd $HOME/../data/CFDE; pwd)/data/CvRefDir"
 ${cwd}/sh/Go_c2m2_DownloadCVRefFiles.sh $CV_REF_DIR
+CV_REF_CID_FILE="${CV_REF_DIR}/compound.tsv.gz"
 #
 ###
-# Auto-generate via prepare_C2M2_submission.py (https://osf.io/c67sp/download)
-wget -O - 'https://osf.io/c67sp/download' \
-	|perl -pe "s#^cvRefDir =.*\$#cvRefDir = '${CV_REF_DIR}'#" \
-	|perl -pe "s#^submissionDraftDir =.*\$#submissionDraftDir = '${DATAPATH}'#" \
-	|perl -pe "s#^outDir =.*\$#outDir = '${DATAPATH}'#" \
-	>${DATADIR}/prepare_C2M2_submission.py
-chmod +x ${DATADIR}/prepare_C2M2_submission.py
+prepscript="${DATADIR}/prepare_C2M2_submission.py"
+wget -O - 'https://osf.io/c67sp/download' >${prepscript}
+#if [ -f ${prepscript} ]; then
+#	printf "File exists, not downloaded: %s (may be custom version)\n" "${prepscript}"
+#else
+#	wget -O - 'https://osf.io/c67sp/download' >${prepscript}
+#fi
+perl -pi -e "s#^cvRefDir =.*\$#cvRefDir = '${CV_REF_DIR}'#" ${prepscript}
+perl -pi -e "s#^submissionDraftDir =.*\$#submissionDraftDir = '${DATAPATH}'#" ${prepscript}
+perl -pi -e "s#^outDir =.*\$#outDir = '${DATAPATH}'#"  ${prepscript}
+chmod +x ${prepscript}
 #
 if [ "$(which sha256sum)" ]; then
 	SHA_EXE="sha256sum"
@@ -131,13 +138,20 @@ MIME_TYPE="application/json"
 #
 # DCID is DrugCentral structure ID.
 N=$(ls $DATADIR/drugcentral_drug_*.json |wc -l)
+N_NOT_FOUND="0"
 I=0
 for ofile in $(ls $DATADIR/drugcentral_drug_*.json) ; do
 	I=$[$I + 1]
 	FILENAME=$(basename $ofile)
 	DCID=$(echo "$ofile" |sed 's/^.*_\([0-9]*\)\.json$/\1/')
-	COMPOUND_PUBCHEM_CID=$(cat $ofile |${cwd}/python/drugpage2pubchem_cid.py)
-	printf "${I}/${N}. DCID=${DCID}; FILE=${FILENAME}\n"
+	PCCID=$(cat $ofile |${cwd}/python/drugpage2pubchem_cid.py)
+	printf "${I}/${N}. DCID=${DCID}; PCCID=${PCCID}; FILE=${FILENAME}\n"
+	# Check if PCCID in CV file?
+	if [ !  "$(gunzip -c ${CV_REF_CID_FILE} |grep "^${PCCID}\s")" ]; then
+		printf "${I}/${N}. ERROR: PubChem_CID:${PCCID} not found in ${CV_REF_CID_FILE}; skipping.\n"
+		N_NOT_FOUND=$[$N_NOT_FOUND + 1]
+		continue
+	fi
 	FILE_LOCAL_ID="DCSTRUCT_ID_${DCID}"
 	FILE_PERSISTENT_ID="${FILE_ID_NAMESPACE}.${DC_VERSION}.file_${FILE_LOCAL_ID}"
 	FILE_SIZE_IN_BYTES=$(cat $ofile |wc -c)
@@ -148,15 +162,17 @@ for ofile in $(ls $DATADIR/drugcentral_drug_*.json) ; do
 	FILE_ANALYSIS_TYPE=""
 	FILE_BUNDLE_COLLECTION_ID_NAMESPACE=""
 	FILE_BUNDLE_COLLECTION_LOCAL_ID=""
-        printf "${FILE_ID_NAMESPACE}\t${FILE_LOCAL_ID}\t${PROJECT_ID_NAMESPACE}\t${PROJECT_LOCAL_ID}\t${FILE_PERSISTENT_ID}\t${CREATION_TIME}\t${FILE_SIZE_IN_BYTES}\t${FILE_UNCOMPRESSED_SIZE_IN_BYTES}\t${FILE_SHA256}\t${FILE_MD5}\t${FILENAME}\t${FILE_FORMAT}\t${FILE_COMPRESSION_FORMAT}\t${DATA_TYPE}\t${ASSAY_TYPE}\t${FILE_ANALYSIS_TYPE}\t${MIME_TYPE}\t${FILE_BUNDLE_COLLECTION_ID_NAMESPACE}\t${FILE_BUNDLE_COLLECTION_LOCAL_ID}\n" >>${DATAPATH}/file.tsv
+	FILE_DBGAP_STUDY_ID=""
+        printf "${FILE_ID_NAMESPACE}\t${FILE_LOCAL_ID}\t${PROJECT_ID_NAMESPACE}\t${PROJECT_LOCAL_ID}\t${FILE_PERSISTENT_ID}\t${CREATION_TIME}\t${FILE_SIZE_IN_BYTES}\t${FILE_UNCOMPRESSED_SIZE_IN_BYTES}\t${FILE_SHA256}\t${FILE_MD5}\t${FILENAME}\t${FILE_FORMAT}\t${FILE_COMPRESSION_FORMAT}\t${DATA_TYPE}\t${ASSAY_TYPE}\t${FILE_ANALYSIS_TYPE}\t${MIME_TYPE}\t${FILE_BUNDLE_COLLECTION_ID_NAMESPACE}\t${FILE_BUNDLE_COLLECTION_LOCAL_ID}\t${FILE_DBGAP_STUDY_ID}\n" >>${DATAPATH}/file.tsv
 	###
 	# collection.tsv
-	COLLECTION_ABBREVIATION="${FILENAME}_collection"
+	COLLECTION_ABBREVIATION="$(echo ${FILENAME} |sed 's/\..*$//')_collection"
 	COLLECTION_NAME="DrugPage Collection: DCID:${DCID}"
-	COLLECTION_DESCRIPTION="DrugPage Collection: ${COMPOUND_NAME} (DrugCentralID:${DCID}; PubChem_CID:${COMPOUND_PUBCHEM_CID}, FILE=${FILENAME})"
+	COLLECTION_DESCRIPTION="DrugPage Collection: ${COMPOUND_NAME} (DrugCentralID:${DCID}; PubChem_CID:${PCCID}, FILE=${FILENAME})"
 	COLLECTION_LOCAL_ID=$FILE_LOCAL_ID
 	COLLECTION_PERSISTENT_ID="${COLLECTION_ID_NAMESPACE}.${TCRD_VERSION}.collection_${COLLECTION_LOCAL_ID}"
-	printf "${COLLECTION_ID_NAMESPACE}\t${COLLECTION_LOCAL_ID}\t${COLLECTION_PERSISTENT_ID}\t${CREATION_TIME}\t${COLLECTION_ABBREVIATION}\t${COLLECTION_NAME}\t${COLLECTION_DESCRIPTION}\n" >>${DATAPATH}/collection.tsv
+	COLLECTION_HAS_TIME_SERIES_DATA=""
+	printf "${COLLECTION_ID_NAMESPACE}\t${COLLECTION_LOCAL_ID}\t${COLLECTION_PERSISTENT_ID}\t${CREATION_TIME}\t${COLLECTION_ABBREVIATION}\t${COLLECTION_NAME}\t${COLLECTION_DESCRIPTION}\t${COLLECTION_HAS_TIME_SERIES_DATA}\n" >>${DATAPATH}/collection.tsv
 	###
 	# file_in_collection.tsv
 	printf "${FILE_ID_NAMESPACE}\t${FILE_LOCAL_ID}\t${COLLECTION_ID_NAMESPACE}\t${COLLECTION_LOCAL_ID}\n" >>${DATAPATH}/file_in_collection.tsv
@@ -165,15 +181,16 @@ for ofile in $(ls $DATADIR/drugcentral_drug_*.json) ; do
 	printf "${COLLECTION_ID_NAMESPACE}\t${COLLECTION_LOCAL_ID}\t${PROJECT_ID_NAMESPACE}\t${PROJECT_LOCAL_ID}\n" >>${DATAPATH}/collection_defined_by_project.tsv
 	###
 	# collection_compound.tsv
-	printf "${COLLECTION_ID_NAMESPACE}\t${COLLECTION_LOCAL_ID}\t${COMPOUND_PUBCHEM_CID}\n" >>${DATAPATH}/collection_compound.tsv
+	printf "${COLLECTION_ID_NAMESPACE}\t${COLLECTION_LOCAL_ID}\t${PCCID}\n" >>${DATAPATH}/collection_compound.tsv
 done
 #
+printf "PubChem_CIDs NOT FOUND IN ${CV_REF_CID_FILE}: ${N_NOT_FOUND}/${N}\n"
 ###
 # Generate: compound.tsv, ...
 # https://github.com/nih-cfde/published-documentation/wiki/C2M2-Table-Summary
 # Generate derived ("Built by script") TSVs:
-echo "RUNNING: ${DATADIR}/prepare_C2M2_submission.py"
-${DATADIR}/prepare_C2M2_submission.py
+echo "RUNNING: ${prepscript}"
+python3 ${prepscript}
 ###
 # https://github.com/nih-cfde/published-documentation/wiki/TableInfo:-id_namespace.tsv
 # https://osf.io/6gahk/
@@ -184,7 +201,8 @@ printf "${PROJECT_ID_NAMESPACE}\tIDGDC\tIDG DRUGCENTRAL\tIDG DrugCentral\n" >>${
 # https://github.com/nih-cfde/published-documentation/wiki/TableInfo:-dcc.tsv
 # https://osf.io/uvw9a/
 Tsv2HeaderOnly $DATAPATH/dcc.tsv
-printf "idg\tIlluminating the Druggable Genome (IDG)\tIDG\tThe goal of the Illuminating the Druggable Genome (IDG) program is to improve our understanding of the properties and functions of proteins that are currently unannotated within the three most commonly drug-targeted protein families: G-protein coupled receptors, ion channels, and protein kinases.\tjjyang@salud.unm.edu\tJeremy Yang\thttps://druggablegenome.net/\t${PROJECT_ID_NAMESPACE}\t${PROJECT_LOCAL_ID}\n" >>${DATAPATH}/dcc.tsv
+DCC_ID="cfde_registry_dcc:idg"
+printf "${DCC_ID}\tIlluminating the Druggable Genome (IDG)\tIDG\tThe goal of the Illuminating the Druggable Genome (IDG) program is to improve our understanding of the properties and functions of proteins that are currently unannotated within the three most commonly drug-targeted protein families: G-protein coupled receptors, ion channels, and protein kinases.\tjjyang@salud.unm.edu\tJeremy Yang\thttps://druggablegenome.net/\t${PROJECT_ID_NAMESPACE}\t${PROJECT_LOCAL_ID}\n" >>${DATAPATH}/dcc.tsv
 ###
 # https://github.com/nih-cfde/published-documentation/wiki/TableInfo:-project.tsv
 # https://osf.io/ns4zf/
@@ -202,13 +220,20 @@ cfde-submit login
 cfde-submit run $DATAPATH \
 	--dcc-id cfde_registry_dcc:idg \
 	--output-dir $DATADIR/submission_output \
-	--dry-run \
 	--verbose
 #
 #	--dry-run \
-#	--delete-dir \
 #
-cfde-submit status
+while [ 1 ]; do
+	x=$(cfde-submit status)
+	echo ${x}
+	if [ ! "$(echo ${x} |grep 'still in progress')" ]; then
+		break
+	fi
+	sleep 10
+done
 #
 conda deactivate
+#
+printf "Elapsed time: %ds\n" "$[$(date +%s) - ${T0}]"
 #
