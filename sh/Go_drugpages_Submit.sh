@@ -54,7 +54,11 @@ ${cwd}/sh/Go_c2m2_DownloadSampleTables.sh $DATAPATH
 #
 CV_REF_DIR="$(cd $HOME/../data/CFDE; pwd)/data/CvRefDir"
 ${cwd}/sh/Go_c2m2_DownloadCVRefFiles.sh $CV_REF_DIR
-CV_REF_CID_FILE="${CV_REF_DIR}/compound.tsv.gz"
+# Uncompress and clean for faster checking.
+CV_REF_CID_FILE="${DATADIR}/compound.cid"
+gunzip -c ${CV_REF_DIR}/compound.tsv.gz \
+	|sed '1d' |awk -F '\t' '{print $1}' |grep '^[0-9]' \
+	>$CV_REF_CID_FILE
 #
 ###
 prepscript="${DATADIR}/prepare_C2M2_submission.py"
@@ -147,7 +151,7 @@ for ofile in $(ls $DATADIR/drugcentral_drug_*.json) ; do
 	PCCID=$(cat $ofile |${cwd}/python/drugpage2pubchem_cid.py)
 	printf "${I}/${N}. DCID=${DCID}; PCCID=${PCCID}; FILE=${FILENAME}\n"
 	# Check if PCCID in CV file?
-	if [ !  "$(gunzip -c ${CV_REF_CID_FILE} |grep "^${PCCID}\s")" ]; then
+	if [ !  "$(cat ${CV_REF_CID_FILE} |grep "^${PCCID}$")" ]; then
 		printf "${I}/${N}. ERROR: PubChem_CID:${PCCID} not found in ${CV_REF_CID_FILE}; skipping.\n"
 		N_NOT_FOUND=$[$N_NOT_FOUND + 1]
 		continue
