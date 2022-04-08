@@ -165,7 +165,7 @@ for ofile in $(ls $DATADIR/tcrd_target_*.json) ; do
 	###
 	# collection.tsv
 	COLLECTION_ABBREVIATION="$(echo ${FILENAME} |sed 's/\..*$//')_collection"
-	COLLECTION_NAME="TargetPage Collection: DOID:${DOID}"
+	COLLECTION_NAME="TargetPage_Collection_TID_${TID}"
 	COLLECTION_DESCRIPTION="TargetPage Collection: ${GENE_NAME} (TID:${TID}; NCBI_GENE_ID:${GENE_ID}, FILE=${FILENAME})"
 	COLLECTION_LOCAL_ID=$FILE_LOCAL_ID
         COLLECTION_PERSISTENT_ID="${COLLECTION_ID_NAMESPACE}.${TCRD_VERSION}.collection_${COLLECTION_LOCAL_ID}"

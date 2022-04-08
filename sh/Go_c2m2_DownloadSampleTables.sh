@@ -66,7 +66,9 @@ for f in $(ls $DATADIR/*.tsv) ; do
 	Tsv2HeaderOnly ${f}
 done
 ###
-wget -O - 'https://osf.io/vzgx9/download' >$DATADIR/C2M2_datapackage.json
+#schema_url="https://osf.io/vzgx9/download"
+schema_url="https://files.osf.io/v1/resources/c63aw/providers/osfstorage/611ea0b6d2109701516b0934?action=download&direct&version=6"
+wget -O - $schema_url >$DATADIR/C2M2_datapackage.json
 printf "Downloaded: $DATADIR/C2M2_datapackage.json\n"
 #
 ###

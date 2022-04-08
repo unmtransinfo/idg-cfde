@@ -143,6 +143,7 @@ MIME_TYPE="application/json"
 # DCID is DrugCentral structure ID.
 N=$(ls $DATADIR/drugcentral_drug_*.json |wc -l)
 N_NOT_FOUND="0"
+N_CID_MISSING="0"
 I=0
 for ofile in $(ls $DATADIR/drugcentral_drug_*.json) ; do
 	I=$[$I + 1]
@@ -150,11 +151,16 @@ for ofile in $(ls $DATADIR/drugcentral_drug_*.json) ; do
 	DCID=$(echo "$ofile" |sed 's/^.*_\([0-9]*\)\.json$/\1/')
 	PCCID=$(cat $ofile |${cwd}/python/drugpage2pubchem_cid.py)
 	printf "${I}/${N}. DCID=${DCID}; PCCID=${PCCID}; FILE=${FILENAME}\n"
-	# Check if PCCID in CV file?
-	if [ !  "$(cat ${CV_REF_CID_FILE} |grep "^${PCCID}$")" ]; then
-		printf "${I}/${N}. ERROR: PubChem_CID:${PCCID} not found in ${CV_REF_CID_FILE}; skipping.\n"
-		N_NOT_FOUND=$[$N_NOT_FOUND + 1]
+	# Check if PCCID exists?
+	if [ !  "${PCCID}" ]; then
+		printf "${I}/${N}. NOTE: PubChem_CID missing for DCID:${DCID}; skipping.\n"
+		N_CID_MISSING=$[$N_CID_MISSING + 1]
 		continue
+	# Check if PCCID in CV file? MAY BE UNNECESSARY.
+	#elif [ !  "$(cat ${CV_REF_CID_FILE} |grep "^${PCCID}$")" ]; then
+	#	printf "${I}/${N}. ERROR: PubChem_CID:${PCCID} not found in ${CV_REF_CID_FILE}; skipping.\n"
+	#	N_NOT_FOUND=$[$N_NOT_FOUND + 1]
+	#	continue
 	fi
 	FILE_LOCAL_ID="DCSTRUCT_ID_${DCID}"
 	FILE_PERSISTENT_ID="${FILE_ID_NAMESPACE}.${DC_VERSION}.file_${FILE_LOCAL_ID}"
@@ -171,7 +177,7 @@ for ofile in $(ls $DATADIR/drugcentral_drug_*.json) ; do
 	###
 	# collection.tsv
 	COLLECTION_ABBREVIATION="$(echo ${FILENAME} |sed 's/\..*$//')_collection"
-	COLLECTION_NAME="DrugPage Collection: DCID:${DCID}"
+	COLLECTION_NAME="DrugPage_Collection_DCID_${DCID}"
 	COLLECTION_DESCRIPTION="DrugPage Collection: ${COMPOUND_NAME} (DrugCentralID:${DCID}; PubChem_CID:${PCCID}, FILE=${FILENAME})"
 	COLLECTION_LOCAL_ID=$FILE_LOCAL_ID
 	COLLECTION_PERSISTENT_ID="${COLLECTION_ID_NAMESPACE}.${TCRD_VERSION}.collection_${COLLECTION_LOCAL_ID}"
@@ -188,6 +194,7 @@ for ofile in $(ls $DATADIR/drugcentral_drug_*.json) ; do
 	printf "${COLLECTION_ID_NAMESPACE}\t${COLLECTION_LOCAL_ID}\t${PCCID}\n" >>${DATAPATH}/collection_compound.tsv
 done
 #
+printf "PubChem_CIDs missing: ${N_CID_MISSING}/${N}\n"
 printf "PubChem_CIDs NOT FOUND IN ${CV_REF_CID_FILE}: ${N_NOT_FOUND}/${N}\n"
 ###
 # Generate: compound.tsv, ...
@@ -219,6 +226,8 @@ printf "${PROJECT_ID_NAMESPACE}\t${PROJECT_LOCAL_ID}\tidg_drugpages\t${CREATION_
 ###
 # Login available via Google, ORCID, or Globus.
 cfde-submit login
+#
+rm -rf $DATADIR/submission_output
 #
 #cfde-submit run --help
 cfde-submit run $DATAPATH \
