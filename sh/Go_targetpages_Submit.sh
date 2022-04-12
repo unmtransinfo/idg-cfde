@@ -205,7 +205,7 @@ printf "${DCC_ID}\tIlluminating the Druggable Genome (IDG)\tIDG\tThe goal of the
 # https://github.com/nih-cfde/published-documentation/wiki/TableInfo:-project.tsv
 # https://osf.io/ns4zf/
 Tsv2HeaderOnly $DATAPATH/project.tsv
-printf "${PROJECT_ID_NAMESPACE}\t${PROJECT_LOCAL_ID}\tidg_diseasepages\t${CREATION_TIME}\ttgtpgs\tidg_diseasepages\tIDG TCRD disease pages\n" >>${DATAPATH}/project.tsv
+printf "${PROJECT_ID_NAMESPACE}\t${PROJECT_LOCAL_ID}\tidg_targetpages\t${CREATION_TIME}\ttgtpgs\tidg_targetpages\tIDG TCRD target pages\n" >>${DATAPATH}/project.tsv
 ###
 ###
 # Login available via Google, ORCID, or Globus.

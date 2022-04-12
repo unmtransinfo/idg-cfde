@@ -157,10 +157,10 @@ for ofile in $(ls $DATADIR/drugcentral_drug_*.json) ; do
 		N_CID_MISSING=$[$N_CID_MISSING + 1]
 		continue
 	# Check if PCCID in CV file? MAY BE UNNECESSARY.
-	#elif [ !  "$(cat ${CV_REF_CID_FILE} |grep "^${PCCID}$")" ]; then
-	#	printf "${I}/${N}. ERROR: PubChem_CID:${PCCID} not found in ${CV_REF_CID_FILE}; skipping.\n"
-	#	N_NOT_FOUND=$[$N_NOT_FOUND + 1]
-	#	continue
+	elif [ !  "$(cat ${CV_REF_CID_FILE} |grep "^${PCCID}$")" ]; then
+		printf "${I}/${N}. ERROR: PubChem_CID:${PCCID} not found in ${CV_REF_CID_FILE}; skipping.\n"
+		N_NOT_FOUND=$[$N_NOT_FOUND + 1]
+		continue
 	fi
 	FILE_LOCAL_ID="DCSTRUCT_ID_${DCID}"
 	FILE_PERSISTENT_ID="${FILE_ID_NAMESPACE}.${DC_VERSION}.file_${FILE_LOCAL_ID}"

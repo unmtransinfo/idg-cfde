@@ -35,6 +35,7 @@ wget -O - "https://files.osf.io/v1/resources/rdeks/providers/osfstorage/?zip=" >
 N=$(zipinfo -1 $zipfile |wc -l)
 printf "C2M2 SampleTables (TSVs): ${N}\n"
 (cd $DATADIR; rm -f *.tsv; unzip -o $zipfile)
+rm $zipfile
 #
 # Delete the files to be "Built by script."
 # https://github.com/nih-cfde/published-documentation/wiki/C2M2-Table-Summary
@@ -66,8 +67,7 @@ for f in $(ls $DATADIR/*.tsv) ; do
 	Tsv2HeaderOnly ${f}
 done
 ###
-#schema_url="https://osf.io/vzgx9/download"
-schema_url="https://files.osf.io/v1/resources/c63aw/providers/osfstorage/611ea0b6d2109701516b0934?action=download&direct&version=6"
+schema_url="https://osf.io/vzgx9/download"
 wget -O - $schema_url >$DATADIR/C2M2_datapackage.json
 printf "Downloaded: $DATADIR/C2M2_datapackage.json\n"
 #

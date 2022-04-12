@@ -1,0 +1,169 @@
+---
+title: 'Human protein biomarkers, with clinical relevance inferred from LOINC terms and Cerner HealthFacts, a preliminary analysis'
+author: "Jeremy Yang"
+output:
+  html_document:
+    number_sections: yes
+    toc: yes
+editor_options: 
+  chunk_output_type: console
+---
+
+# Introduction
+
+The purpose of this preliminary analysis is to investigate likely proteomic
+biomarkers, by associating LOINC codes to human proteins (and genes),
+and thereby, the IDG Pharos/TCRD database.
+
+* [LOINC](https://loinc.org/) _(Logical Observation Identifiers Names and Codes)_
+is developed and maintained by the [Regenstrief Institute](https://www.regenstrief.org/)  and widely used for encoding clinical lab records in EHR systems.
+* [Cerner HealthFacts](https://www.cerner.com/ap/en/solutions/data-research)
+contains over 42 million US patient records from the previous two decades,
+with lab results encoded with LOINC.
+* [NextMove](https://www.nextmovesoftware.com/) Leadmine is a leading
+text mining software system providing named entity recognition (NER) for chemical
+and biomedical entities via domain-intelligent term dictionaries, with error
+correction and resolution to controlled vocabularies.
+* [IDG](https://druggablegenome.net/) (Illuminating the Druggable Genome) is an
+NIH Common Fund program dedicated to elucidating the properties and functions of
+understudied proteins in the three most commonly drug-targeted protein families:
+G-protein coupled receptors, ion channels, and protein kinases.
+
+## Biomarkers
+
+The [FDA Biomarker Qualification Program](https://www.fda.gov/drugs/biomarker-qualification-program/about-biomarkers-and-qualification), via its Biomarkers, EndpointS and other Tools [BEST](https://www.ncbi.nlm.nih.gov/books/NBK326791/) glossary, defines biomarker thus:
+
+	[A] defined characteristic that is measured as an indicator of normal biological processes, pathogenic processes, or responses to an exposure or intervention, including therapeutic interventions. Molecular, histologic, radiographic, or physiologic characteristics are types of biomarkers.
+
+This analysis is concerned with ___molecular___ biomarkers only.
+
+
+# Workflow
+
+* Download [LOINC](https://loinc.org/) codes.
+
+* Build local LOINC PostgreSql db. Query for chemical biomarkers, to include proteins.
+
+* Named Entity Recognition for genes/proteins with [NextMove](https://www.nextmovesoftware.com/) Leadmine in selected fields
+of LOINC.
+
+* Query Cerner HealthFacts 2019 (licensed at UNM) to find encounter_id and patient_id counts for all LOINC codes, for clinically relevant biomarkers (not just theoretical).
+
+* Join HF and NER outputs to generate initial list of clinically relevant molecular biomarker candidates.
+
+```{r echo=FALSE}
+knitr::opts_chunk$set(echo=FALSE, message=FALSE)
+base::date()
+```
+
+```{r setup, echo=FALSE, message=FALSE}
+library(readr)
+library(data.table)
+library(plotly, quietly=T)
+```
+
+# LOINC codes for chemical tests
+
+```{r}
+loinc_file <- "data/loinc_chem_names.tsv"
+sprintf("LOINC codes for chemical tests: %s", loinc_file)
+loinc_chem <- read_delim(loinc_file, "\t", escape_double=F)
+setDT(loinc_chem)
+sprintf("LOINC codes: %d", loinc_chem[, uniqueN(loinc_num)])
+```
+
+# NextMove LeadMine NER output using GeneAndProtein dictionary.
+
+NER = named entity recognition, a form of text-mining.
+
+## NER on LOINC field: "component".
+
+```{r}
+protein_NER_component_file <- "data/loinc_chem_names_2_NM_CFDictGeneAndProtein_leadmine.tsv"
+sprintf("NextMove NER for LOINC-component: %s", protein_NER_component_file)
+protein_NER_component <- read_delim(protein_NER_component_file, "\t")
+setDT(protein_NER_component)
+sprintf("LOINC codes mapped via component text to NER proteins: %d", protein_NER_component[, uniqueN(DocName)])
+```
+
+## NER on LOINC field: "relatednames2".
+
+```{r}
+protein_NER_relatednames_file <-  "data/loinc_chem_names_6_NM_CFDictGeneAndProtein_leadmine.tsv"
+sprintf("NextMove NER for LOINC-relatednames: %s", protein_NER_relatednames_file)
+protein_NER_relatednames <-  read_delim(protein_NER_relatednames_file, "\t")
+setDT(protein_NER_relatednames)
+sprintf("LOINC codes mapped via relatednames2 text to NER proteins: %d", protein_NER_relatednames[, uniqueN(DocName)])
+```
+
+# Cerner HealthFacts 2019 counts of encounter\_ids and patient\_ids for all LOINC codes.
+
+```{r}
+hf_loinc_counts_file <- "data/hf_lab_loinc_counts_OUT.tsv"
+sprintf("Cerner HealthFacts 2019 counts for all LOINC codes: %s", protein_NER_relatednames_file)
+hf_loinc_counts <- read_delim(hf_loinc_counts_file, "\t")
+setDT(hf_loinc_counts)
+sprintf("LOINC codes in HF encounters: %d", hf_loinc_counts[, uniqueN(loinc_code)])
+```
+
+## Group lab procedures into list; aggregate on LOINC codes.
+
+Some different labs have same LOINC codes.
+
+```{r}
+hf_loinc_counts <- hf_loinc_counts[, .(
+	lab_procedure_names = paste(c(lab_procedure_name), collapse="; "),
+	lab_procedure_mnemonics = paste(c(lab_procedure_mnemonic), collapse="; "),
+	lab_procedure_groups = paste(base::unique(c(lab_procedure_group)), collapse="; "),
+	lab_super_groups = paste(base::unique(c(lab_super_group)), collapse="; "),
+	encounter_id_count = sum(encounter_id_count),
+	patient_id_count = sum(patient_id_count)
+	), by=c("loinc_code")]
+
+```
+
+
+# LOINC proteins in HF encounters
+
+```{r}
+protein_hr_loincs_component <- merge(protein_NER_component, hf_loinc_counts, by.x="DocName", by.y="loinc_code", all=F)
+protein_hr_loincs_relatednames <- merge(protein_NER_relatednames, hf_loinc_counts, by.x="DocName", by.y="loinc_code", all=F)
+protein_hr_loincs <- rbind(protein_hr_loincs_component, protein_hr_loincs_relatednames)
+sprintf("LOINC codes for proteins in HF encounters: %d", protein_hr_loincs[, uniqueN(DocName)])
+sprintf("LOINC protein names in HF encounters: %d", protein_hr_loincs[, uniqueN(EntityText)])
+```
+
+## Group protein synonyms into list; aggregate on LOINC codes.
+
+```{r}
+protein_hr_loincs_out <- unique(protein_hr_loincs[, .(loinc_code=DocName, lab_procedure_names, protein_name=EntityText, encounter_id_count, patient_id_count)])
+protein_hr_loincs_out <- protein_hr_loincs_out[, .(lab_procedure_names,
+protein_names = paste(c(protein_name), collapse="; ")), by=c("loinc_code", "encounter_id_count", "patient_id_count")]
+protein_hr_loincs_out <- unique(protein_hr_loincs_out)
+setcolorder(protein_hr_loincs_out, c("loinc_code", "lab_procedure_names", "protein_names", "encounter_id_count", "patient_id_count"))
+```
+
+# Top occurring LOINCs:
+
+```{r}
+protein_hr_loincs_out <- protein_hr_loincs_out[order(-encounter_id_count)]
+write_delim(protein_hr_loincs_out, "data/biomarkers_loinc_hf_out.tsv", delim="\t")
+knitr::kable(protein_hr_loincs_out[1:50], caption="Top occurring LOINCs")
+```
+
+# Discussion
+
+The preliminary results include 218 distinct LOINC codes associated with human
+proteins (and genes) and thus potential molecular biomarkers. However, only 99
+distinct LOINC codes are associated with 10 thousand or more clinical encounters
+(in comparison, the most commonly recorded LOINC code (Alanine aminotransferase)
+is associated with 48 million clinical encounters). In addition, distinct LOINC codes can map to
+the same protein (e.g., Albumin), thus the number of distinct molecular biomarkers (proteins),
+137, is less than the number of LOINC codes. However, these results strongly indicate
+that proteomic molecular biomarkers of clinical relevance can be identified by
+this approach, integrated with other entities and datasets, and provide added
+value to IDG and CFDE. It should be noted that although clinical relevance is emphasized
+by this analysis, biomarkers which lack such relevance according to existing
+EHRs may nevertheless offer high value for research, and achieve clinical relevance in future,
+and can also be identified via this approach.
+
