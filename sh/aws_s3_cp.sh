@@ -1,8 +1,6 @@
 #!/bin/bash
 ###
 # Needed since aws s3 cp does not allow wildcard specification of multiple files.
-# Example use:
-# aws_s3_cp.sh -p cfdeidg -d "s3://kmc-idg/unm/tcrd/" -f "$(ls tcrd_disease_DOID_*.json)"
 ###
 
 AWS_PROFILE="cfdeidg"
@@ -14,6 +12,10 @@ help() {
 	echo "        -p PROFILE ....... AWS profile [$AWS_PROFILE]"
 	echo "        -d DESTINATION ... AWS destination URI"
 	echo "        -f FILES ......... local files, space separated"
+	echo ""
+	echo "Examples:"
+	printf "\taws_s3_cp.sh -p cfdeidg -f \"\$(ls tcrd_disease_DOID_*.json)\" -d \"s3://kmc-idg/unm/tcrd/\"\n"
+	printf "\taws_s3_cp.sh -p cfdeidg -f \"\$(ls drugcentral_drug_*.json)\" -d \"s3://kmc-idg/unm/drugcentral/\"\n"
 	echo ""
 }
 #
