@@ -15,9 +15,10 @@ metadata = pd.read_csv("data/ReproTox_kg_compounds_lincs.tsv", "\t")
 N = df.shape[0] + 1 #Individual count
 N_clusters = max(max(df.idxa), max(df.idxb)) - N + 1 #Cluster count
 logging.debug(f"N = {N}; N_clusters = {N_clusters}; N+N_clusters = {N+N_clusters}")
-df_display = pd.DataFrame(dict(ids = range(N+N_clusters), labels = None, parents = None))
+df_display = pd.DataFrame(dict(ids = range(N+N_clusters), labels = None, parents = None, values = None))
 for i in range(N):
   df_display.loc[i, "labels"] = metadata.pert_name[i]
+  df_display.loc[i, "values"] = 1
 for i in range(N_clusters):
   df_display.loc[N+i, "labels"] = f"Cluster_{N+i:03d}"
 for i in range(df.shape[0]):
@@ -30,23 +31,27 @@ for i in range(df.shape[0]):
     logging.error(f"{df.idxb[i]}>{df_display.shape[0]-1}")
   else:
     df_display.loc[df.idxb[i], "parents"] = N+i
-  
+  if N+i<df_display.shape[0]:
+    df_display.loc[N+i, "values"] = df.n[i]
+
 #df_display.to_csv(sys.stderr, "\t", index=False)
 
 fig = pgo.Figure()
 
 fig.add_trace(pgo.Sunburst(
+    domain = dict(column=0),
     ids = df_display.ids,
     labels = df_display.labels,
     parents = df_display.parents,
-    domain = dict(column=0),
     maxdepth = 5
 ))
 fig.add_trace(pgo.Sunburst(
+    domain = dict(column=1),
     ids = df_display.ids,
     labels = df_display.labels,
     parents = df_display.parents,
-    domain = dict(column=1),
+    #values = df_display.values,
+    #hovertemplate='<b>%{label}</b><br>Count: %{value}',
     maxdepth = 8
 ))
 
