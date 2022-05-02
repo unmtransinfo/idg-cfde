@@ -7,57 +7,79 @@ import sys,os,argparse,logging
 import pandas as pd
 import plotly.graph_objects as pgo
 
-logging.basicConfig(format='%(levelname)s:%(message)s', level=(logging.INFO))
+if __name__=="__main__":
+  parser = argparse.ArgumentParser(description="Plotly sunburst from Scikit-learn agglomerative clusters via linkage matrix (Scipy format)")
+  parser.add_argument("--i", dest="ifile", help="input linkage matrix file (CSV|TSV)")
+  parser.add_argument("--i_meta", dest="ifile_meta", help="input metadata file (CSV|TSV)")
+  parser.add_argument("--o_html", dest="ofile_html", help="output plot as HTML (interactive)")
+  parser.add_argument("--o_img", dest="ofile_img", help="output plot as static image (PNG|JPEG|SVG|PDF|EPS)")
+  parser.add_argument("--tsv", action="store_true", help="input file TSV")
+  parser.add_argument("--delim", default=",", help="use if not comma or tab")
+  parser.add_argument("--display", action="store_true", help="Show plot interactively.")
+  parser.add_argument("-v", "--verbose", default=0, action="count")
+  args = parser.parse_args()
 
-# Input linkage matrix (Scipy format).
-df = pd.read_csv("data/ReproTox_kg_compounds_lincs_clusters_lmat.tsv", "\t")
-metadata = pd.read_csv("data/ReproTox_kg_compounds_lincs.tsv", "\t")
-N = df.shape[0] + 1 #Individual count
-N_clusters = max(max(df.idxa), max(df.idxb)) - N + 1 #Cluster count
-logging.debug(f"N = {N}; N_clusters = {N_clusters}; N+N_clusters = {N+N_clusters}")
-df_display = pd.DataFrame(dict(ids = range(N+N_clusters), labels = None, parents = None, values = None))
-for i in range(N):
-  df_display.loc[i, "labels"] = metadata.pert_name[i]
-  df_display.loc[i, "values"] = 1
-for i in range(N_clusters):
-  df_display.loc[N+i, "labels"] = f"Cluster_{N+i:03d}"
-for i in range(df.shape[0]):
-  logging.debug(f"{i}. PARENT({df.idxa[i]}, {df.idxb[i]}) = {N+i}")
-  if df.idxa[i]>df_display.shape[0]-1:
-    logging.error(f"{df.idxa[i]}>{df_display.shape[0]-1}")
-  else:
-    df_display.loc[df.idxa[i], "parents"] = N+i
-  if df.idxb[i]>df_display.shape[0]-1:
-    logging.error(f"{df.idxb[i]}>{df_display.shape[0]-1}")
-  else:
-    df_display.loc[df.idxb[i], "parents"] = N+i
-  if N+i<df_display.shape[0]:
-    df_display.loc[N+i, "values"] = df.n[i]
+  logging.basicConfig(format='%(levelname)s:%(message)s', level=(logging.DEBUG if args.verbose>1 else logging.INFO))
 
-#df_display.to_csv(sys.stderr, "\t", index=False)
+  DELIM='\t' if args.tsv else args.delim
 
-fig = pgo.Figure()
+  # Input linkage matrix (Scipy format).
+  df = pd.read_csv(args.ifile, DELIM)
+  metadata = pd.read_csv(args.ifile_meta, DELIM)
+  N = df.shape[0] + 1 #Individual count
+  N_clusters = max(max(df.idxa), max(df.idxb)) - N + 1 #Cluster count
+  logging.debug(f"N = {N}; N_clusters = {N_clusters}; N+N_clusters = {N+N_clusters}")
+  df_display = pd.DataFrame(dict(ids = range(N+N_clusters), labels = None, parents = None, values = None))
+  for i in range(N):
+    df_display.loc[i, "labels"] = metadata.pert_name[i]
+    df_display.loc[i, "values"] = 1
+  for i in range(N_clusters):
+    df_display.loc[N+i, "labels"] = f"Cluster_{N+i:03d}"
+  for i in range(df.shape[0]):
+    logging.debug(f"{i}. PARENT({df.idxa[i]}, {df.idxb[i]}) = {N+i}")
+    if df.idxa[i]>df_display.shape[0]-1:
+      logging.error(f"{df.idxa[i]}>{df_display.shape[0]-1}")
+    else:
+      df_display.loc[df.idxa[i], "parents"] = N+i
+    if df.idxb[i]>df_display.shape[0]-1:
+      logging.error(f"{df.idxb[i]}>{df_display.shape[0]-1}")
+    else:
+      df_display.loc[df.idxb[i], "parents"] = N+i
+    if N+i<df_display.shape[0]:
+      df_display.loc[N+i, "values"] = df.n[i]
 
-fig.add_trace(pgo.Sunburst(
-    domain = dict(column=0),
-    ids = df_display.ids,
-    labels = df_display.labels,
-    parents = df_display.parents,
-    maxdepth = 5
-))
-fig.add_trace(pgo.Sunburst(
-    domain = dict(column=1),
-    ids = df_display.ids,
-    labels = df_display.labels,
-    parents = df_display.parents,
-    #values = df_display.values,
-    #hovertemplate='<b>%{label}</b><br>Count: %{value}',
-    maxdepth = 8
-))
+  #df_display.to_csv(sys.stderr, "\t", index=False)
 
-fig.update_layout(
-    grid = dict(columns=2, rows=1),
-    margin = dict(t=0, l=0, r=0, b=0)
-)
+  fig = pgo.Figure()
 
-fig.show()
+  fig.add_trace(pgo.Sunburst(
+	domain = dict(column=0),
+	ids = df_display.ids,
+	labels = df_display.labels,
+	parents = df_display.parents,
+	maxdepth = 5
+	))
+  fig.add_trace(pgo.Sunburst(
+	domain = dict(column=1),
+	ids = df_display.ids,
+	labels = df_display.labels,
+	parents = df_display.parents,
+	#values = df_display.values,
+	#hovertemplate='<b>%{label}</b><br>Count: %{value}',
+	maxdepth = 8
+	))
+  fig.update_layout(
+	grid = dict(columns=2, rows=1),
+	margin = dict(t=0, l=0, r=0, b=0)
+	)
+
+  if args.ofile_html is not None:
+    fig.write_html(args.ofile_html)
+
+  if args.ofile_img is not None:
+    # Requires kaleido
+    fig.write_image(args.ofile_img) #PNG|JPEG|SVG|PDF|EPS
+
+  if args.display:
+    fig.show()
+
