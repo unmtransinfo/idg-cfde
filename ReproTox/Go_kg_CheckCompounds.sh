@@ -29,7 +29,8 @@ ofile="$DATADIR/ReproTox_kg_compounds_lincs_cfchemdb.tsv"
 python3 -m BioClients.cfde.cfchemdb.Client get_structure_by_smiles \
 	--i ${smifile} \
 	--o ${ofile} \
-	2> &>1 |tee $DATADIR/ReproTox_kg_compounds_lincs_cfchemdb.log
+	-v -v \
+	2>&1 |tee $DATADIR/ReproTox_kg_compounds_lincs_cfchemdb.log
 ###
 #
 conda deactivate

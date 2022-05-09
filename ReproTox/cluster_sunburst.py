@@ -3,7 +3,7 @@
 # https://plotly.com/python/sunburst-charts/
 # https://docs.scipy.org/doc/scipy/reference/generated/scipy.cluster.hierarchy.linkage.html
 ###
-import sys,os,argparse,logging
+import sys,os,random,argparse,logging
 import pandas as pd
 import plotly.graph_objects as pgo
 
@@ -21,32 +21,33 @@ if __name__=="__main__":
 
   logging.basicConfig(format='%(levelname)s:%(message)s', level=(logging.DEBUG if args.verbose>1 else logging.INFO))
 
-  DELIM='\t' if args.tsv else args.delim
+  DELIM = '\t' if args.tsv else args.delim
 
   # Input linkage matrix (Scipy format).
-  df = pd.read_csv(args.ifile, DELIM)
-  metadata = pd.read_csv(args.ifile_meta, DELIM)
+  df = pd.read_csv(args.ifile, sep=DELIM)
+  metadata = pd.read_csv(args.ifile_meta, sep=DELIM)
   N = df.shape[0] + 1 #Individual count
   N_clusters = max(max(df.idxa), max(df.idxb)) - N + 1 #Cluster count
   logging.debug(f"N = {N}; N_clusters = {N_clusters}; N+N_clusters = {N+N_clusters}")
-  df_display = pd.DataFrame(dict(ids = range(N+N_clusters), labels = None, parents = None, values = None))
+  df_display = pd.DataFrame(dict(ids = range(N+N_clusters), label = None, parent = None, value = None, color=None))
   for i in range(N):
-    df_display.loc[i, "labels"] = metadata.pert_name[i]
-    df_display.loc[i, "values"] = 1
+    df_display.loc[i, "label"] = metadata.pert_name[i]
+    df_display.loc[i, "value"] = 1
   for i in range(N_clusters):
-    df_display.loc[N+i, "labels"] = f"Cluster_{N+i:03d}"
+    df_display.loc[N+i, "label"] = f"Cluster_{N+i:03d}"
   for i in range(df.shape[0]):
     logging.debug(f"{i}. PARENT({df.idxa[i]}, {df.idxb[i]}) = {N+i}")
     if df.idxa[i]>df_display.shape[0]-1:
       logging.error(f"{df.idxa[i]}>{df_display.shape[0]-1}")
     else:
-      df_display.loc[df.idxa[i], "parents"] = N+i
+      df_display.loc[df.idxa[i], "parent"] = N+i
     if df.idxb[i]>df_display.shape[0]-1:
       logging.error(f"{df.idxb[i]}>{df_display.shape[0]-1}")
     else:
-      df_display.loc[df.idxb[i], "parents"] = N+i
+      df_display.loc[df.idxb[i], "parent"] = N+i
     if N+i<df_display.shape[0]:
-      df_display.loc[N+i, "values"] = df.n[i]
+      df_display.loc[N+i, "value"] = df.n[i]
+    df_display.loc[df.idxa[i], "color"] = random.randint(1, 100) #DEBUG
 
   #df_display.to_csv(sys.stderr, "\t", index=False)
 
@@ -55,17 +56,20 @@ if __name__=="__main__":
   fig.add_trace(pgo.Sunburst(
 	domain = dict(column=0),
 	ids = df_display.ids,
-	labels = df_display.labels,
-	parents = df_display.parents,
+	labels = df_display.label,
+	parents = df_display.parent,
 	maxdepth = 5
 	))
   fig.add_trace(pgo.Sunburst(
 	domain = dict(column=1),
 	ids = df_display.ids,
-	labels = df_display.labels,
-	parents = df_display.parents,
-	#values = df_display.values,
-	#hovertemplate='<b>%{label}</b><br>Count: %{value}',
+	labels = df_display.label,
+	parents = df_display.parent,
+	marker = dict(
+		colors = df_display.color,
+		colorscale='RdBu', ),
+	values = df_display.value,
+	hovertemplate = '<b>Label:</b> %{label}<br/><b>Count:</b> %{value}',
 	maxdepth = 8
 	))
   fig.update_layout(
