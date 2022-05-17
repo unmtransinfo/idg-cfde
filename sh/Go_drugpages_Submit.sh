@@ -128,8 +128,8 @@ Tsv2HeaderOnly $DATAPATH/collection_defined_by_project.tsv
 # Currently one collection per compound this datapackage.
 Tsv2HeaderOnly $DATAPATH/collection_compound.tsv
 #
-PROJECT_ID_NAMESPACE="cfde_idg_drugcentral"
-PROJECT_LOCAL_ID="idgdrugcentral"
+PROJECT_ID_NAMESPACE="https://druggablegenome.net/cfde_idg_drugcentral_drugs"
+PROJECT_LOCAL_ID="idg_drugcentral_drugs"
 FILE_ID_NAMESPACE=$PROJECT_ID_NAMESPACE
 COLLECTION_ID_NAMESPACE=$PROJECT_ID_NAMESPACE
 #
@@ -229,15 +229,19 @@ cfde-submit login
 #
 rm -rf $DATADIR/submission_output
 #
+#DRY_RUN_ARG=""
+DRY_RUN_ARG="--dry-run"
+#
 #cfde-submit run --help
-cfde-submit run $DATAPATH \
+cfde-submit run $DATAPATH $DRY_RUN_ARG \
 	--dcc-id cfde_registry_dcc:idg \
 	--output-dir $DATADIR/submission_output \
 	--verbose
 #
-#	--dry-run \
-#
 while [ 1 ]; do
+	if [ "$DRY_RUN_ARG" ]; then
+		break
+	fi
 	x=$(cfde-submit status)
 	echo ${x}
 	if [ ! "$(echo ${x} |grep 'still in progress')" ]; then
