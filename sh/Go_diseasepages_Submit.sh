@@ -131,6 +131,8 @@ PROJECT_LOCAL_ID="idg_tcrd_diseases"
 FILE_ID_NAMESPACE=$PROJECT_ID_NAMESPACE
 COLLECTION_ID_NAMESPACE=$PROJECT_ID_NAMESPACE
 #
+FILE_AWS_HTTP_PREFIX="https://kmc-idg.s3.amazonaws.com/unm/tcrd"
+#
 CREATION_TIME=$(date +'%Y-%m-%d')
 # http://edamontology.org/format_3464
 FILE_FORMAT="format:3464"
@@ -154,9 +156,9 @@ for ofile in $(ls $DATADIR/tcrd_disease_*.json) ; do
 		fi
 		continue
 	fi
+        FILE_PERSISTENT_ID="${FILE_AWS_HTTP_PREFIX}/${FILENAME}"
 	DISEASE_NAME=$(cat $ofile |grep diseaseName |sed 's/^.*: "\(.*\)",/\1/')
 	FILE_LOCAL_ID="DISEASE_DOID_${DOID}"
-        FILE_PERSISTENT_ID="${FILE_ID_NAMESPACE}.${TCRD_VERSION}.file_${FILE_LOCAL_ID}"
         FILE_SIZE_IN_BYTES=$(cat $ofile |wc -c)
         FILE_UNCOMPRESSED_SIZE_IN_BYTES=${FILE_SIZE_IN_BYTES}
         FILE_SHA256=$(cat $ofile |$SHA_EXE |sed 's/ .*$//')
