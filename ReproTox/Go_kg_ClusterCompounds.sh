@@ -7,6 +7,7 @@ T0=$(date +%s)
 #
 cwd=$(pwd)
 DATADIR="${cwd}/data"
+OUTPUTDIR="${cwd}/output"
 #
 ###
 #
@@ -34,9 +35,9 @@ source $(dirname $CONDA_EXE)/../bin/activate rdktools
 ofile_fp="$DATADIR/ReproTox_kg_compounds_lincs_fp.tsv"
 ofile_clusters="$DATADIR/ReproTox_kg_compounds_lincs_clusters.tsv"
 ofile_clusters_lmat="$DATADIR/ReproTox_kg_compounds_lincs_clusters_lmat.tsv"
-ofile_clusters_dendro="$DATADIR/ReproTox_kg_compounds_lincs_clusters_dendrogram.png"
-ofile_clusters_sunburst_png="$DATADIR/ReproTox_kg_compounds_lincs_clusters_sunburst.png"
-ofile_clusters_sunburst_html="$DATADIR/ReproTox_kg_compounds_lincs_clusters_sunburst.html"
+ofile_clusters_dendro="$OUTPUTDIR/ReproTox_kg_compounds_lincs_clusters_dendrogram.png"
+ofile_clusters_sunburst_png="$OUTPUTDIR/ReproTox_kg_compounds_lincs_clusters_sunburst.png"
+ofile_clusters_sunburst_html="$OUTPUTDIR/ReproTox_kg_compounds_lincs_clusters_sunburst.html"
 python3 -m rdktools.fp.App FingerprintMols \
 	--i ${smifile} \
 	--smilesColumn "canonical_smiles" --idColumn "id" \
