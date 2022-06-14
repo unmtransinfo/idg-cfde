@@ -29,12 +29,15 @@ if __name__=="__main__":
   N = df.shape[0] + 1 #Individual count
   N_clusters = max(max(df.idxa), max(df.idxb)) - N + 1 #Cluster count
   logging.debug(f"N = {N}; N_clusters = {N_clusters}; N+N_clusters = {N+N_clusters}")
-  df_display = pd.DataFrame(dict(ids = range(N+N_clusters), label = None, parent = None, value = None, color=None))
+  df_display = pd.DataFrame(dict(ids=range(N+N_clusters), label=None, parent=None, value=None, color=None))
   for i in range(N):
     df_display.loc[i, "label"] = metadata.pert_name[i]
     df_display.loc[i, "value"] = 1
   for i in range(N_clusters):
     df_display.loc[N+i, "label"] = f"Cluster_{N+i:03d}"
+    #df_display.loc[N+i, "color"] = "red" #DEBUG
+    df_display.loc[N+i, "color"] = random.randint(1, 12) #DEBUG
+    #df_display.loc[N+i, "color"] = random.randint(1, 5) #DEBUG
   for i in range(df.shape[0]):
     logging.debug(f"{i}. PARENT({df.idxa[i]}, {df.idxb[i]}) = {N+i}")
     if df.idxa[i]>df_display.shape[0]-1:
@@ -47,7 +50,6 @@ if __name__=="__main__":
       df_display.loc[df.idxb[i], "parent"] = N+i
     if N+i<df_display.shape[0]:
       df_display.loc[N+i, "value"] = df.n[i]
-    df_display.loc[df.idxa[i], "color"] = random.randint(1, 100) #DEBUG
 
   #df_display.to_csv(sys.stderr, "\t", index=False)
 
@@ -69,7 +71,7 @@ if __name__=="__main__":
 		colors = df_display.color,
 		colorscale='RdBu', ),
 	values = df_display.value,
-	hovertemplate = '<b>Label:</b> %{label}<br/><b>Count:</b> %{value}',
+	hovertemplate = '<b>Label:</b> %{label} <br /><b>Count:</b> %{value}',
 	maxdepth = 8
 	))
   fig.update_layout(
@@ -81,8 +83,7 @@ if __name__=="__main__":
     fig.write_html(args.ofile_html)
 
   if args.ofile_img is not None:
-    # Requires kaleido
-    fig.write_image(args.ofile_img) #PNG|JPEG|SVG|PDF|EPS
+    fig.write_image(args.ofile_img) #PNG|JPEG|SVG|PDF|EPS (requires kaleido)
 
   if args.display:
     fig.show()

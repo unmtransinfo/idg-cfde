@@ -53,7 +53,7 @@ python3 -m rdktools.util.sklearn.ClusterFingerprints cluster \
 #	--display \
 #
 ###
-python3 ./cluster_sunburst.py \
+python3 ./cluster_sunburst.py -v \
 	--i $ofile_clusters_lmat \
 	--i_meta $metafile \
 	--tsv \
