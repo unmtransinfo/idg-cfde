@@ -1,0 +1,6 @@
+pandas
+datapackage
+requests
+python-dotenv
+tqdm
+numpy	
