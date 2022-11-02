@@ -140,3 +140,5 @@ data
 .Rhistory
 *.Rproj
 Rplot.png
+
+*.html

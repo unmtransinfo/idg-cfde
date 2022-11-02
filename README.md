@@ -1,8 +1,9 @@
-# idg-cfde <img align="right" src="/doc/images/cfde_logo.png" height="120">
+# IDG-CFDE <img align="right" src="/doc/images/cfde_logo.png" height="120">
 
 Illuminating the Druggable Genome (IDG) code, tools, and workflows for integration, harmonization and FAIRification in the Common Fund Data Ecosystem (CFDE).
 
-The IDG CFDE team is led by PI's Christophe Lambert, PhD, of UNM, and Avi Ma'ayan, PhD, of ISMMS. 
+The CFDE IDG Data Coordinating Center (DCC) team is led by PI Christophe Lambert, PhD,
+of UNM. 
 
 ## Manifests
 
@@ -25,3 +26,4 @@ The IDG CFDE team is led by PI's Christophe Lambert, PhD, of UNM, and Avi Ma'aya
   * [NIH-CFDE.org](https://www.nih-cfde.org/)
   * [GitHub:NIH-CFDE](https://github.com/nih-cfde)
   * [CFChemDb: CFDE Chemical Db and Development System](https://github.com/unmtransinfo/CFChemDb)
+  * [Content-registry](update-content-registry)
