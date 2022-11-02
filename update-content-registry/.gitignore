@@ -1,0 +1,6 @@
+*~
+output_pieces_*
+upload_json
+.snakemake
+__pycache__
+.DS_Store
