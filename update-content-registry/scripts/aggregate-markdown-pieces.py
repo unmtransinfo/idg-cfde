@@ -1,4 +1,4 @@
-#! /usr/bin/env python
+#! /usr/bin/env python3
 """
 Aggregate a bunch of individual markdown chunks into one large list of
 JSON dictionaries, combining for individual IDs.

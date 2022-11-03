@@ -1,4 +1,4 @@
-#! /usr/bin/env python
+#! /usr/bin/env python3
 """
 Adapted from build-appyter-gene-links.py as suggested at
 https://github.com/nih-cfde/update-content-registry/README.md.
