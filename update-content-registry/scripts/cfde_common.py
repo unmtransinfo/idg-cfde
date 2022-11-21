@@ -11,8 +11,8 @@ REF_FILES = {
     'compound': 'data/validate/compound.tsv',
     'disease': 'data/validate/disease.tsv',
     'gene': 'data/validate/ensembl_genes.tsv',
+    'protein': 'data/validate/protein.tsv',
     }
-
 
 def write_output_pieces(output_dir, widget_name, cv_id, md, *, verbose=False):
     #if md is None:

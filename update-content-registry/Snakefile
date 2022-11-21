@@ -2,7 +2,7 @@
 ## Workflow logic to build and then upload content registry information.
 ##
 
-TERM_TYPES = ['anatomy', 'compound', 'disease', 'gene']
+TERM_TYPES = ['anatomy', 'compound', 'disease', 'gene', 'protein']
 
 rule all:
     message:
@@ -49,16 +49,6 @@ rule anatomy_json:
     shell: """
         ./scripts/aggregate-markdown-pieces.py {input} -o {output.json}
     """
-
-
-# nothing here yet.
-rule disease_json:
-    output:
-        "upload_json/disease.json"
-    shell: """
-        touch {output}
-    """
-
 #
 rule compound_json:
     input:
@@ -68,15 +58,30 @@ rule compound_json:
     shell: """
         ./scripts/aggregate-markdown-pieces.py {input} -o {output.json}
     """
+# 
+rule disease_json:
+    input:
+        "output_pieces_disease/12-pharos-disease",
+    output:
+        json = "upload_json/disease.json"
+    shell: """
+        ./scripts/aggregate-markdown-pieces.py {input} -o {output.json}
+    """
+# 
+rule protein_json:
+    input:
+        "output_pieces_protein/12-pharos-protein",
+    output:
+        json = "upload_json/protein.json"
+    shell: """
+        ./scripts/aggregate-markdown-pieces.py {input} -o {output.json}
+    """
 
 
 ###
-
 ##
 ## add specific widgets here
 ## 
-
-
 
 rule gene_json_alias_widget:
     message: "build alias widgets for genes"
@@ -186,6 +191,40 @@ rule drugcentral_link:
         widget_name = "11-drugcentral"
     shell: """
         {input.script} compound {input.id_list} \
+           --widget-name {params.widget_name} \
+           --output-dir {output}
+    """
+
+# Generate tcrd_diseases.doid thus:
+# cat tcrd_diseases.tsv |awk -F '\t' '{print $2}' |sed '1d' |grep 'DOID:' |sort -u
+rule pharos_disease_link:
+    message: "build Pharos links for diseases"
+    input:
+        script = "scripts/build-pharos-disease-links.py",
+        id_list = "data/inputs/tcrd_diseases.doid",
+    output:
+        directory("output_pieces_disease/12-pharos-disease")
+    params:
+        widget_name = "12-pharos-disease"
+    shell: """
+        {input.script} disease {input.id_list} \
+           --widget-name {params.widget_name} \
+           --output-dir {output}
+    """
+
+# Generate tcrd_targets.uniprotid thus:
+# cat tcrd_targets.tsv |awk -F '\t' '{print $8}' |sed '1d' |sort -u
+rule pharos_protein_link:
+    message: "build Pharos links for proteins"
+    input:
+        script = "scripts/build-pharos-protein-links.py",
+        id_list = "data/inputs/tcrd_targets.uniprotid",
+    output:
+        directory("output_pieces_protein/12-pharos-protein")
+    params:
+        widget_name = "12-pharos-protein"
+    shell: """
+        {input.script} protein {input.id_list} \
            --widget-name {params.widget_name} \
            --output-dir {output}
     """
