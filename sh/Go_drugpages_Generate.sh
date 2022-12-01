@@ -6,11 +6,18 @@ date
 #
 T0=$(date +%s)
 #
-DC_VERSION="2021"
-#
 cwd=$(pwd)
 #
-DATADIR="${cwd}/data/drugpages${DC_VERSION}"
+DC_VERSION="$(python3 -m BioClients.drugcentral.Client version |sed '1d' |awk '{print $2}')"
+#
+if [ ! "$DC_VERSION" ]; then
+	printf "ERROR: cannot determine DrugCentral version."
+	exit
+else
+	printf "DrugCentral version: ${DC_VERSION}\n"
+fi
+#
+DATADIR="${cwd}/data/drugpages_${DC_VERSION}"
 if [ ! -f ${DATADIR} ]; then
 	mkdir -p ${DATADIR}
 fi

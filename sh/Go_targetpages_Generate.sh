@@ -6,11 +6,13 @@ date
 
 T0=$(date +%s)
 
-TCRD_VERSION="6124"
-
 cwd=$(pwd)
 
-DATADIR="${cwd}/data/targetpages${TCRD_VERSION}"
+TCRD_VERSION="$(python3 -m BioClients.idg.tcrd.Client info |sed '1d' |awk '{print $3}')"
+
+printf "TCRD version: ${TCRD_VERSION}\n"
+
+DATADIR="${cwd}/data/targetpages_${TCRD_VERSION}"
 if [ ! -f ${DATADIR} ]; then
 	mkdir -p ${DATADIR}
 fi

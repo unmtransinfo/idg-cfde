@@ -9,8 +9,29 @@
 ###
 set -e
 #
+cwd=$(pwd)
+#
 T0=$(date +%s)
 #
+###
+# First run Go_diseasepages_Generate.sh and note DATADIR, needed
+# as argument to this script.
+#
+if [ $# -ne 1 ]; then
+	printf "ERROR: Syntax %s DATADIR\n" "$0"
+	exit
+else
+	DATADIR="$1"
+fi
+#
+DATADIR="$(cd $DATADIR; pwd)"
+printf "DATADIR: ${DATADIR}\n"
+#
+DATAPATH="${DATADIR}/submission"
+#
+if [ ! -e "$DATAPATH" ]; then
+	mkdir -p $DATAPATH
+fi
 ###
 # From https://docs.nih-cfde.org/en/latest/cfde-submit/docs/install/:
 #	conda create --name cfde python
@@ -31,17 +52,6 @@ if [ ! $(which cfde-submit) ]; then
 	exit
 else
 	printf "cfde-submit EXE: $(which cfde-submit)\n"
-fi
-#
-TCRD_VERSION="6124"
-#
-cwd=$(pwd)
-#
-DATADIR="$(cd $HOME/../data/CFDE/data/diseasepages${TCRD_VERSION}; pwd)"
-DATAPATH="${DATADIR}/submission"
-#
-if [ ! -e "$DATAPATH" ]; then
-	mkdir -p $DATAPATH
 fi
 #
 ###
@@ -219,8 +229,8 @@ cfde-submit login
 #
 rm -rf $DATADIR/submission_output
 #
-DRY_RUN_ARG=""
-#DRY_RUN_ARG="--dry-run"
+#DRY_RUN_ARG=""
+DRY_RUN_ARG="--dry-run"
 #
 #cfde-submit run --help
 cfde-submit run $DATAPATH $DRY_RUN_ARG \
