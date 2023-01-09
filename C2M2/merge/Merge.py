@@ -3,10 +3,10 @@
 CFDE Datapackage Merge
  
 How to use
-1. Download the latest preparation script as well as the external vocabulary table
+1. Download the latest preparation script, prepare_C2M2_submission.py (https://osf.io/c67sp), as well as the external vocabulary table
 2. `pip install -r requirements.txt`
-3. edit indir (cell 2) and outdir (cell 15) 
-4. run all cells
+3. Edit indir (cell 2) and outdir (cell 15) 
+4. Run all cells
 5. `cfde-submit run <directory_to_submit (outdir)> --output-dir=<new_output_directory> --dcc idg`
 """
 

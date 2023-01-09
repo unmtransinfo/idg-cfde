@@ -227,8 +227,8 @@ cfde-submit login
 #
 rm -rf $DATADIR/submission_output
 #
-#DRY_RUN_ARG=""
-DRY_RUN_ARG="--dry-run"
+DRY_RUN_ARG=""
+#DRY_RUN_ARG="--dry-run"
 #
 #cfde-submit run --help
 cfde-submit run $DATAPATH $DRY_RUN_ARG \
