@@ -97,7 +97,7 @@ if __name__ == "__main__":
     protein_md_ofile = "data/protein_markdown.json"
 
     # create markdown file for protein
-    # generate_protein_markdown_file(ifile=protein_ifile, ofile=protein_md_ofile)
+    generate_protein_markdown_file(ifile=protein_ifile, ofile=protein_md_ofile)
 
     # create markdown file for disease
     generate_disease_markdown_file(ifile=disease_ifile, ofile=disease_md_ofile)
