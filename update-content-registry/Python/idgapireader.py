@@ -49,7 +49,7 @@ class PharosAPIReader:
         This function accesses Pharos GraphQL API to fetch data for the given disease.
 
         :return:
-         data in Markdown format
+         data in json format
         """
         json_data = {
             'query': 'query diseaseDetails{\n  disease(name:"' + disease + '"){\n    mondoID\n    name\n    '
@@ -84,7 +84,7 @@ class PharosAPIReader:
         This function accesses Pharos GraphQL API fetch data for the given protein uniprot_id.
 
         :return:
-         data in Markdown format
+         data in json format
         """
         json_data = {
             'query': 'query targetDetails{\n  target(q:{sym:"' + uniprot_id + '"}) {\n    name\n    tdl\n    fam\n    '
@@ -265,7 +265,7 @@ def convert_json_to_md_protein(jdata, uniprot_id):
 
 def fetch_secondary_accession_id(uniprot_id=None):
     """
-    For the given uniprot_id, fetch the secondary uniprot accession ids.
+    For the given uniprot_id, fetch the secondary uniprot accession ids using Unitprot API.
     """
     headers = {"Accept": "application/json"}
     resource_url = "https://www.ebi.ac.uk/proteins/api/proteins?offset=0&size=100&accession="
