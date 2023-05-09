@@ -17,12 +17,18 @@ T0=$(date +%s)
 # First run Go_diseasepages_Generate.sh and note DATADIR, needed
 # as argument to this script.
 #
-if [ $# -ne 1 ]; then
-	printf "ERROR: Syntax %s DATADIR\n" "$0"
+if [ $# -ne 2 ]; then
+        printf "ERROR: Syntax %s DATADIR DRYRUN|SUBMIT\n" "$0"
 	exit
 else
 	DATADIR="$1"
+	MODE="$2"
 fi
+if [ "$MODE" != "DRYRUN" -a "$MODE" != "SUBMIT" ]; then
+	printf "ERROR: mode must be \"DRYRUN\" or \"SUBMIT\"\n"
+	exit
+fi
+printf "MODE: ${MODE}\n"
 #
 DATADIR="$(cd $DATADIR; pwd)"
 printf "DATADIR: ${DATADIR}\n"
@@ -229,8 +235,12 @@ cfde-submit login
 #
 rm -rf $DATADIR/submission_output
 #
-DRY_RUN_ARG=""
-#DRY_RUN_ARG="--dry-run"
+printf "MODE: ${MODE}\n"
+if [ "$MODE" = "SUBMIT" ]; then
+	DRY_RUN_ARG=""
+else
+	DRY_RUN_ARG="--dry-run"
+fi
 #
 #cfde-submit run --help
 cfde-submit run $DATAPATH $DRY_RUN_ARG \
