@@ -68,8 +68,8 @@ for f in $(ls $DATADIR/*.tsv) ; do
 done
 ###
 schema_url="https://osf.io/vzgx9/download"
-wget -O - $schema_url >$DATADIR/C2M2_datapackage.json
-printf "Downloaded: $DATADIR/C2M2_datapackage.json\n"
+wget -O - $schema_url >$DATADIR/datapackage.json
+printf "Downloaded: $DATADIR/datapackage.json\n"
 #
 ###
 #

@@ -63,12 +63,12 @@ fi
 # Scriptable via https://github.com/osfclient/osfclient
 # (pip install osfclient). Project is c8txv.
 ###
-# Also download schema JSON: C2M2_datapackage.json
+# Also download schema JSON: datapackage.json
 ###
 ###
 ${cwd}/sh/Go_c2m2_DownloadSampleTables.sh $DATAPATH
 #
-CV_REF_DIR="$(cd $HOME/../data/CFDE; pwd)/data/CvRefDir"
+CV_REF_DIR="$(cd $HOME/../data/CFDE; pwd)/cfde-submit/CvRefDir"
 ${cwd}/sh/Go_c2m2_DownloadCVRefFiles.sh $CV_REF_DIR
 CV_REF_ENSEMBL_FILE="${CV_REF_DIR}/ensembl_genes.tsv"
 #
