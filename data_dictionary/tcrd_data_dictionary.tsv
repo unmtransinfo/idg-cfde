@@ -1,538 +1,539 @@
-TCRD Current Variables Data Dictionary						
-						
-Primary Table	Column name	Column description	potential values; example value	DATA TYPE	distinct_values	DATA SOURCE
-alias	id	Alias identifier	1-150037	int(11)	150037	
-alias	protein_id	Foreign key to column id in table protein.	1-19673	int(11)	19673	
-alias	type	Alias type	uniport, symbol	enum('symbol','uniprot')	2	
-alias	value	String containing the target alias (synonym) value	Q53FB3	varchar(255)	125167	
-alias	dataset_id	Foreign key to column id in table dataset.	1	int(11)	2	
-clinvar	id	TCRD ClinVar identifier	1-511408	int(11)	511408	
-clinvar	protein_id	Foreign key to column id in table protein.	6107	int(11)	2947	
-clinvar	clinvar_phenotype_id	Foreign key to column id in table clinvar_phenotype.	4077	int(11)	5803	
-clinvar	alleleid	ClinVar allele identifier	15046	int(11)	97381	
-clinvar	type	Type of variant	unique types, single nucleotide variant, short repeat, deletion, duplication, indel, insertion, inversion, NT expansion, undetermined variant	varchar(40)	9	
-clinvar	name	ClinVar "preferred name of the variation" record	NM_000410.3(HFE):c.187C>G (p.His63Asp)	text	97381	
-clinvar	review_status	ClinVar reports the level of review supporting the assertion of clinical significance for the variation as review status	criteria provided, multiple submitters, no conflicts, reviewed by expert panel	varchar(60)	2	
-clinvar	clinical_significance	Clinical significance 	Pathogenic, other; Pathogenic; Pathogenic/Likely pathogenic; Benign; Likely pathogenic; drug response; Benign/Likely benign; Likely benign, other; Likely benign; Pathogenic/Likely pathogenic, other; Benign/Likely benign, other; Benign, other; Pathogenic/Likely pathogenic, risk factor; Uncertain significance, other; Likely benign, risk factor; Pathogenic/Likely pathogenic, drug response; Pathogenic, drug response; Benign/Likely benign, risk factor; Benign, drug response; Pathogenic, risk factor; Benign, risk factor; other, risk factor; Uncertain significance, association; drug response, other; Likely benign, drug response; Likely pathogenic, risk factor        	varchar(80)	28	
-clinvar	clin_sig_simple	Coded value to indicate clinical significance. 0 = no current value of Pathogenic or Likely pathogenic 1 = at least one current record submitted with an interpretation of Pathogenic or Likely pathogenic	0,1	int(11)	2	
-clinvar	last_evaluated	date last evaluated	2019-01-09	date	1883	
-clinvar	dbsnp_rs	dbSNP RefSNP (rs) IDs	1799945	int(11)	91635	
-clinvar	dbvarid	variation id	nsv1067859, nsv1197557, nsv513781, nsv1197451, nsv513792, nsv1067916	varchar(10)	6	
-clinvar	origin	The genetic origin of the variant for each observation. Single or multiple values between germline, de novo, somatic, maternal, paternal, inherited, unknown, uniparental, biparental are allowed. Uniparental and biparental are intended for the context of uniparental disomy, not to indicate zygosity. 	biparental;germline;unknown	varchar(60)	67	
-clinvar	origin_simple	Simplified allele origin. ClinVar includes interpretations of variants identified in the germline and as somatic events. Note that allele origin refers to an observation of a variant, not the variant itself, so the same variant may have been reported both as germline and as somatic.	germline, germline/somatic, somatic, unknown	varchar(20)	4	
-clinvar	assembly	genome assembly name	GRCh37, GRCh38, NCBI36	varchar(8)	3	
-clinvar	chr	chromosome	1-26, MT, X, Y, na	varchar(2)	26	
-clinvar	chr_acc	nucleotide	NC_000006.12	varchar(20)	0	
-clinvar	start	Variant start location on chromosome	26090951	int(11)		
-clinvar	stop	Variant stop location on chromosome	26090951	int(11)		
-clinvar	number_submitters	Number of variant submitters	13	int(2)		
-clinvar	tested_in_gtr	The Genetic Testing Registry (GTR) is a database of genetic test information submitted by test providers.	0 or 1	tinyint(1)	2	
-clinvar	submitter_categories	Coded value to indicate whether data were submitted by another resource (1), any other type of source (2), both (3).	1-3	tinyint(1)	3	
-clinvar_phenotype	id	TCRD ClinVar phenotype identifier	1-12280	int(11)	12280	
-clinvar_phenotype	name	ClinVar phenotype name	Nephronophthisis	varchar(255)	12279	
-clinvar_phenotype_xref	id	Tcrd ClinVar phenotype external reference identifier	1-22373		22373	
-clinvar_phenotype_xref	clinvar_phenotype_id	Foreign key to column id in table clinvar_phenotype.	1-10297		10297	
-clinvar_phenotype_xref	source	Name of source for external reference	Orphanet, SNOMED CT, MedGen, HPO, OMIM, MeSH, EFO, Gene	varchar(40)	8	
-clinvar_phenotype_xref	value	External reference ID	ORPHA79172	varchar(20)	22361	
-cmpd_activity	id	TCRD compound identifier. The id is unique in the target table.	4	int(11)	500993	
-cmpd_activity	target_id	Foreign key to column id in table target.	3000	int(11)	2051	
-cmpd_activity	catype	Foreign key to column name in table cmpd_activity_type.	ChEMBL, Guide to Pharmacology	varchar(255)	2	
-cmpd_activity	cmpd_id_in_src	Source compound ID	CHEMBL186240	varchar(255)	271016	
-cmpd_activity	cmpd_name_in_src	Source compound name	N-(5-Cyclobutyl-thiazol-2-yl)-2-(1H-indol-3-yl)-acetamide	text	283853	
-cmpd_activity	smiles	Compound structure in SMILES format	O=C(Cc1c[nH]c2ccccc12)Nc3ncc(s3)C4CCC4	text	269547	
-cmpd_activity	act_value	Bioactivity measurement value	7.8	decimal(10,8)	1322	
-cmpd_activity	act_type	Bioactivity measurement type	IC50	varchar(255)	9	
-cmpd_activity	reference	Literature reference	Bioorg. Med. Chem. Lett., (2004) 14:22:5521	text	16125	
-cmpd_activity	pubmed_ids	PubMed IDs	15482916	text	18504	
-cmpd_activity	cmpd_pubchem_cid	PubChem CID	9815202	int(11)	249460	
-cmpd_activity	lychi_h4	The NCATS Layered Chemical Identifier (LyChI) is a chemical standardization tool that generates a unique hash for chemicals that is layered and used for quick fuzzy uniqueness checks and searches. A unique feature of the LyChI hash keys is that they are, to a certain extent, lexicologically meaningful (https://github.com/ncats/lychi). Level 4 of the identifier is used here.	2DB427URCFNS	varchar(15)	266188	
-cmpd_activity_type	name	Name of the source for the compound activity data	ChEMBL, Guide to Pharmacology	varchar(255)	2	
-cmpd_activity_type	description	Description of the source for the compound activity data	The IUPHAR/BPS Guide to PHARMACOLOGY	text	2	
-compartment	id	Cellular compartment identifier	2	int(11)	1075822	
-compartment	ctype	Foreign key to column name in table compartment_type.	Human Cell Atlas, JensenLab Experiment, JensenLab Knowledge, JensenLab Prediction, JensenLab Text Mining	varchar(255)	5	
-compartment	target_id	Foreign key to column id in table target.	(null)	int(11)	(null)	
-compartment	protein_id	Foreign key to column id in table protein.	15604	int(11)	18813	
-compartment	go_id	Gene ontology identifier for the cell compartment	GO:0005739	varchar(255)	2984	
-compartment	go_term	Gene ontology term for the cell compartment	Mitochondria	text	3000	
-compartment	evidence	Empty (reserved for future use)	(null)	varchar(255)	118	
-compartment	zscore	Empty (reserved for future use)	(null)	decimal(4,3)	4715	
-compartment	conf	Empty (reserved for future use)	(null)	decimal(2,1)	33	
-compartment	url	Empty (reserved for future use)	(null)	text	184602	
-compartment	reliability	Reliability of association between target and cellular compartment	Supported, Approved, Validated, (null)	enum('Supported','Approved','Validated')	4	
-compartment_type	name	Name of the source for the cellular compartment data	Human Cell Atlas, JensenLab Experiment, JensenLab Knowledge, JensenLab Prediction, JensenLab Text Mining	varchar(255)	5	
-compartment_type	description	Description of the source for the cellular compartment data	Human Cell Atlas protein locations, minus rows with Uncertain reliability. Experiment channel subcellular locations from JensenLab COMPARTMENTS resource, filtered for confidence scores of 3 or greater. Knowledge channel subcellular locations from JensenLab COMPARTMENTS resource, filtered for confidence scores of 3 or greater. Prediction channel subcellular locations from JensenLab COMPARTMENTS resource, filtered for confidence scores of 3 or greater. Text Mining channel subcellular locations from JensenLab COMPARTMENTS resource, filtered for zscore of 3.0 or greater.	text	5	
-disease	id	Primary key	1-407551	int(11)	407551	
-disease	dtype	Foreign key to column name in table disease_type.	CTD, DisGeNET, DrugCentral Indication, eRAM, Expression Atlas, JensenLab Experiment COSMIC, JensenLab Experiment DistiLD, JensenLab Knowledge GHR, JensenLab Knowledge UniProtKB-KW, JensenLab Text Mining, Monarch, UniProt Disease	varchar(255)	12	
-disease	protein_id	Foreign key to column id in table protein.	1	int(11)	18879	
-disease	nhprotein_id	Foreign key to column id in table nhprotein.	(null)	int(11)	0	
-disease	name	Disease name	Cystathioninuria	text	20032	
-disease	did	Disease identifier (DOID, UMLS, MESH, AmyCo, OrphaNet, or NCBIGene)	MIM:219500, OMIM:219500, C0220993, DOID:0090142	varchar(20)	28232	
-disease	evidence	Evidence of association between target and disease	2 PubMed IDs; 3 SNPs	text	3225	
-disease	zscore	Standard score for the strength of association between target and disease	(null)	decimal(4,3)	4511	
-disease	conf	Confidence level for the strength of association between target and disease	(null)	decimal(2,1)	37	
-disease	description	Disease description	Autosomal recessive phenotype characterized by abnormal accumulation of plasma cystathionine, leading to increased urinary excretion.	text	3887	
-disease	reference	Empty (reserved for future use)	(null)	varchar(255)	0	
-disease	drug_name	Drug indicated for a specific disease, having a pharmacological mechanism of action by acting of a specific target	cepharanthine	text	1443	
-disease	log2foldchange	Differential expression log2 fold-change for differentially expressed gene in disease patient tissue versus matched normal tissue in Expression Atlas	-2.329	decimal(5,3)	5245	
-disease	pvalue	p-value for differentially expressed gene in disease patient tissue versus matched normal tissue in Expression Atlas	0.01	varchar(255)	137079	
-disease	score	DisGeNET score for gene-disease association	(null)	decimal(16,15)	83	
-disease	source	Source of target-disease association	(null)	varchar(255)	135	
-disease	O2S	Monarch object-to-subject score	(null)	decimal(16,13)	0	
-disease	S2O	Monarch subject-to-object score	96.18	decimal(16,13)	5626	
-disease_type	name	Name of the source for the target-disease association data	CTD, DisGeNET, DrugCentral Indication, eRAM, Expression Atlas, JensenLab Experiment COSMIC, JensenLab Experiment DistiLD, JensenLab Knowledge GHR, JensenLab Knowledge UniProtKB-KW, JensenLab Text Mining, Monarch, UniProt Disease	varchar(255)	12	
-disease_type	description	Description of the source for the target-disease association data	Disease association from UniProt comment field with type="disease"	text	12	Gene-Disease associations with direct evidence from the Comparative Toxicogenomics Database. Currated disease associations from DisGeNET (http://www.disgenet.org/). Disease indications and associated drug names from Drug Central. Currated gene disease associations from eRAM. Target-Disease associations from Expression Atlas where the log2 fold change in gene expresion in disease sample vs reference sample is greater than 1.0. Only reference samples "normal" or "healthy" are selected. Data is derived from the file: ftp://ftp.ebi.ac.uk/pub/databases/microarray/data/atlas/experiments/atlas-latest-data.tar.gz, JensenLab Experiment channel using COSMIC, JensenLab Experiment channel using DistiLD, JensenLab Knowledge channel using GHR, JensenLab Knowledge channel using UniProtKB-KW, JensenLab Text Mining channel, Gene-Disease associations from Monarch that have S2O and/or O2S score(s), Disease association from UniProt comment field with type="disease"
-do	doid	Disease ontology identifier (from https://disease-ontology.org)	DOID:0001816	varchar(12)	9233	https://disease-ontology.org
-do	name	Disease name	angiosarcoma	text	9233	
-do	def	Disease definition	A vascular cancer that derives_from the cells that line the walls of blood vessels or lymphatic vessels.	text	6118	
-do_parent	doid	Disease identifier (foreign key to column doid in table do)	DOID:0080337	varchar(12)	9232	
-do_parent	parent_id	Parent disease identifier (foreign key to column doid in table do)	DOID:0050737	varchar(12)	2097	
-do_xref	doid	Foreign key to column doid in table do.	DOID:10588	varchar(12)	8635	
-do_xref	db	Source of the external reference identifier	CSP2005, DERMO, DO, EFO, GARD, ICD-10, ICD10CM, ICD9CM, ICD9CM_2006, JA, KEGG, ls, MEDDRA, MESH, MTH, MTHICD9_2006, NCI, NCI2004_11_17, OMIM, ORDO, sn, SNOMECT, SNOMED_CT_US_2018_03_01, SNOMEDCT_US_2018_03_01, stedman, UMLS_CUI	varchar(24)	25	
-do_xref	value	External reference identifier	2042-2215, E75.2, 358.3	varchar(24)	36392	
-drgc_resource	id	TCRD identifier for the drgc_resource table containing links and metadata about the resources generated by the Illuminating the druggable genome (IDG) experimental data and resource generation centers (DRGC)	1-320	int(11)	320	
-drgc_resource	rssid	Resource Submission System (RSS) identifier	https://repo.metadatacenter.org/template-instances/6b9c4cec-0c93-4b49-927b-6f81f55df901	text	320	
-drgc_resource	resource_type	Resource type	Cell, Mouse, Expression, Mouse Phenotype, NanoBRET, GPCR Mouse Imaging, Chemical Tool	varchar(255)	7	
-drgc_resource	target_id	Foreign key to column id in table target.	1-149	int(11)	149	
-drgc_resource	json	Resource metadata in json format	json file	text	320	
-drug_activity	id	TCRD drug activity identifier	1-4004	int(11)	4004	
-drug_activity	target_id	Foreign key to column id in table target.	1-993	int(11)	993	
-drug_activity	drug	Drug name	avapritinib	varchar(255)	1642	
-drug_activity	act_value	Bioactivity measurement value	9.62	decimal(10,8)	1019	
-drug_activity	act_type	Bioactivity measurement type	(null), IC50, Ki, Kd, EC50, ID50, ED50, MEC, IC90, A2, Kb, AC50	varchar(255)	12	
-drug_activity	action_type	Pharmacological action type	INHIBITOR, PHARMACOLOGICAL CHAPERONE, AGONIST, ANTIBODY BINDING, ANTAGONIST, BLOCKER, ACTIVATOR, INVERSE AGONIST, MODULATOR, PARTIAL AGONIST, OPENER, POSITIVE ALLOSTERIC MODULATOR, NEGATIVE ALLOSTERIC MODULATOR, GATING INHIBITOR,, RELEASING AGENT, POSITIVE MODULATOR, SUBSTRATE, ALLOSTERIC ANTAGONIST, (null), BINDING AGENT, ALLOSTERIC MODULATOR, ANTISENSE INHIBITOR	varchar(255)	22	
-drug_activity	has_moa	Boolean flag indicating whether or not the drug has a Mechanism of Action as defined by DrugCentral	0 or 1	tinyint(1)	2	
-drug_activity	source	Source of knowledge	SCIENTIFIC LITERATURE, DRUG LABEL, KEGG DRUG, IUPHAR, CHEMBL	varchar(255)	5	
-drug_activity	reference	Source URL	https://www.accessdata.fda.gov/drugsatfda_docs/label/2020/212608s000lbl.pdf	text	1716	
-drug_activity	smiles	Drug structure in SMILES format	CN1C=C(C=N1)C1=CN2N=CN=C(N3CCN(CC3)C3=NC=C(C=N3)[C@@](C)(N)C3=CC=C(F)C=C3)C2=C1	text	1495	
-drug_activity	cmpd_chemblid	ChEMBL molecule ID	CHEMBL4204794	varchar(255)	1513	
-drug_activity	nlm_drug_info	Drug mechanism of action (where available) as described in the drug label.	Avapritinib is a tyrosine kinase inhibitor that targets PDGFRA and PDGFRA D842 mutants as well as multiple KIT exon 11, 11/17 and 17 mutants with half maximal inhibitory concentrations (IC50s) less than 25 nM. Certain mutations in PDGFRA and KIT can result in the autophosphorylation and constitutive activation of these receptors which can contribute to tumor cell proliferation. Other potential targets for avapritinib include wild type KIT, PDGFRB, and CSFR1.	text	1473	https://druginfo.nlm.nih.gov/drugportal/
-drug_activity	cmpd_pubchem_cid	PubChem CID	(null)	int(11)	(null)	
-drug_activity	dcid	DrugCentral ID (drug compound)	integer	int(11)	1642	
-drug_activity	lychi_h4	The NCATS Layered Chemical Identifier (LyChI) is a chemical standardization tool that generates a unique hash for chemicals that is layered and used for quick fuzzy uniqueness checks and searches. A unique feature of the LyChI hash keys is that they are, to a certain extent, lexicologically meaningful (https://github.com/ncats/lychi). Level 4 of the identifier is used here.	BUBUSK1338HA	varchar(15)	1489	
-dto	dtoid	Drug Target Ontology (DTO) identifier (from http://drugtargetontology.org/)	BTO_0000007	varchar(255)	17779	
-dto	name	DTO term name	HEK-293 cell	text	17733	
-dto	parent_id	DTO identifier for parent term (foreign key to column dtoid in table dto)	BTO_0000067	varchar(255)	2841	
-dto	def	DTO term definition	Established from a human primary embryonal kidney transformed by adenovirus type 5.'	text	5706	
-expression	id	TCRD identifier for expression table	1-26935759	int(11)	26935759	
-expression	etype	Foreign key to column name in table expression_type.	CCLE, Cell Surface Protein Atlas, Consensus, GTEx, HCA RNA, HPA, HPM Gene, HPM Protein, JensenLab Experiment Cardiac proteome, JensenLab Experiment Exon array, JensenLab Experiment GNF, JensenLab Experiment HPA, JensenLab Experiment HPA-RNA, JensenLab Experiment HPM, JensenLab Experiment RNA-seq, JensenLab Experiment UniGene, JensenLab Knowledge UniProtKB-RC, JensenLab Text Mining, UniProt Tissue	varchar(255)	18	
-expression	target_id	Foreign key to column id in table target.	(null)	int(11)	0	
-expression	protein_id	Foreign key to column id in table protein.	3	int(11)	19945	
-expression	tissue	Tissue where expression was measured	Brain	text	5721	
-expression	qual_value	Qualitative level of expression	(null), Not detected, Medium, High, Low	enum('Not detected','Low','Medium','High')	5	
-expression	integer_value	Numeric value of expression	float	decimal(12,6)	4523984	
-expression	boolean_value	Boolean flag indicating whether a protein is expressed in a tissue/organ or not	0 or 1	tinyint(1)	2	
-expression	string_value	Textual description of expression results, using different formats for each expression source	(null)	text	53449	
-expression	pubmed_id	Pubmed ID for the paper reporting the expression results	17974005	int(11)	10490	
-expression	evidence	Level of evidence	(null), CURATED, Approved, Enhanced, Supported	varchar(255)	5	
-expression	zscore	Standard score for the strength of association between target and tissue	(null)	decimal(4,3)	4046	
-expression	conf	Confidence values from JensenLab TISSUES  resource. Only persent for rows where etype LIKE 'JensenLab%'	(null)	decimal(2,1)	51	
-expression	oid	Tissue ontology ID	(null)	varchar(20)	4060	
-expression	confidence	A score indicating how many sources agree on the qualitative level of expression for a given target. Only present for rows where etype = 'Consensus' 	0, 1, 2, 3, 4, 5, NULL	tinyint(1)	7	
-expression	url	URL of specific expression data	(null)	text	60782	
-expression	cell_id	Cell line identifier	HELA	varchar(20)	1155	
-expression	uberon_id	Foreign key to column uid in table uberon.	UBERON:0000955	varchar(20)	1269	
-expression_type	name	Name of the source for the expression data	CCLE, Cell Surface Protein Atlas, Consensus, GTEx, HCA RNA, HPA, HPM Gene, HPM Protein, JensenLab Experiment Cardiac proteome, JensenLab Experiment Exon array, JensenLab Experiment GNF, JensenLab Experiment HPA, JensenLab Experiment HPA-RNA, JensenLab Experiment HPM, JensenLab Experiment RNA-seq, JensenLab Experiment UniGene, JensenLab Knowledge UniProtKB-RC, JensenLab Text Mining, UniProt Tissue	varchar(255)	18	
-expression_type	data_type	Foreign key to column name in table data_type.	integer, Boolean, String	varchar(7)	3	
-expression_type	description	Description of the source for the expression data	Broad Institute Cancer Cell Line Encyclopedia expression data.	text	18	Broad Institute Cancer Cell Line Encyclopedia expression data., Cell Surface Protein Atlas protein expression in cell lines., Qualitative consensus expression value calulated from GTEx, HPA and HPM data aggregated according to manually mapped tissue types, GTEx V4 RNA-SeQCv1.1.8 Log Median RPKM and qualitative expression values per SMTSD tissue type, Human Cell Atlas gene expression in cell lines, Human Protein Atlas normal tissue expression values, Human Proteome Map gene-level Log and qualitative expression values., Human Proteome Map protein-level Log and qualitative expression values., JensenLab Experiment channel using Cardiac proteome, JensenLab Experiment channel using Exon array, JensenLab Experiment channel using GNF, JensenLab Experiment channel using Human Protein Atlas IHC, JensenLab Experiment channel using Human Protein Atlas RNA, JensenLab, Experiment channel using Humap Proteome Map, JensenLab Experiment channel using RNA-seq, JensenLab Experiment channel using UniGene, JensenLab Knowledge channel using UniProtKB-RC, JensenLab Text Mining channel, Tissue and PubMed ID from UniProt
-extlink	id	TCRD external link identifier 				
-extlink	protein_id	Foreign key to column id in table protein				
-extlink	source	Source of external link	GlyGen,TIGA			
-extlink	url	URL of external link	https://glygen.org/protein/P32929			
-feature	id	TCRD identifier for protein feature table	1- 564259	int(11)	564259	
-feature	protein_id	Foreign key to column id in table protein.	integer 	int(11)	20412	
-feature	type	Protein feature type	chain, binding site, modified residue, splice variant, sequence variant, helix, strand, turn, short sequence motif, sequence conflict, domain, repeat, nucleotide phosphate-binding region, region of interest, compositionally biased region, cross-link, initiator, methionine, calcium-binding region, lipid moiety-binding region, mutagenesis site, DNA-binding region, transmembrane region, coiled-coil region, active site, metal ion-binding site, site, topological domain, signal peptide, propeptide, glycosylation site, disulfide bond, zinc finger region, transit peptide, intramembrane region, peptide, non-standard amino acid, non-terminal residue, non-consecutive residues	varchar(255)	38	
-feature	description	Protein feature description	Cystathionine gamma-lyase	text	134583	
-feature	srcid	Protein feature source id	PRO_0000114749	varchar(255)	130947	
-feature	evidence	Evidence code(s) from UniProt feature table	3 4 5 10	varchar(255)	9158	
-feature	begin	Position in sequence where protein feature begins	1	int(11)	5218	
-feature	end	Position in sequence where protein feature begins	405	int(11)	5282	
-feature	position	Position in sequence of the single amino acid feature	(null)	int(11)	4940	
-feature	original	Empty - reserved for future use	(null)	varchar(255)	0	
-feature	variation	Empty - reserved for future use	(null)	varchar(255)	0	
-gene_attribute	id	TCRD identifier for gene_attribute table	1-65549760	int(11)	65549760	
-gene_attribute	protein_id	Foreign key to column id in table protein.	1897	int(11)	18789	
-gene_attribute	gat_id	Foreign key to column id in table gene_attribute_type.	1	int(11)	113	
-gene_attribute	name	Gene attribute name	2-LTR circle formation/Reactome Pathways	text	321763	
-gene_attribute	value	Gene attribute value	1, -1	int(1)	1	
-gene_attribute_type	id	TCRD identifier for the gene_attribute_type table	integer	int(11)	113	
-gene_attribute_type	name	Name of data source for gene attribute types	COSMIC Cell Line Gene Mutation Profiles	varchar(255)	113	
-gene_attribute_type	association	Type of association	gene-cell line associations by mutation of gene in cell line	text	113	
-gene_attribute_type	description	Description of data source	The Catalogue of Somatic Mutations in Cancer is a database of information about somatic mutations in cancer obtained from curation of relevant literature and from high-throughput sequencing data generated by the Cancer Genome Project and other cancer profiling projects such as The Cancer Genome Atlas.  Specifically, COSMIC collects information about point mutations, gene fusions, genomic rearrangements, and copy integer variation in cancer tissue samples and cancer cell lines.	text	113	
-gene_attribute_type	resource_group	Type of data source	genomics, transcriptomics, proteomics, physical interactions	enum('omics','genomics','proteomics','physical interactions','transcriptomics','structural or functional annotations','disease or phenotype associations')	113	
-gene_attribute_type	measurement	Type of measurement or literature curation to establish association	gene mutation by data aggregation	varchar(255)	113	
-gene_attribute_type	attribute_group	Gene attribute group	cell line, cell type or tissue	varchar(255)	113	
-gene_attribute_type	attribute_type	Gene attribute type	cell line	varchar(255)	113	
-gene_attribute_type	pubmed_ids	Pubmed IDs of reference papers	19906727|20952405	text	113	
-gene_attribute_type	url	URL of data source	http://cancer.sanger.ac.uk/cancergenome/projects/cosmic/	text	113	
-generif	id	TCRD identifier for the  Gene Reference into Function table	1-740376	int(11)	740376	
-generif	protein_id	Foreign key to column id in table protein.	1	int(11)	16411	
-generif	pubmed_ids	Pubmed IDs of reference papers	19692168|15151507|20634891|18701025|19625176|19324355|18676680|19161160|19913121	text	473814	
-generif	text	Gene Reference into Function (GeneRIF) text	Observational study of gene-disease association. (HuGE Navigator)	text	514140	
-generif	years	Years when the reference papers were published	2010|2004|2010|2008|2009|2010|2008|2009|2009	text	6041	
-goa	id	TCRD identifier for the Gene Ontology table	1-258719	int(11)	258719	
-goa	protein_id	Foreign key to column id in table protein.	integer	int(11)	19100	
-goa	go_id	GO term id	GO:0005737	varchar(255)	17903	
-goa	go_term	GO term name	C:cytoplasm	text	17903	
-goa	evidence	Type of evidence	IBA, TAS, HDA, IEA, IDA, IPI, IMP, ISS, ISM, IGI, NAS, IEP, EXP, ISA, HEP, IC, HMP, ISO	text	18	
-goa	goeco	Evidence and Conclusion Ontology (ECO) terms that describe types of evidence and assertion methods as described at https://evidenceontology.org/	ECO:0000318, ECO:0000304, ECO:0007005, ECO:0000501, ECO:0000314, ECO:0000353, ECO:0000315, ECO:0000250, ECO:0000255, ECO:0000316, ECO:0000303, ECO:0000270, ECO:0000269, ECO:0000247, ECO:0007007, ECO:0000305, ECO:0007001, ECO:0000266	varchar(255)	18	
-goa	assigned_by	Data source for GO term	UniProtKB	varchar(50)	35	
-goa	go_type	Type of GO term	Component, Function, Process	enum('Component','Function','Process')	3	
-gtex	id	TCRD identifier for the Genotype-Tissue Expression (GTEx) table	1-1805436	int(11)	1805436	
-gtex	protein_id	Foreign key to column id in table protein	integer	int(11)	18474	
-gtex	tissue	GTEx tissue name	Adipose - Subcutaneous	text	53	
-gtex	gender	GTEx tissue biological sex	M, F	enum('F','M')	2	
-gtex	tpm	Gene and transcript expression shown in Transcripts Per Million (TPM) units	23.220000	decimal(12,6)	45047	
-gtex	tpm_rank	Rank percentile [0-1]	0.653	decimal(4,3)	628	
-gtex	tpm_rank_bysex	Rank by sex percentile [0-1]	0.627	decimal(4,3)	478	
-gtex	tpm_level	Low, Medium or High from rank percentiles with cutoffs .25 and .75	Low, Medium, High	enum('Not detected','Low','Medium','High')	3	
-gtex	tpm_level_bysex	Low, Medium or High from rank percentiles with cutoffs .25 and .75, by sex	Low, Medium, High	enum('Not detected','Low','Medium','High')	3	
-gtex	tpm_f	Transcripts per million (TPM) - female	23.220000	decimal(12,6)	39018	
-gtex	tpm_m	Transcripts per million (TPM) - male	22.280000	decimal(12,6)	39085	
-gtex	log2foldchange	LOG2(TPM_F/TPM_M)	0.057	decimal(4,3)	0	
-gtex	tau	Tau is tissue specificity index (Yanai et al., 2004)	0.801	decimal(4,3)	661	
-gtex	tau_bysex	Tau is tissue specificity index (Yanai et al., 2004), by sex	0.798	decimal(4,3)	687	
-gtex	uberon_id	UBERON ID for tissue	UBERON:0002369	varchar(20)	48	
-gwas	id	TCRD identifier for the Genome Wide Association Studies (GWAS) data table	1-124149	int(11)	124149	
-gwas	protein_id	Foreign key to column id in table protein.	15243	int(11)	13116	
-gwas	disease_trait	TCRD identifier for the GWAS table	Waist-to-hip ratio adjusted for BMI	varchar(255)	3180	
-gwas	snps	SNP IDs (RefSNP or other)	rs2179129	text	62952	
-gwas	pmid	PubMed ID	26426971	int(11)	3230	
-gwas	study	Study name	The Influence of Age and Sex on Genetic Associations with Adult Body Size and Shape: A Large-Scale Genome-Wide Interaction Study.	text	3230	
-gwas	context	SNP functional class	3_prime_UTR_variant	text	105	
-gwas	intergenic	Is SNP integenic?	FALSE, TRUE, (null)	tinyint(1)	3	
-gwas	p_value	p-value for association	1.00E-15	double	1740	
-gwas	or_beta	Odds ratio (OR) or Beta value as measures of effect size	0.0266488	float	30345	
-gwas	cnv	Copy number variation	N	char(1)	1	
-gwas	mapped_trait	EFO mapped trait (name)	BMI-adjusted waist-hip ratio	text	2693	
-gwas	mapped_trait_uri	EFO mapped trait (URI)	http://www.ebi.ac.uk/efo/EFO_0007788	text	2693	
-hgram_cdf	id	TCRD identifier for the Harmonogram CDF data	1-1167880	int(11)	1167880	
-hgram_cdf	protein_id	Foreign key to column id in table protein.	integer	int(11)	18789	
-hgram_cdf	type	Foreign key to column name in table gene_attribute_type.	Allen Brain Atlas Prenatal Human Brain Tissue Gene Expression Profiles	varchar(255)	110	
-hgram_cdf	attr_count	Gene attribute count	integer	int(11)	2540	
-hgram_cdf	attr_cdf	Gene attribute CDF (cummulative distribution function)	0.7703750883424460	decimal(17,16)	17059	
-homologgene	id	TCRD identifier for the HomoloGene data table	1-69991	int(11)	69991	
-homologgene	protein_id	Foreign key to column id in table protein.	(null), or integer	int(11)	18806	
-homologgene	nhprotein_id	Foreign key to column id in table nhprotein.	(null), or integer	int(11)	51185	
-homologgene	groupid	Unique integer identifier for the HomoloGene group	integer	int(11)	20932	
-homologgene	taxid	Taxonomic id for the highest taxonomic level of conservation for the group	9606, 10090, 10116	int(11)	3	
-idg_evol	id	TCRD identifier for the idg_evol table, which keeps track of target evolution between major TCRD versions	1-5118	int(11)	5118	
-idg_evol	tcrd_ver	The major version number of TCRD 	1-6	tinyint(1)	6	
-idg_evol	tcrd_dbid	The value of target.id in the corresponding major version of TCRD	integer	int(11)	3900	
-idg_evol	name	UniProt entry name	5HT1A_HUMAN	varchar(255)	1836	
-idg_evol	description	UniProt protein name	5-hydroxytryptamine receptor 1A	text	1848	
-idg_evol	uniprot	UniProt entry code	P08908	varchar(20)	1803	
-idg_evol	sym	Gene symbol	HTR1A	varchar(20)	1814	
-idg_evol	geneid	HGNC gene id	integer	int(11)	1806	
-idg_evol	tdl	IDG target development level	Tclin, Tchem, Tbio, Tdark	varchar(6)	4	
-idg_evol	fam	IDG protein family	GPCR, IC, Kinase, NR, oGPCR	varchar(20)	6	
-kegg_distance	id	TCRD identifier for kegg_distance table	1-208238	int(11)	208238	
-kegg_distance	pid1	Foreign key to column id in table protein.	integer	int(11)	4323	
-kegg_distance	pid2	Foreign key to column id in table protein.	integer	int(11)	3071	
-kegg_distance	distance	Shortest path distance from KEGG Pathways between two proteins	integer	int(11)	18	
-kegg_nearest_tclin	id	TCRD identifier for kegg_nearest_tclin table	integer	int(11)	15911	
-kegg_nearest_tclin	protein_id	Foreign key to column id in table protein.	integer	int(11)	2574	
-kegg_nearest_tclin	tclin_id	Foreign key to column id in table target	integer	int(11)	403	
-kegg_nearest_tclin	direction	Direction to nearest Tclin target	upstream, downstream	enum('upstream','downstream')	2	
-kegg_nearest_tclin	distance	Distance to neareast upstream and downstream Tclin from KEGG Pathways	integer	int(11)	8	
-knex_migrations	id		integer	int(10) unsigned	19	
-knex_migrations	name		20201222234410_createIDGtable.ts	varchar(255)	19	
-knex_migrations	batch		integer	int(11)	19	
-knex_migrations	migration_time		2021-01-22 22:41:48	timestamp	19	
-knex_migrations_lock	index		44	int(10) unsigned	1	
-knex_migrations_lock	is_locked		0	int(11)	1	
-lincs	id	TCRD identifier for the LINCS table	1-84097720	int(11)	84097720	
-lincs	protein_id	Foreign key to column id in table protein.	integer	int(11)	980	
-lincs	cellid	ATCC cell line	HELA	varchar(10)	82	
-lincs	zscore	Z-score of the differential expression values for the specific gene	-0.436812	decimal(8,6)	7804415	
-lincs	pert_dcid	DrugCentral ID for perturbagen drug	integer	int(11)	1613	
-lincs	pert_smiles	Chemical structure in SMILES format for perturbagen drug	OC(=O)CCc1nc(c(o1)-c1ccccc1)-c1ccccc1	text	2147	
-locsig	id	TCRD identifier for the LocSigDB table	1-106521	int(11)	106521	
-locsig	protein_id	Foreign key to column id in table protein.	integer	int(11)	18916	
-locsig	location	Cellular location of protein	Lysosome|Melanosome	varchar(255)	14	
-locsig	signal	Generic structure of protein localization signal peptide	[DE]x{3}L[LI]	varchar(255)	31	
-locsig	pmids	PubMed references	19116314|16262729|19523115|18479248|17635580	text	239	
-mlp_assay_info	id			int(11)	0	Empty table?
-mlp_assay_info	protein_id	Foreign key to column id in table protein.		int(11)	0	
-mlp_assay_info	assay_name	Assay name		text	0	
-mlp_assay_info	method	Assay method		varchar(255)	0	
-mlp_assay_info	active_sids	PubChem substance ID count for actives.		int(11)	0	
-mlp_assay_info	inactive_sids	PubChem substance ID count for inactives.		int(11)	0	
-mlp_assay_info	iconclusive_sids	PubChem substance ID count for inconclusives.		int(11)	0	
-mlp_assay_info	total_sids	PubChem substance ID count (total).		int(11)	0	
-mlp_assay_info	aid	PubChem assay ID (AID) for Molecular Libraries Program assay		int(11)	0	
-mpo	mpid	Mammalian Phenotype Ontology (MPO) term ID	MP:0000018			
-mpo	parent_id	MPO parent term ID				
-mpo	name	MPO term name				
-mpo	def	MPO term definition				
-nhprotein	id	TCRD identifier for the nhprotein table (NH = non-human)	1- 121277	int(11)	121277	
-nhprotein	uniprot	UniProt entry ID	Q9CQA6	varchar(20)	121277	
-nhprotein	name	UniProt entry ID	CHCH1_MOUSE	varchar(255)	121277	
-nhprotein	description	UniProt protein name	Coiled-coil-helix-coiled-coil-helix domain-containing protein 1	text	47393	
-nhprotein	sym	Gene symbol	Chchd1	varchar(30)	29381	
-nhprotein	species	Organism	Rattus norvegicus Mus musculus	varchar(40)	2	
-nhprotein	taxid	UniProt taxonomy ID	10090, 10116	int(11)	2	
-nhprotein	geneid	HGNC gene ID	66121	int(11)	38094	
-omim	mim	Phenotype Mendelian Inheritance in Man (MIM) number	integer	int(11)	26221	
-omim	title	Phenotype name	AARSKOG SYNDROME, AUTOSOMAL DOMINANT	varchar(255)	25960	
-omim_ps	id	TCRD identifier for the omim_ps table	1-4375	int(11)	4375	
-omim_ps	omim_ps_id	OMIM phenotypic series ID	PS100070	char(8)	450	
-omim_ps	mim	Foreign key to column mim in table omim.	100070	int(11)	3628	
-omim_ps	title	Phenotypic series name	Aortic aneurysm, familial abdominal 1	varchar(255)	4232	
-ortholog	id	TCRD identifier for the HGNC Comparison of Orthology Predictions (HCOP) ortholog table	integer	int(11)	178759	
-ortholog	protein_id	Foreign key to column id in table protein.	1-18056	int(11)	18056	
-ortholog	taxid	UniProt taxonomy ID	integer	int(11)	17	
-ortholog	species	Organism	Cow	varchar(255)	17	
-ortholog	db_id	HCOP ortholog database ID	VGNC:27795	varchar(255)	113894	
-ortholog	geneid	HGNC gene ID	integer	int(11)	169587	
-ortholog	symbol	Gene symbol	CTH	varchar(255)	33498	
-ortholog	name	Human protein name	cystathionine gamma-lyase	varchar(255)	49376	
-ortholog	mod_url	Model organism database URL	http://www.informatics.jax.org/marker/MGI:1339968	text	49093	
-ortholog	sources	Data sources	OMA, EggNOG Inparanoid, OMA, EggNOG Inparanoid, OMA Inparanoid, EggNOG	varchar(255)	4	
-ortholog_disease	id	TCRD identifier for the ortholog-disease association table	1-37852	int(11)	37852	
-ortholog_disease	protein_id	Foreign key to column id in table protein.	integer	int(11)	3827	
-ortholog_disease	did	Disease ID	OMIM:125460	varchar(255)	5641	
-ortholog_disease	name	Disease name	Deoxyribose-5-Phosphate Aldolase Deficiency	varchar(255)	5641	
-ortholog_disease	ortholog_id	Foreign key to column id in table ortholog.	integer	int(11)	3827	
-ortholog_disease	score	Ortholog-disease association score	float	varchar(255)	23678	
-p2pc	panther_class_id	Foreign key to column id in table panther_class.	integer	int(11)	214	
-p2pc	protein_id	Foreign key to column id in table protein.	integer	int(11)	8070	
-panther_class	id	TCRD identifier for the Panther protein classification system table	integer	int(11)	256	
-panther_class	pcid	Panther class ID	PC00035	char(7)	256	
-panther_class	parent_pcids	Panther class IDs for parents	PC00084	varchar(255)	79	
-panther_class	name	Panther class name	TGF-beta receptor	text	256	
-panther_class	description	Empty (reserved for future use)	n/a	text	0	
-patent_count	id	TCRD identifier for the patent count table	integer	int(11)	41280	
-patent_count	protein_id	Foreign key to column id in table protein.	integer	int(11)	1710	
-patent_count	year	Year	2016	int(4)	44	
-patent_count	count	Number of patents published in a certain year mentioning the specified protein target	integer	int(11)	4650	
-pathway	id	TCRD identifier for the pathway table	1-331936	int(11)	331936	
-pathway	target_id	Foreign key to column id in table target.	(null)	int(11)	0	
-pathway	protein_id	Foreign key to column id in table protein.	integer	int(11)	12984	
-pathway	pwtype	Foreign key to column name in table pathway_type.	KEGG, PathwayCommons: humancyc, PathwayCommons: inoh, PathwayCommons: netpath, PathwayCommons: panther, PathwayCommons: pid, Reactome, UniProt, WikiPathways	varchar(255)	9	
-pathway	id_in_source	Pathway ID in the source database	path:hsa04151	varchar(255)	3109	
-pathway	name	Pathway name	PI3K-Akt signaling pathway	text	4516	
-pathway	description	Empty (reserved for future use)	(null)	text	0	
-pathway	url	Pathway URL	http://www.kegg.jp/kegg-bin/show_pathway?hsa04151	text	4323	
-pathway_type	name	Name of the pathway data source	KEGG PathwayCommons: ctd PathwayCommons: humancyc PathwayCommons: inoh PathwayCommons: mirtarbase PathwayCommons: netpath PathwayCommons: panther PathwayCommons: pid PathwayCommons: recon PathwayCommons: smpdb PathwayCommons: transfac Reactome UniProt WikiPathways	varchar(255)	14	
-pathway_type	url	URL of the pathway data source	http://www.kegg.jp/kegg/pathway.html http://www.pathwaycommons.org/pc2/ctd http://www.pathwaycommons.org/pc2/humancyc http://www.pathwaycommons.org/pc2/inoh http://www.pathwaycommons.org/pc2/mirtarbase http://www.pathwaycommons.org/pc2/netpath http://pathwaycommons.org/pc2/panther http://www.pathwaycommons.org/pc2/pid http://www.pathwaycommons.org/pc2/recon http://www.pathwaycommons.org/pc2/smpdb http://www.pathwaycommons.org/pc2/transfac http://www.reactome.org/ http://www.uniprot.org/ http://www.wikipathways.org/index.php/WikiPathways	text	14	
-phenotype	id	TCRD identifier for the phenotype table	integer	int(11)	7318480	
-phenotype	ptype	Foreign key to column name in table phenotype_type.	IMPC, JAX/MGI Human Ortholog Phenotype, OMIM	varchar(255)	3	
-phenotype	protein_id	Foreign key to column id in table protein.	integer	int(11)	15397	
-phenotype	nhprotein_id	Foreign key to column id in table nhprotein.	integer	int(11)	27637	
-phenotype	trait	Phenotype trait information	MIM integer: 103320; Phenotype: Myasthenic syndrome, congenital, 8, with pre- and postsynaptic defects, 615120 (3)	text	13751	
-phenotype	top_level_term_id	Top level phenotype term ID	MP:0005378	varchar(255)	76	
-phenotype	top_level_term_name	Top level phenotype term name	cardiovascular system phenotype	varchar(255)	76	
-phenotype	term_id	Phenotype term ID	MP:0005386	varchar(255)	738	
-phenotype	term_name	Phenotype term name	behavior/neurological phenotype	varchar(255)	741	
-phenotype	term_description	Empty (reserved for future use)	(null)	text	0	
-phenotype	p_value	p-value of protein-phenotype association	float	double	452786	
-phenotype	percentage_change	Measure of effect size for continuous data	-186.1220193	varchar(255)	7282	
-phenotype	effect_size	Effect size	float	varchar(255)	11149	
-phenotype	procedure_name	Name of phenotyping procedure	Intraperitoneal glucose tolerance test (IPGTT)	varchar(255)	92	
-phenotype	parameter_name	Name of phenotyping parameter	Fat mass	varchar(255)	967	
-phenotype	gp_assoc	Gene-phenotype association flag	boolean	tinyint(1)	3	
-phenotype	statistical_method	Name of statistical procedure	(null) Mixed Model framework, linear mixed-effects model, equation withoutWeight Mixed Model framework, generalized least squares, equation withWeight Mixed Model framework, generalized least squares, equation withoutWeight Mixed Model framework, linear mixed-effects model, equation withWeight Unknown Fisher Exact Test framework Supplied as data Not processed  Manual	text	10	
-phenotype	sex	Sex	(null), female, male, no_data, both    	varchar(8)	5	
-phenotype_type	name	Source of the phenotype data	GWAS Catalog IMPC JAX/MGI Human Ortholog Phenotype OMIM	varchar(255)	4	
-phenotype_type	ontology	Ontology used by source	(null) Mammalian Phenotype Ontology Mammalian Phenotype Ontology (null)	varchar(255)	4	
-phenotype_type	description	Description of source	GWAS findings from NHGRI/EBI GWAS catalog file. Phenotypes from the International Mouse Phenotyping Consortium. These are single gene knockout phenotypes. JAX/MGI house/human orthology phenotypes in file HMD_HumanPhenotype.rpt from ftp.informatics.jax.or Phenotypes from OMIM with status Confirmed. phenotype.trait is a concatenation of Title, MIM integer, Method, and Comments fields from the OMIM genemap2.txt file.	text	4	
-pmscore	id	TCRD identifier for the Jensen PubMed scores table	integer	int(11)	384954	
-pmscore	protein_id	Foreign key to column id in table protein.	integer	int(11)	17982	
-pmscore	year	Year for whom the score was computed	integer	int(4)	119	
-pmscore	score	Score value	float	decimal(12,6)	168075	
-ppi	id	TCRD identifier for the protein-protein interaction table	integer	int(11)	11735789	
-ppi	ppitype	Protein-protein interaction (PPI) source	BioPlex Reactome STRINGDB	varchar(255)	3	
-ppi	protein1_id	Foreign key to column id in table protein.	integer	int(11)	19113	
-ppi	protein1_str	Protein ID in the source database	P62136|PPP1CA|5499	varchar(255)	28935	
-ppi	protein2_id	Foreign key to column id in table protein.	integer	int(11)	19136	
-ppi	protein2_str	Protein ID in the source database	Q9ULJ8|PPP1R9A|55607	varchar(255)	36977	
-ppi	p_int	Likelihood that both proteins are true interactors	Q07021|C1QBP|708	decimal(10,9)	69661	
-ppi	p_ni	Likelihood that one protein is a background protein (chaperones, proteasome subunits, etc)	float	decimal(10,9)	68441	
-ppi	p_wrong	Likelihood of an incorrect protein ID	float	decimal(10,9)	18917	
-ppi	evidence	Empty (reserved for future use)	0	varchar(255)	0	
-ppi	interaction_type	Empty (reserved for future use)	(null)	varchar(100)	0	
-ppi	score	Interaction score	integer (150-999)	int(4)	850	
-ppi_type	name	Protein-protein interaction (PPI) data source	BioPlex Reactome	varchar(255)	2	
-ppi_type	description	PPI data source description	The BioPlex (biophysical interactions of ORFeome-based complexes) network is the result of creating thousands of cell lines with each expressing a tagged version of a protein from the ORFeome collection. Interactions derived from Reactome pathways	text	2	
-ppi_type	url	PPI data source description	http://wren.hms.harvard.edu/bioplex/ http://www.reactome.org/	text	2	
-protein	id	TCRD protein identifier	1 - 20412	int(11)	20412	
-protein	name	UniProt entry name	CHERP_HUMAN	varchar(255)	20412	
-protein	description	Uniprot recommended protein name	Calcium homeostasis endoplasmic reticulum protein	text	20405	
-protein	uniprot	UniProt ID	Q8IWX8	varchar(20)	20412	
-protein	up_version	UniProt ID version	integer	int(11)	8	
-protein	geneid	NCBI gene ID	integer	int(11)	20011	
-protein	sym	Protein symbol	CHP1	varchar(20)	20080	
-protein	family	Uniprot family and domains information derived from sequence similarities	Belongs to the calcineurin regulatory subunit family. CHP subfamily.	varchar(255)	5043	
-protein	chr	Chromosome	19	varchar(255)	0	
-protein	seq	Protein sequence	MQEKDASSQGFLPHFQHFATQAIHVGQDPEQWTSRAVVPPISLSTTFKQGAPGQHSGFEYSRSGNPTRNCLEKAVAALDGAKYCLAFASGLAATVTITHLLKAGDQIICMDDVYGGTNRYFRQVASEFGLKISFVDCSKIKLLEAAITPETKLVWIETPTNPTQKVIDIEGCAHIVHKHGDIILVVDNTFMSPYFQRPLALGADISMYSATKYMNGHSDVVMGLVSVNCESLHNRLRFLQNSLGAVPSPIDCYLCNRGLKTLHVRMEKHFKNGMAVAQFLESNPWVEKVIYPGLPSHPQHELVKRQCTGCTGMVTFYIKGTLQHAEIFLKNLKLFTLAESLGGFESLAELPAIMTHASVLKNDRDVLGISDTLIRLSVGLEDEEDLLEDLDQALKAAHPPSGSHS	text	20348	
-protein	dtoid	DTO ID	DTO_05004572	varchar(13)	9232	
-protein	stringid	Ensembl protein ID (as used by STRING-DB)	ENSP00000359976	varchar(15)	18960	
-protein	dtoclass	DTO class	Lyase	varchar(255)	860	
-protein2pubmed	protein_id	Foreign key to column id in table protein.	integer	int(11)	19790	
-protein2pubmed	pubmed_id	Foreign key to column id in table pubmed	integer	int(11)	576647	
-provenance		see datasets tab				
-ptscore	id	TCRD identifier for the PubTator scores table	integer	int(11)	468019	
-ptscore	protein_id	Foreign key to column id in table protein.	integer	int(11)	18310	
-ptscore	year	Year for whom the score was computed	integer	int(4)	119	
-ptscore	score	Score value	float	decimal(12,6)	59549	
-pubmed	id	Article PubMed ID	integer	int(11)	2746858	
-pubmed	title	Article title	Aflatoxin B1 metabolism to aflatoxicol and derivatives lethal to Bacillus subtilis GSY 1057 by rainbow trout (Salmo gairdneri) liver.	text	2737912	
-pubmed	journal	Article journal	Cancer research	text	12234	
-pubmed	date	Article publication date	1976-06	varchar(10)	18197	
-pubmed	authors	Article authors	Schoenhard, G L GL and 5 more authors.	text	2423527	
-pubmed	abstract	Article authors	Aflatoxicol, R0, was isolated from Mt. Shasta strain rainbow trout (Salmo gairdneri), and liver homogenates were incubated with aflatoxin B1. Its identity was confirmed by mass, infrared, and ultraviolet spectrometry. The structure was identical to one of the diastereomers prepared by chemical reduction of aflatoxin B1. Aflatoxicol was apparently formed by a reduced nicotinamide adenine dinucleotide phosphate-dependent soluble enzyme of the 105,000 x g supernatant from rainbow trout. Aflatoxicol was not lethal in phosphate buffer to Bacillus subtilis GSY 1057 (metB4, hisA1, uvr-1) nor were aflatoxins B1, Q1, and B2. In the presence of reduced nicotinamide adenine dinucleotide phosphate and trout liver microsomes, aflatoxicol reduced the viability of B. subtilis. Aflatoxin B2, which lacks the vinyl ether present in the other compounds, could not be activated. The product of aflatoxin B1 activation by trout liver microsomes was sought after incubation of 14C-labeled aflatoxin B1. The radioactivity was found in unaltered aflatoxin B1 and in three extremely polar metabolites. The quantity of the new metabolites and the level of microbial lethality was reduced by addition of cytosine and cysteine to the incubation medium. The vinyl ether configuration was a structural requirement for activation, and this finding and the nature of the enzymatic reaction were consistent with the hypothesis that the compounds were metabolized to highly reactive and unstable electrophilic products which bound to nucleophiles such as cytosine and were lethal to B. subtilis. The formation of aflatoxicol as the major product of trout liver metabolism is of great significance considering that it could be activated to a lethal compound and that rainbow trout are one of the most sensitive species to aflatoxin B1-induced carcinoma.	text	2666654	
-rat_qtl	id	TCRD identifier for the Rat Genome Database (RGD) quantitative trait loci (QTL) table	integer	int(11)	1799	
-rat_qtl	nhprotein_id	Foreign key to column id in table nhprotein.	integer	int(11)	908	
-rat_qtl	rgdid	Rat Genome Database (RGD) ID	integer	int(11)	502	
-rat_qtl	qtl_rgdid	RGD quantitative trait loci (QTL) ID	integer	int(11)	301	
-rat_qtl	qtl_symbol	QTL symbol	Plsm2	varchar(10)	301	
-rat_qtl	qtl_name	QTL name	Polydactyly-luxate syndrome (PLS) morphotypes QTL 2	varchar(255)	301	
-rat_qtl	trait_name	Trait name	hindlimb integrity trait (VT:0010563)	varchar(255)	74	
-rat_qtl	measurement_type	QTL measurement type	hind foot phalanges count (CMO:0001949)	varchar(255)	109	
-rat_qtl	associated_disease	Associated disease	polydactyly	varchar(255)	82	
-rat_qtl	phenotype	RGD rat phenotype	polydactyly	varchar(255)	126	
-rat_qtl	p_value	P-value	float	decimal(20,19)	44	
-rat_qtl	lod	A statistical estimate of the likelihood that a trait is associated with a locus on a chromosome.  A LOD score of three or more is generally taken to indicate that the locus contains genes that influence the trait.  LOD scores of less than 3 can indicate loci that have limited but “true” influence on a trait, eg when a trait is controlled by several genes at several loci, and none of the genes by itself determines the phenotype	float	float(6,3)	114	
-rat_term	id	TCRD identifier for the rat_term table	integer	int(11)	117602	
-rat_term	rgdid	Rat Genome Database (RGD) ID	integer	int(11)	10127	
-rat_term	term_id	Phenotype or disease term ID	DOID:1612	varchar(20)	11332	
-rat_term	obj_symbol	Official symbol of the annotated object (gene, QTL, strain or other data object)	Six1	varchar(20)	10127	
-rat_term	term_name	Phenotype or disease term name	breast cancer	varchar(255)	10058	
-rat_term	qualifier	Phenotype qualifier	severity, onset, susceptibility, resistance, disease_progression, treatment, no_association, model, induced, spontaneous	varchar(20)	11	
-rat_term	evidence	Evidence codes are attached to an annotation, as described at https://rgd.mcw.edu/wg/help3/genes/rgd-gene-report-pages/evidence-codes-guide/	ISS	varchar(5)	12	
-rat_term	ontology	Phenotype or disease ontology	Disease Ontology, Mammalian Phenotype, RGD Disease Ontology	varchar(40)	3	
-rdo	doid	RGD Disease Ontology ID	DOID:0001816	varchar(12)	18085	
-rdo	name	RGD Disease Ontology term name	angiosarcoma	text	18085	
-rdo	def	RGD Disease Ontology term definition	A rare malignant neoplasm characterized by rapidly proliferating, extensively infiltrating, anaplastic cells derived from blood vessels and lining irregular blood-filled or lumpy spaces. (Stedman, 25th ed)	text	10034	
-rdo_xref	doid	Foreign key to column doid in table rdo.	DOID:9009161	varchar(12)	17318	
-rdo_xref	db	External reference dataset	DOID	varchar(24)	10	
-rdo_xref	value	External reference ID	number	varchar(24)	38831	
-t2tc	target_id	Foreign key to column id in table target.	integer	int(11)	20412	
-t2tc	protein_id	Foreign key to column id in table protein.	integer	int(11)	20412	
-t2tc	nucleic_acid_id	Foreign key to the (future) nucleic_acid table	(null)	int(11)	0	
-target	id	TCRD target identifier	integer	int(11)	20412	Generated for each new version of TCRD.
-target	name	Target name	Calmodulin-binding transcription activator 2	varchar(255)	20405	
-target	ttype	Reserved for future use - now only Single Protein	Single Protein	varchar(255)	1	
-target	description	Empty (reserved for future use)	(null)	text	0	
-target	comment	Empty (reserved for future use)	(null)	text	0	
-target	tdl	Target development level, as defined at http://juniper.health.unm.edu/tcrd/	Tbio, Tclin, Tdark, Tchem	enum('Tclin','Tchem','Tbio','Tdark')	4	
-target	idg	Flag to mark if protein is on the IDG understudied proteins list (1) or not (0)	boolean	tinyint(1)	2	
-target	fam	Major target family	Enzyme, GPCR, IC, Kinase, NR, TF	enum('Enzyme','Epigenetic','GPCR','IC','Kinase','NR','oGPCR','TF','TF; Epigenetic','Transporter')	10	
-target	famext	Target family	phosphatase, GTPase, peptidase	varchar(255)	139	
-tdl_info	id	TCRD identifier for the Target Development Level (TDL) information table	integer	int(11)	241680	
-tdl_info	itype	Foreign key to column name in table info_type.	UniProt Function	varchar(255)	19	
-tdl_info	target_id	Foreign key to column id in table target.	integer	int(11)	1791	
-tdl_info	protein_id	Foreign key to column id in table protein.	integer	int(11)	20412	
-tdl_info	nucleic_acid_id	Empty (reserved for future use)	(null)	int(11)	0	
-tdl_info	string_value	URL link or textual description of information used in computing TDL levels	Catalyzes the last step in the trans-sulfuration pathway from methionine to cysteine. Has broad substrate specificity. Converts cystathionine to cysteine, ammonia and 2-oxobutanoate. Converts two cysteine molecules to lanthionine and hydrogen sulfide. Can also accept homocysteine as substrate. Specificity depends on the levels of the endogenous substrates. Generates the endogenous signaling molecule hydrogen sulfide (H2S), and so contributes to the regulation of blood pressure. Acts as a cysteine-protein sulfhydrase by mediating sulfhydration of target proteins: sulfhydration consists of converting -SH groups into -SSH on specific cysteine residues of target proteins such as GAPDH, PTPN1 and NF-kappa-B subunit RELA, thereby regulating their function.	text	58520	
-tdl_info	number_value	Information in numerical (floating point) format (Jensen Pubmed or Pubtator scores, etc)	float	decimal(12,6)	32867	
-tdl_info	integer_value	Information in integer format (antibody count, etc)	integer	int(11)	2609	
-tdl_info	date_value	Empty (reserved for future use)	date	date	0	
-tdl_info	boolean_value	Binary information (Is Transcription Factor)	boolean	tinyint(1)	1	
-tdl_info	curration_level	Empty (reserved for future use)	(cull)	varchar(50)	0	
-tdl_update_log	id			int(11)	0	
-tdl_update_log	target_id			int(11)	0	
-tdl_update_log	old_tdl			varchar(10)	0	
-tdl_update_log	new_tdl			varchar(10)	0	
-tdl_update_log	person			varchar(255)	0	
-tdl_update_log	datetime			timestamp	0	
-tdl_update_log	explanation			text	0	
-tdl_update_log	application			varchar(255)	0	
-tdl_update_log	app_version			varchar(255)	0	
-techdev_contact	id			int(11)	0	
-techdev_contact	contact_name			varchar(255)	0	
-techdev_contact	contact_email			varchar(255)	0	
-techdev_contact	date			date	0	
-techdev_contact	grant_integer			varchar(255)	0	
-techdev_contact	pi			varchar(255)	0	
-techdev_info	id			int(11)	0	
-techdev_info	contact_id	Foreign key to column id in table techdev_contact.		int(11)	0	
-techdev_info	protein_id	Foreign key to column id in table protein.		int(11)	0	
-techdev_info	comment			text	0	
-techdev_info	publication_pcmid			varchar(255)	0	
-techdev_info	publication_pmid			int(11)	0	
-techdev_info	resource_url			text	0	
-techdev_info	data_url			text	0	
-tiga	id	TCRD TIGA association ID	integer	int(11)	102407	
-tiga	protein_id	Foreign key to column id in table protein.	integer	int(11)	11765	
-tiga	ensg	Ensembl gene ID	ENSG00000000460	varchar(15)	11761	
-tiga	efoid	EFO ID (trait ID)	EFO_0006937	varchar(15)	1441	
-tiga	trait	Trait name (from EFO)	optic disc area measurement	varchar(255)	1441	
-tiga	n_study	Number of studies for this gene-trait association	integer	int(2)	38	
-tiga	n_snp	Number of SNPs for this gene-trait association	integer	int(2)	56	
-tiga	n_snpw	Number of SNPs for this gene-trait pair, weighted by SNP-gene distance	float	decimal(5,3)	3170	
-tiga	geneNtrait	Number of traits associated with this gene	integer	int(2)	91	
-tiga	geneNstudy	Number of studies associated with this gene	integer	int(2)	139	
-tiga	traitNgene	Number of genes associated with this trait	integer	int(2)	269	
-tiga	traitNstudy	Number of studies associated with this trait	integer	int(2)	64	
-tiga	pvalue_mlog_median	median(-log(pvalue))	float	decimal(6,3)	2129	
-tiga	or_median	median(OR)	float	decimal(8,3)	2679	
-tiga	n_beta	Number of beta values for this gene-trait association	integer	int(2)	92	
-tiga	study_N_mean	mean(N) for studies supporting this association	integer	int(2)	7938	
-tiga	rcras	Relative Citation Ratio Aggregate Score	float	decimal(5,3)	2429	
-tiga	meanRank	mean rank for selected gene-trait association variables (see TIGA documentation for list)	float	decimal(18,12)	21932	
-tiga	meanRankScore	100 - percentile(meanRank)	float	decimal(18,14)	21932	
-tiga_provenance	id	TCRD TIGA provenance ID	integer	int(11)	167811	
-tiga_provenance	ensg	Ensembl gene ID	ENSG00000000971	varchar(15)	12158	
-tiga_provenance	efoid	EFO ID (trait ID)	EFO_0001365	varchar(15)	1452	
-tiga_provenance	study_acc	GWAS Catalog study accession	GCST001100	varchar(20)	3930	
-tiga_provenance	pubmedid	PubMed ID	21665990	int(11)	2500	
-tinx_articlerank	id	TCRD identifier for the TIN-X article rank table	integer	int(11)	53609232	
-tinx_articlerank	doid	Foreign key to column doid in table do.				
-tinx_articlerank	protein_id	Foreign key to column id in table protein.	integer	int(11)		
-tinx_articlerank	pmid	Article PubMed ID	integer	int(11)	2505076	
-tinx_articlerank	rank	Article rank for each protein-disease association pair	integer	int(11)	143637	
-tinx_disease	id	TCRD identifier for the TIN-X disease table	integer	int(11)	7604	
-tinx_disease	doid	Disease DOID	DOID:3121	varchar(20)	7604	
-tinx_disease	name	Disease name	gallbladder cancer	text	7604	
-tinx_disease	summary	Disease summary	A biliary tract cancer that is located_in the gallbladder.	text	5065	
-tinx_disease	score	TIN-X disease novelty score (Cannon et al., 2017)	float	decimal(34,16)	6848	
-tinx_importance	doid	Foreign key to column doid in table tinx_disease.	integer	int(11)	3015526	
-tinx_importance	protein_id	Foreign key to column id in table protein.	integer	int(11)	17425	
-tinx_importance	disease_id	TIN-X disease ID	integer	int(11)	6778	
-tinx_importance	score	TIN-X importance score (Cannon et al., 2017)	float	decimal(34,16)	660313	
-tinx_novelty	id	TCRD identifier for the TIN-X target novelty table	integer	int(11)	18032	
-tinx_novelty	protein_id	Foreign key to column id in table protein.	integer	int(11)	18032	
-tinx_novelty	score	TIN-X target novelty score (Cannon et al., 2017)	float	decimal(34,16)	15420	
-uberon	uid	Uber-anatomy ontology (Uberon) entity identifier	CHEBI:138675	varchar(20)	18117	
-uberon	name	Uberon entity name	gas molecular entity	text	18113	
-uberon	def	Uberon entity definition	Any of the passages admitting nutrient vessels to the medullary cavity of bone	text	12779	
-uberon	comment	Uberon entity comment	A prepollex does not contain phalanges nor does it articulate with a metacarpal. It articulates with elements of the carpal (wrist) skeleton[AAO:DB]. editor note: TODO add articulation relations	text	1068	
-uberon_parent	uid	Foreign key to column uid in table uberon.	UBERON:0003531	varchar(20)	18107	
-uberon_parent	parent_id	Foreign key to column uid in table uberon.	UBERON:0001419	varchar(20)	5747	
-uberon_xref	uid	Uberon ID to be mapped to an external ontology - Foreign key to column uid in table uberon.	CL:0000000	varchar(20)	10934	
-uberon_xref	db	External ontology 	GO	varchar(24)	69	
-uberon_xref	value	External ontology term ID	integer	varchar(255)	24122	
-viral_ppi	id	TCRD identifier for the viral_ppi table, storing experimental and inferred interactions between pathogen and human proteins	integer	int(11)	282528	
-viral_ppi	viral_protein_id	Foreign key to column id in table viral_protein.	integer	int(11)	7463	
-viral_ppi	protein_id	Foreign key to column id in table protein.	integer	int(11)	5719	
-viral_ppi	dataSource	Data source for pathogen-human proteins interaction	P-HIPSTer	varchar(20)	1	
-viral_ppi	finalLR	Combined likelihood ratio of interaction	float	decimal(20,12)	2170	
-viral_ppi	pdbIDs	PDB structure ID(s) of pathogen-human protein complexes		varchar(128)	44	
-viral_ppi	highConfidence	Binary flag for the level of interaction confidence	0,1	tinyint(4)	2	
-viral_protein	id	TCRD identifier for the viral protein table	integer	int(11)	12499	
-viral_protein	name	Viral protein name	full_polyprotein 1..2119	varchar(128)	5020	
-viral_protein	ncbi	Viral protein NCBI ID	YP_009112712.1	varchar(128)	9709	
-viral_protein	virus_id	Foreign key to column virusTaxid in table virus.	1582094	varchar(16)	990	
-virus	virusTaxid	Virus taxonomy ID	integer	varchar(16)	1001	
-virus	nucleic1	Level 1 in the Baltimore virus classification system (https://viralzone.expasy.org/254)	DNA,RNA, Retro	varchar(128)	2	
-virus	nucleic2	Level 2 in the Baltimore virus classification system (https://viralzone.expasy.org/254)	(+)ssRNA dsDNA retro-DNA (-)ssRNA ssDNA dsRNA retro-RNA	varchar(128)	7	
-virus	order	Virus order in the official virus taxonomy developed by the International Committee on Taxonomy of Viruses (ICTV)	Mononegavirales	varchar(128)		
-virus	family	Virus family	Rhabdoviridae	varchar(128)	28	
-virus	subfamily	Virus subfamily		varchar(128)	11	
-virus	genus	Virus genus	Lyssavirus	varchar(128)	78	
-virus	species	Virus species	Gammapapillomavirus 7	varchar(128)	212	
-virus	name	Virus strain	Human papillomavirus type 109	varchar(128)	1001	
-xref	id	TCRD identifier for the external references table	integer	int(11)	2600228	
-xref	xtype	Foreign key to column name in table xref_type	UniProt Keyword	varchar(255)	21	
-xref	target_id	Foreign key to column id in table target	(null)	int(11)	0	
-xref	protein_id	Foreign key to column id in table protein.	integer	int(11)	20412	
-xref	nucleic_acid_id	Empty (reserved for future use)	(null)	int(11)	0	
-xref	value	External reference value	KW-0677	varchar(255)	1458974	
-xref	xtra	Additional info about the xref value	Repeat	varchar(255)	25703	
-xref	dataset_id	Foreign key to column id in table dataset.	integer	int(11)	7	
-xref	nhprotein_id	Foreign key to column id in table nhprotein.	integer	int(11)	86258	
-xref_type	name	External reference resource name	PubMed	varchar(255)	21	
-xref_type	description	External reference resource description	CMap landmark gene ID. See http://support.lincscloud.org/hc/en-us/articles/202092616-The-Landmark-Genes	text	6	
-xref_type	url	Empty (reserved for future use)	(null)	text	0	
-xref_type	eg_q_url	Empty (reserved for future use)	(null)	text	0	
+Primary Table	Column name	Column description	Data Type
+affiliate	id	TCRD identifier, Primary key	int(10) unsigned
+affiliate	source	Source name	varchar(255)
+affiliate	display_name	Source display name	varchar(255)
+affiliate	description	Source description	varchar(255)
+alias	id	Alias identifier, Primary key	int(11)
+alias	protein_id	Foreign key to column id in table protein	int(11)
+alias	type	Alias type	enum('symbol','uniprot')
+alias	value	String containing the target alias (synonym) value	varchar(255)
+alias	dataset_id	Foreign key to column id in table dataset.	int(11)
+ancestry_do	oid	Foreign key to column doid in table do	varchar(12)
+ancestry_do	ancestor_id	Foreign key to column doid in table do	varchar(12)
+ancestry_dto	oid	Foreign key to column dtoid in table dto	varchar(255)
+ancestry_dto	ancestor_id	Foreign key to column dtoid in table dto	varchar(255)
+ancestry_mondo	oid	Foreign key to column mondoid in table mondo	varchar(20)
+ancestry_mondo	ancestor_id	Foreign key to column mondoid in table mondo	varchar(20)
+ancestry_uberon	oid	Foreign key to column uid in table uberon	varchar(20)
+ancestry_uberon	ancestor_id	Foreign key to column uid in table uberon	varchar(20)
+cmpd_activity	id	TCRD compound identifier and Primary key	int(11)
+cmpd_activity	target_id	Foreign key to column id in table target	int(11)
+cmpd_activity	catype	Foreign key to column name in table cmpd_activity_type	varchar(255)
+cmpd_activity	cmpd_id_in_src	Source compound ID	varchar(255)
+cmpd_activity	cmpd_name_in_src	Source compound name	text
+cmpd_activity	smiles	Compound structure in SMILES format	text
+cmpd_activity	act_value	Bioactivity measurement value	decimal(10,8)
+cmpd_activity	act_type	Bioactivity measurement type	varchar(255)
+cmpd_activity	reference	Literature reference	text
+cmpd_activity	pubmed_ids	PubMed IDs	text
+cmpd_activity	cmpd_pubchem_cid	PubChem CID	int(11)
+cmpd_activity	lychi_h4	The NCATS Layered Chemical Identifier (LyChI)	varchar(15)
+cmpd_activity_type	name	Name of the source for the compound activity data	varchar(255)
+cmpd_activity_type	description	Description of the source for the compound activity data	text
+data_type	name	Data type name and Primary key	varchar(7)
+dataset	id	TCRD identifier and Primary key	int(11)
+dataset	name	Name of the dataset	varchar(255)
+dataset	source	source of the dataset	text
+dataset	app	Application used for the dataset	varchar(255)
+dataset	app_version	Version of the application	varchar(255)
+dataset	datetime	Updated date and time	timestamp
+dataset	url	URL for the application	text
+dataset	comments	Comments on dataset	text
+dbinfo	dbname	Name of the database	varchar(16)
+dbinfo	schema_ver	Version of the database schema	varchar(16)
+dbinfo	data_ver	Version of the data	varchar(16)
+dbinfo	owner	Name of the owner	varchar(16)
+dbinfo	is_copy	Indicates if the database is copy of any other database	tinyint(1)
+dbinfo	dump_file	Database dump file	varchar(64)
+disease	id	Primary key	int(11)
+disease	dtype	Foreign key to column name in table disease_type.	varchar(255)
+disease	protein_id	Foreign key to column id in table protein.	int(11)
+disease	nhprotein_id	Foreign key to column id in table nhprotein.	int(11)
+disease	name	Disease name	text
+disease	ncats_name	NCATS disease name	text
+disease	did	"Disease identifier (DOID, UMLS, MESH, AmyCo, OrphaNet, or NCBIGene)	"	varchar(20)
+disease	evidence	"Evidence of association between target and disease	"	text
+disease	zscore	Standard score for the strength of association between target and disease	decimal(5,3)
+disease	conf	Confidence level for the strength of association between target and disease	decimal(2,1)
+disease	description	Disease description	text
+disease	reference	Empty (reserved for future use)	varchar(255)
+disease	drug_name	"Drug indicated for a specific disease, having a pharmacological mechanism of action by acting of a specific target	"	text
+disease	log2foldchange	"Differential expression log2 fold-change for differentially expressed gene in disease patient tissue versus matched normal tissue in Expression Atlas	"	decimal(5,3)
+disease	pvalue	p-value for differentially expressed gene in disease patient tissue versus matched normal tissue in Expression Atlas	varchar(255)
+disease	score	DisGeNET score for gene-disease association	decimal(16,15)
+disease	source	Source of target-disease association	varchar(255)
+disease	O2S	Monarch object-to-subject score	decimal(16,13)
+disease	S2O	Monarch subject-to-object score	decimal(16,13)
+disease	mondoid	Foreign key to column mondoid in table mondo	varchar(20)
+disease	updated	?	tinyint(1)
+disease_type	name	Name of the source for the target-disease association  data	varchar(255)
+disease_type	description	Description of the source for the target-disease association data	text
+do	doid	Disease ontology identifier (from https://disease-ontology.org) 	varchar(12)
+do	name	Disease name	text
+do	def	Disease definitio	text
+do_parent	doid	Disease identifier (foreign key to column doid in table do)	varchar(12)
+do_parent	parent_id	Parent disease identifier (foreign key to column doid in table do)	varchar(12)
+drgc_resource	id	TCRD identifier for the drgc_resource table containing links and metadata about the resources generated by the Illuminating the druggable genome (IDG) experimental data and resource generation centers (DRGC)	int(11)
+drgc_resource	rssid	Resource Submission System (RSS) identifier	text
+drgc_resource	resource_type	Resource type	varchar(255)
+drgc_resource	target_id	Foreign key to column id in table target.	int(11)
+drgc_resource	json	Resource metadata in json format	text
+drug_activity	id	TCRD drug activity identifier	int(11)
+drug_activity	target_id	Foreign key to column id in table target.	int(11)
+drug_activity	drug	Drug name	varchar(255)
+drug_activity	act_value	Bioactivity measurement value	decimal(10,8)
+drug_activity	act_type	Bioactivity measurement type	varchar(255)
+drug_activity	action_type	Pharmacological action type	varchar(255)
+drug_activity	has_moa	Boolean flag indicating whether or not the drug has a Mechanism of Action as defined by DrugCentral	tinyint(1)
+drug_activity	source	Source of knowledge	varchar(255)
+drug_activity	reference	Source URL	text
+drug_activity	smiles	Drug structure in SMILES format	text
+drug_activity	cmpd_chemblid	ChEMBL molecule ID	varchar(255)
+drug_activity	nlm_drug_info	Drug mechanism of action (where available) as described in the drug label.	text
+drug_activity	cmpd_pubchem_cid	PubChem CID	int(11)
+drug_activity	dcid	DrugCentral ID (drug compound)	int(11)
+drug_activity	lychi_h4	The NCATS Layered Chemical Identifier (LyChI) is a chemical standardization tool that generates a unique hash for chemicals that is layered and used for quick fuzzy uniqueness checks and searches. A unique feature of the LyChI hash keys is that they are, to a certain extent, lexicologically meaningful (https://github.com/ncats/lychi). Level 4 of the identifier is used here.	varchar(15)
+dto	dtoid	Drug Target Ontology (DTO) identifier (from http://drugtargetontology.org/)	varchar(255)
+dto	name	DTO term name	text
+dto	parent_id	DTO identifier for parent term (foreign key to column dtoid in table dto)	varchar(255)
+dto	def	DTO term definition	text
+expression	id	TCRD identifier for expression table	int(11)
+expression	etype	Foreign key to column name in table expression_type.	varchar(255)
+expression	protein_id	Foreign key to column id in table protein.	int(11)
+expression	source_id	?	varchar(20)
+expression	tissue	Tissue where expression was measured	varchar(255)
+expression	tissue_id	Foreign key to column id in table tissue.	int(11)
+expression	qual_value	Qualitative level of expression	enum('Not detected','Low','Medium','High')
+expression	number_value	Numeric value of expression	decimal(12,6)
+expression	expressed	Binary expression flag (1 or 0)	tinyint(4)
+expression	source_rank	Rank among expression values (qual_value)	decimal(12,6)
+expression	evidence	Level of evidence	varchar(255)
+expression	oid	Tissue ontology ID	varchar(20)
+expression	uberon_id	Foreign key to column uid in table uberon.	varchar(20)
+extlink	id	TCRD external link identifier	int(11)
+extlink	protein_id	Foreign key to column id in table protein	int(11)
+extlink	source	Source of external link	enum('GlyGen','Prokino','Dark Kinome','Reactome','ClinGen','GENEVA','TIGA','RESOLUTE','ARCHS4','PubChem')
+extlink	url	URL of external link	text
+gene_attribute	id	TCRD identifier for gene_attribute table	int(11)
+gene_attribute	protein_id	Foreign key to column id in table protein.	int(11)
+gene_attribute	gat_id	Foreign key to column id in table gene_attribute_type.	int(11)
+gene_attribute	name	Gene attribute name	text
+gene_attribute	value	Gene attribute value	int(11)
+gene_attribute_type	id	TCRD identifier for the gene_attribute_type table	int(11)
+gene_attribute_type	name	Name of data source for gene attribute types	varchar(255)
+gene_attribute_type	association	Type of association	text
+gene_attribute_type	description	Description of data source	text
+gene_attribute_type	resource_group	Type of data source	enum('omics','genomics','proteomics','physical interactions','transcriptomics','structural or functional annotations','disease or phenotype associations')
+gene_attribute_type	measurement	Type of measurement or literature curation to establish association	varchar(255)
+gene_attribute_type	attribute_group	Gene attribute group	varchar(255)
+gene_attribute_type	attribute_type	Gene attribute type	varchar(255)
+gene_attribute_type	pubmed_ids	Pubmed IDs of reference papers	text
+gene_attribute_type	url	URL of data source	text
+generif	id	TCRD identifier for the Gene Reference into Function table	int(11)
+generif	protein_id	Foreign key to column id in table protein.	int(11)
+generif	gene_id	TCRD identifier	int(11)
+generif	text	Gene Reference into Function (GeneRIF) text	text
+generif	date	"Date when the reference papers were published 	"	datetime
+generif2pubmed	generif_id	Foreign key to column id in table generif.	int(11)
+generif2pubmed	pubmed_id	PubMed ID	int(11)
+goa	id	TCRD identifier for the Gene Ontology table	int(11)
+goa	protein_id	Foreign key to column id in table protein.	int(11)
+goa	go_id	GO term id	varchar(255)
+goa	go_term	GO term name	text
+goa	evidence	Type of evidence	text
+goa	goeco	Evidence and Conclusion Ontology (ECO) terms that describe types of evidence and assertion methods as described at https://evidenceontology.org/	varchar(255)
+goa	assigned_by	Data source for GO term	varchar(50)
+goa	go_type	Type of GO term	enum('Component','Function','Process')
+goa	go_term_text	GO term text	text
+gtex	id	TCRD identifier for the Genotype-Tissue Expression (GTEx) table	int(11)
+gtex	protein_id	Foreign key to column id in table protein	int(11)
+gtex	tissue	GTEx tissue name	text
+gtex	tpm	Gene and transcript expression shown in Transcripts Per Million (TPM) units	decimal(12,6)
+gtex	tpm_female	Transcripts per million (TPM) - female	decimal(12,6)
+gtex	tpm_female_rank	Female Rank percentile [0-1]	decimal(4,3)
+gtex	tpm_male	Transcripts per million (TPM) - male	decimal(12,6)
+gtex	tpm_male_rank	Male Rank percentile [0-1]	decimal(4,3)
+gtex	tpm_rank	Rank percentile [0-1]	decimal(4,3)
+gtex	uberon_id	UBERON ID for tissue	varchar(20)
+gwas	id	TCRD identifier for the Genome Wide Association Studies (GWAS) data table	int(11)
+gwas	protein_id	Foreign key to column id in table protein.	int(11)
+gwas	disease_trait	TCRD identifier for the GWAS table	varchar(255)
+gwas	snps	SNP IDs (RefSNP or other)	text
+gwas	pmid	PubMed ID	int(11)
+gwas	study	Study name	text
+gwas	context	SNP functional class	text
+gwas	intergenic	Is SNP integenic?	tinyint(1)
+gwas	p_value	p-value for association	double
+gwas	or_beta	Odds ratio (OR) or Beta value as measures of effect size	float
+gwas	cnv	Copy number variation	char(1)
+gwas	mapped_trait	EFO mapped trait (name)	text
+gwas	mapped_trait_uri	EFO mapped trait (URI)	text
+hgram_cdf	id	TCRD identifier for the Harmonogram CDF data	int(11)
+hgram_cdf	protein_id	Foreign key to column id in table protein.	int(11)
+hgram_cdf	type	Foreign key to column name in table gene_attribute_type.	varchar(255)
+hgram_cdf	attr_count	Gene attribute count	int(11)
+hgram_cdf	attr_cdf	Gene attribute CDF (cummulative distribution function)	decimal(17,16)
+info_type	name	Name of the info_type and Primary key	varchar(255)
+info_type	data_type	Foreign key to column name in data_type.	varchar(7)
+info_type	unit	Unit of information value	varchar(255)
+info_type	description	Description of the info_type	text
+input_version	source_key	TCRD identifier and Primary key	varchar(45)
+input_version	data_source	Source of the data	varchar(45)
+input_version	file_key	Primary key	varchar(45)
+input_version	file	File containing data of the source	varchar(256)
+input_version	version	Version of the file	varchar(45)
+input_version	release_date	File released date	date
+input_version	download_date	File downloaded date	date
+kegg_distance	id	TCRD identifier for kegg_distance table	int(11)
+kegg_distance	pid1	Foreign key to column id in table protein.	int(11)
+kegg_distance	pid2	Foreign key to column id in table protein.	int(11)
+kegg_distance	distance	Shortest path distance from KEGG Pathways between two proteins	int(11)
+kegg_nearest_tclin	id	TCRD identifier for kegg_nearest_tclin table	int(11)
+kegg_nearest_tclin	protein_id	Foreign key to column id in table protein.	int(11)
+kegg_nearest_tclin	tclin_id	Foreign key to column id in table target	int(11)
+kegg_nearest_tclin	direction	Direction to nearest Tclin target	enum('upstream','downstream')
+kegg_nearest_tclin	distance	Distance to neareast upstream and downstream Tclin from KEGG Pathways	int(11)
+knex_migrations	id	TCRD Identifier and Primary key	int(10) unsigned
+knex_migrations	name	Name of the migrated data	varchar(255)
+knex_migrations	batch	Batch of the migrated data	int(11)
+knex_migrations	migration_time	Migration time of the data	timestamp
+knex_migrations_lock	index	?	int(10) unsigned
+knex_migrations_lock	is_locked	?	int(11)
+lincs	id	TCRD identifier for the LINCS table	int(11)
+lincs	protein_id	Foreign key to column id in table protein.	int(11)
+lincs	cellid	ATCC cell line	varchar(10)
+lincs	zscore	Z-score of the differential expression values for the specific gene	decimal(8,6)
+lincs	pert_dcid	DrugCentral ID for perturbagen drug	int(11)
+lincs	pert_smiles	Chemical structure in SMILES format for perturbagen drug	text
+locsig	id	TCRD identifier for the LocSigDB table	int(11)
+locsig	protein_id	Foreign key to column id in table protein.	int(11)
+locsig	location	Cellular location of protein	varchar(255)
+locsig	signal	Generic structure of protein localization sign...	varchar(255)
+locsig	pmids	PubMed references	text
+mondo	mondoid	TCRD identifier and Primary key	varchar(20)
+mondo	name	Name of the data	text
+mondo	def	Definition of the data	text
+mondo	comment	Comments on data	text
+mondo_parent	mondoid	Foreign key to column mondoid in table mondo.	varchar(20)
+mondo_parent	parentid	Parentid of the table	varchar(20)
+mondo_xref	id	TCRD identifier and Primary key	int(11)
+mondo_xref	mondoid	Foreign key to column mondoid in table mondo.	varchar(20)
+mondo_xref	db	Database name, prefix	varchar(24)
+mondo_xref	value	Xref ID withtout prefix	varchar(255)
+mondo_xref	equiv_to	Indicates if the data is equivalent to 	tinyint(1)
+mondo_xref	source_info	Source_Info of the data	text
+mondo_xref	xref	Xref ID with prefix	varchar(255)
+mpo	mpid	Mammalian Phenotype Ontology (MPO) term ID	char(10)
+mpo	parent_id	MPO parent term ID	varchar(10)
+mpo	name	MPO term name	text
+mpo	def	MPO term definition	text
+ncats_d2da	ncats_disease_id	TCRD Identifier for ncats_disease	int(10) unsigned
+ncats_d2da	disease_assoc_id	Disease association ID	int(11)
+ncats_d2da	direct	?	tinyint(1)
+ncats_dataSource	dataSource	TCRD identifier and Primary key	varchar(50)
+ncats_dataSource	dataSourceDescription	Description of data source	varchar(512)
+ncats_dataSource	url	URL for ncats_dataSource	varchar(128)
+ncats_dataSource	license	License information	varchar(128)
+ncats_dataSource	licenseURL	URL for license information	varchar(128)
+ncats_dataSource	citation	Indicates if cited	varchar(512)
+ncats_dataSource_map	id	TCRD identifier and Primary key	int(10) unsigned
+ncats_dataSource_map	dataSource	Name of the datasource	varchar(50)
+ncats_dataSource_map	url	URL for the datasource	varchar(128)
+ncats_dataSource_map	license	License information	varchar(128)
+ncats_dataSource_map	licenseURL	URL for license information	varchar(128)
+ncats_dataSource_map	protein_id	Foreign key to column id in table protein.	int(11)
+ncats_dataSource_map	ncats_ligand_id	Foreign key to column id in table ncats_ligands.	int(10) unsigned
+ncats_dataSource_map	disease_name	Name of the disease	text
+ncats_disease	id	TCRD identifier and Primary key	int(10) unsigned
+ncats_disease	name	Name of the disease	varchar(255)
+ncats_disease	uniprot_description	UniProt disease description	text
+ncats_disease	do_description	Disease Ontology disease description	text
+ncats_disease	mondo_description	MONDO disease description	text
+ncats_disease	mondoid	Foreign key to column mondoid in table mondo.	varchar(20)
+ncats_disease	maxTDL	Maximum Target Dev Level (TDL) of associated targets	varchar(6)
+ncats_disease	target_count	Count of the associated targets	int(11)
+ncats_disease	direct_target_count	Count of directly associated targets (not to child term)	int(11)
+ncats_disease	gard_rare	Rare disease according to NCATS GARD database	tinyint(1)
+ncats_disease_ancestry	id	TCRD identifier and Primary key	int(10) unsigned
+ncats_disease_ancestry	ncats_disease_id	Foreign key to column id in table ncats_disease.	int(10) unsigned
+ncats_disease_ancestry	ancestor	Ancestor disease name	varchar(256)
+ncats_disease_ancestry	mondoid	Ancestor MONDO identifier	varchar(20)
+ncats_ligand_activity	id	TCRD identifier and Primary key	int(10) unsigned
+ncats_ligand_activity	ncats_ligand_id	Foreign key to column id in table ncats_ligands.	int(10) unsigned
+ncats_ligand_activity	target_id	Foreign key to column id in table target.	int(11)
+ncats_ligand_activity	smiles	SMILES of ligand	text
+ncats_ligand_activity	act_value	Activity value	decimal(10,8)
+ncats_ligand_activity	act_type	Activity type	varchar(255)
+ncats_ligand_activity	action_type	Action type	varchar(255)
+ncats_ligand_activity	reference	Information of reference	text
+ncats_ligand_activity	reference_source	Source of the reference	varchar(255)
+ncats_ligand_activity	pubmed_ids	TCRD identifier for pubmed	text
+ncats_ligands	id	TCRD identifier number and Primary key	int(10) unsigned
+ncats_ligands	identifier	TCRD identifier	varchar(255)
+ncats_ligands	name	Name	text
+ncats_ligands	isDrug	Indicates if it is a drug	tinyint(1)
+ncats_ligands	smiles	SMILES of ligand	text
+ncats_ligands	PubChem	PubChem compound ID of ligand	varchar(255)
+ncats_ligands	ChEMBL	ChEMBL molecule ID of ligand	varchar(255)
+ncats_ligands	Guide to Pharmacology	Guide to Pharmacology ID of ligand	varchar(255)
+ncats_ligands	DrugCentral	DrugCentral ID of ligand	varchar(255)
+ncats_ligands	description	Description	text
+ncats_ligands	actCnt	Activity count	int(11)
+ncats_ligands	targetCount	Target count	int(11)
+ncats_ligands	unii	UNII ID	varchar(10)
+ncats_ligands	pt	Preferred term/name	varchar(128)
+ncats_p2da	id	TCRD identifier and Primary key	int(10) unsigned
+ncats_p2da	name	Name of the disease	text
+ncats_p2da	protein_id	Foreign key to column id in table protein.	int(11)
+ncats_p2da	disease_assoc_id	Foreign key to column id in table disease.	int(11)
+ncats_p2da	direct	Boolean direct association (true or false)	tinyint(1)
+ncats_ppi	id	TCRD identifier and Primary key	int(10) unsigned
+ncats_ppi	ppitypes	Indicates type and source of the protein-protein interaction (PPI)	varchar(255)
+ncats_ppi	protein_id	Foreign key to column id in table protein.	int(11)
+ncats_ppi	other_id	Foreign key to column id in table protein.	int(11)
+ncats_ppi	p_int	?	decimal(10,9)
+ncats_ppi	p_ni	?	decimal(10,9)
+ncats_ppi	p_wrong	?	decimal(10,9)
+ncats_ppi	evidence	?	varchar(255)
+ncats_ppi	interaction_type	Indicates the type of the interaction	varchar(100)
+ncats_ppi	score	Indicates score of the ppi	int(11)
+ncats_typeahead_index	id	TCRD identifier and Primary key	int(10) unsigned
+ncats_typeahead_index	category	Category of the index	varchar(45)
+ncats_typeahead_index	value	Value of the index	varchar(255)
+ncats_typeahead_index	reference_id	Reference id of the index	varchar(255)
+nhprotein	id	TCRD identifier for the nhprotein table (NH = non-human)	int(11)
+nhprotein	uniprot	UniProt entry ID	varchar(20)
+nhprotein	name	UniProt entry ID	varchar(255)
+nhprotein	description	UniProt protein name	text
+nhprotein	sym	Gene symbol	varchar(30)
+nhprotein	species	Organism	varchar(40)
+nhprotein	taxid	UniProt taxonomy ID	int(11)
+nhprotein	geneid	HGNC gene ID	int(11)
+nih_list	id	TCRD identifier and Primary key	int(10) unsigned
+nih_list	protein_id	Foreign key to column id in table protein.	int(11)
+nih_list	symbol	symbol of the data	varchar(20)
+nih_list	family	Family to which the data belongs	varchar(20)
+nih_list	nih_list	Foreign key to column id in table nih_list_type.	int(10) unsigned
+nih_list_type	id	TCRD identifier and Primary key	int(10) unsigned
+nih_list_type	list_type	Indicates the type of the list	varchar(255)
+omim	mim	Phenotype Mendelian Inheritance in Man (MIM) number	int(11)
+omim	title	Phenotype name	varchar(255)
+omim_ps	id	TCRD identifier for the omim_ps table	int(11)
+omim_ps	omim_ps_id	OMIM phenotypic series ID	char(8)
+omim_ps	mim	Foreign key to column mim in table omim.	int(11)
+omim_ps	title	Phenotypic series name	varchar(255)
+ortholog	id	TCRD identifier for the HGNC Comparison of Orthology Predictions (HCOP) ortholog table	int(11)
+ortholog	protein_id	Foreign key to column id in table protein.	int(11)
+ortholog	taxid	UniProt taxonomy ID	int(11)
+ortholog	species	Organism	varchar(255)
+ortholog	db_id	HCOP ortholog database ID	varchar(255)
+ortholog	geneid	HGNC gene ID	int(11)
+ortholog	symbol	Gene symbol	varchar(255)
+ortholog	name	Human protein name	varchar(255)
+ortholog	mod_url	Model organism database URL	text
+ortholog	sources	Data sources	varchar(255)
+ortholog_disease	id	TCRD identifier for the ortholog-disease association table	int(11)
+ortholog_disease	protein_id	Foreign key to column id in table protein.	int(11)
+ortholog_disease	did	Disease ID	varchar(255)
+ortholog_disease	name	Disease name	varchar(255)
+ortholog_disease	ortholog_id	Foreign key to column id in table ortholog.	int(11)
+ortholog_disease	score	Ortholog-disease association score	varchar(255)
+p2dto	dtoid	Drug Target Ontology (DTO) ID	varchar(255)
+p2dto	protein_id	TCRD protein ID	int(11)
+p2dto	generation	?	int(11)
+p2pc	panther_class_id	Foreign key to column id in table panther_class.	int(11)
+p2pc	protein_id	Foreign key to column id in table protein.	int(11)
+panther_class	id	TCRD identifier for the Panther protein classification system table	int(11)
+panther_class	pcid	Panther class ID	char(7)
+panther_class	parent_pcids	Panther class IDs for parents	varchar(255)
+panther_class	name	Panther class name	text
+panther_class	description	Empty (reserved for future use)	text
+patent_count	id	TCRD identifier for the patent count table	int(11)
+patent_count	protein_id	Foreign key to column id in table protein.	int(11)
+patent_count	year	Year	int(11)
+patent_count	count	Number of patents published in a certain year mentioning the specified protein target	int(11)
+pathway	id	TCRD identifier for the pathway table	int(11)
+pathway	target_id	Foreign key to column id in table target.	int(11)
+pathway	protein_id	Foreign key to column id in table protein.	int(11)
+pathway	pwtype	Foreign key to column name in table pathway_type.	varchar(255)
+pathway	id_in_source	Pathway ID in the source database	varchar(255)
+pathway	name	Pathway name	text
+pathway	description	Empty (reserved for future use)	text
+pathway	url	Pathway URL	text
+pathway_type	name	Name of the pathway data source	varchar(255)
+pathway_type	url	URL of the pathway data source	text
+phenotype	id	TCRD identifier for the phenotype table	int(11)
+phenotype	ptype	Foreign key to column name in table phenotype_type.	varchar(255)
+phenotype	protein_id	Foreign key to column id in table protein.	int(11)
+phenotype	nhprotein_id	Foreign key to column id in table nhprotein.	int(11)
+phenotype	trait	Phenotype trait information	text
+phenotype	top_level_term_id	Top level phenotype term ID	varchar(255)
+phenotype	top_level_term_name	Top level phenotype term name	varchar(255)
+phenotype	term_id	Phenotype term ID	varchar(255)
+phenotype	term_name	Phenotype term name	varchar(255)
+phenotype	term_description	Empty (reserved for future use)	text
+phenotype	p_value	p-value of protein-phenotype association	double
+phenotype	percentage_change	Measure of effect size for continuous data	varchar(255)
+phenotype	effect_size	Effect size	varchar(255)
+phenotype	procedure_name	Name of phenotyping procedure	varchar(255)
+phenotype	parameter_name	Name of phenotyping parameter	varchar(255)
+phenotype	gp_assoc	Gene-phenotype association flag	tinyint(1)
+phenotype	statistical_method	Name of statistical procedure	text
+phenotype	sex	Sex	varchar(8)
+phenotype	original_id	?	int(11)
+phenotype_type	name	Source of the phenotype data	varchar(255)
+phenotype_type	ontology	Ontology used by source	varchar(255)
+phenotype_type	description	Description of source	text
+pmscore	id	TCRD identifier for the Jensen PubMed scores table	int(11)
+pmscore	protein_id	Foreign key to column id in table protein.	int(11)
+pmscore	year	Year for whom the score was computed	int(11)
+pmscore	score	Score value	decimal(12,6)
+ppi_type	name	Protein-protein interaction (PPI) data source	varchar(255)
+ppi_type	description	PPI data source description	text
+ppi_type	url	PPI data source description	text
+protein	id	TCRD protein identifier	int(11)
+protein	name	UniProt entry name	varchar(255)
+protein	description	Uniprot recommended protein name	text
+protein	uniprot	UniProt ID	varchar(20)
+protein	up_version	UniProt ID version	int(11)
+protein	geneid	NCBI gene ID	int(11)
+protein	sym	Protein symbol	varchar(20)
+protein	family	Uniprot family and domains information derived from sequence similarities	varchar(255)
+protein	chr	Chromosome	varchar(255)
+protein	seq	Protein sequence	text
+protein	dtoid	DTO ID	varchar(13)
+protein	stringid	Ensembl protein ID (as used by STRING-DB)	varchar(15)
+protein	dtoclass	DTO class	varchar(255)
+protein	preferred_symbol	Indicates the preferred symbol	varchar(20)
+protein2pubmed	protein_id	Foreign key to column id in table protein.	int(11)
+protein2pubmed	pubmed_id	Foreign key to column id in table pubmed	int(11)
+protein2pubmed	gene_id	Indicates gene identification number	int(11)
+protein2pubmed	source	Source of the protein	varchar(45)
+provenance	id	TCRD identifier and Primary key	int(11)
+provenance	dataset_id	Foreign key to column id in table dataset.	int(11)
+provenance	table_name	Indicates table name	varchar(255)
+provenance	column_name	Indicates column name	varchar(255)
+provenance	where_clause	Represents the where clause used	text
+provenance	comment	Shows the comments on data	text
+ptscore	id	TCRD identifier for the PubTator scores table	int(11)
+ptscore	protein_id	Foreign key to column id in table protein.	int(11)
+ptscore	year	Year for whom the score was computed	int(11)
+ptscore	score	Score value	decimal(12,6)
+sequence_annotation	id	TCRD identifier and Primary key	int(10) unsigned
+sequence_annotation	dataSource	Indicates the source of the data	varchar(255)
+sequence_annotation	protein_id	Foreign key to column id in table protein.	int(11)
+sequence_annotation	residue_start	Starting position of protein residue	int(11)
+sequence_annotation	residue_end	Ending position of protein residue	int(11)
+sequence_annotation	type	Represents the types of the annotation	enum('Activation Loop','Activation Segment','alphaC-beta4 Loop','CMGC Insert','Gatekeeper','Linker','KeyAA','Motif','beta-strand','alpha-helix','C-Lobe','C-Spine','RD Pocket','Catalytic Loop','Glycine Loop','N-Lobe','R-Spine','R-Spine Shell','Subdomain')
+sequence_annotation	name	Name of the annotation	varchar(255)
+sequence_variant	id	TCRD identifier and Primary key	int(10) unsigned
+sequence_variant	dataSource	Indicates the source of the data	varchar(255)
+sequence_variant	protein_id	Foreign key to column id in table protein.	int(11)
+sequence_variant	residue	Residue number	int(11)
+sequence_variant	variant	Variant of the sequence	varchar(1)
+sequence_variant	bits	?	float(12,11)
+t2tc	target_id	Foreign key to column id in table target.	int(11)
+t2tc	protein_id	Foreign key to column id in table protein.	int(11)
+t2tc	nucleic_acid_id	Foreign key to the (future) nucleic_acid table	int(11)
+target	id	TCRD target identifier	int(11)
+target	name	Target name	varchar(255)
+target	ttype	Reserved for future use - now only Single Protein	varchar(255)
+target	description	Empty (reserved for future use)	text
+target	comment	Empty (reserved for future use)	text
+target	tdl	Target development level, as defined at http://juniper.health.unm.edu/tcrd/	enum('Tclin+','Tclin','Tchem+','Tchem','Tbio','Tgray','Tdark')
+target	idg	Flag to mark if protein is on the IDG understudied proteins list (1) or not (0)	tinyint(1)
+target	fam	Major target family	enum('Enzyme','Epigenetic','GPCR','IC','Kinase','NR','oGPCR','TF','TF; Epigenetic','Transporter')
+target	famext	Target family	varchar(255)
+tdl_info	id	TCRD identifier for the Target Developmen Level (TDL) information table	int(11)
+tdl_info	itype	Foreign key to column name in table info_type.	varchar(255)
+tdl_info	target_id	Foreign key to column id in table target.	int(11)
+tdl_info	protein_id	Foreign key to column id in table protein.	int(11)
+tdl_info	nucleic_acid_id	Empty (reserved for future use)	int(11)
+tdl_info	string_value	URL link or textual description of information used in computing TDL levels	text
+tdl_info	number_value	Information in numerical (floating point) format (Jensen Pubmed or Pubtator scores, etc)	decimal(12,6)
+tdl_info	integer_value	Information in integer format (antibody count, etc)	int(11)
+tdl_info	date_value	Empty (reserved for future use)	date
+tdl_info	boolean_value	Binary information (Is Transcription Factor)	tinyint(1)
+tdl_info	curration_level	Empty (reserved for future use)	varchar(50)
+tiga	id	TCRD TIGA association ID	int(11)
+tiga	protein_id	Foreign key to column id in table protein.	int(11)
+tiga	ensg	Ensembl gene ID	varchar(15)
+tiga	efoid	EFO ID (trait ID)	varchar(15)
+tiga	trait	Trait name (from EFO)	varchar(255)
+tiga	n_study	Number of studies for this gene-trait association	int(11)
+tiga	n_snp	Number of SNPs for this gene-trait association	int(11)
+tiga	n_snpw	Number of SNPs for this gene-trait pair, weighted by SNP-gene distance	decimal(6,3)
+tiga	geneNtrait	Number of traits associated with this gene	int(11)
+tiga	geneNstudy	Number of studies associated with this gene	int(11)
+tiga	traitNgene	Number of genes associated with this trait	int(11)
+tiga	traitNstudy	Number of studies associated with this trait	int(11)
+tiga	pvalue_mlog_median	median(-log(pvalue))	decimal(7,3)
+tiga	pvalue_mlog_max	max(-log(pvalue))	decimal(8,3)
+tiga	or_median	median(OR)	decimal(8,3)
+tiga	n_beta	Number of beta values for this gene-trait association	int(11)
+tiga	study_N_mean	mean(N) for studies supporting this association	int(11)
+tiga	rcras	Relative Citation Ratio Aggregate Score	decimal(5,3)
+tiga	meanRank	mean rank for selected gene-trait association variables (see TIGA documentation for list)	decimal(18,12)
+tiga	meanRankScore	100 - percentile(meanRank)	decimal(18,14)
+tiga	ncats_disease_id	Foreign key to column id in table ncats_disease.	int(10) unsigned
+tiga_provenance	id	TCRD TIGA provenance ID	int(11)
+tiga_provenance	ensg	Ensembl gene ID	varchar(15)
+tiga_provenance	efoid	EFO ID (trait ID)	varchar(15)
+tiga_provenance	study_acc	GWAS Catalog study accession	varchar(20)
+tiga_provenance	pubmedid	PubMed ID	int(11)
+tinx_disease	doid	Disease DOID	varchar(20)
+tinx_disease	name	Disease name	text
+tinx_disease	summary	Disease summary	text
+tinx_disease	score	TIN-X disease novelty score (Cannon et al., 2017)	decimal(34,16)
+tinx_importance	doid	Foreign key to column doid in table tinx_disease.	varchar(20)
+tinx_importance	protein_id	Foreign key to column id in table protein.	int(11)
+tinx_importance	score	TIN-X importance score (Cannon et al., 2017)	decimal(34,16)
+tinx_novelty	id	"TCRD identifier for the TIN-X target novelty table	"	int(11)
+tinx_novelty	protein_id	Foreign key to column id in table protein.	int(11)
+tinx_novelty	score	TIN-X target novelty score (Cannon et al., 2017)	decimal(34,16)
+tissue	id	TCRD identifier and Primary key	int(11)
+tissue	name	Name of the tissue	varchar(255)
+uberon	uid	Uber-anatomy ontology (Uberon) entity identifier	varchar(30)
+uberon	name	Uberon entity name	text
+uberon	def	Uberon entity definition	text
+uberon	comment	Uberon entity comment	text
+uberon_parent	uid	Foreign key to column uid in table uberon.	varchar(30)
+uberon_parent	parent_id	Foreign key to column uid in table uberon.	varchar(30)
+uberon_xref	uid	Uberon ID to be mapped to an external ontology - Foreign key to column uid in table uberon.	varchar(30)
+uberon_xref	db	External ontology	varchar(24)
+uberon_xref	value	External ontology term ID	varchar(255)
+viral_ppi	id	TCRD identifier for the viral_ppi table, storing experimental and inferred interactions between pathogen and human proteins	int(11)
+viral_ppi	viral_protein_id	Foreign key to column id in table viral_protein.	int(11)
+viral_ppi	protein_id	Foreign key to column id in table protein.	int(11)
+viral_ppi	dataSource	Data source for pathogen-human proteins ininteraction	varchar(20)
+viral_ppi	finalLR	Combined likelihood ratio of interaction	decimal(20,12)
+viral_ppi	pdbIDs	PDB structure ID(s) of pathogen-human protein complexes	varchar(128)
+viral_ppi	highConfidence	"Binary flag for the level of interaction confidence	"	tinyint(4)
+viral_protein	id	TCRD identifier for the viral protein table	int(11)
+viral_protein	name	Viral protein name	varchar(128)
+viral_protein	ncbi	Viral protein NCBI ID	varchar(128)
+viral_protein	virus_id	Foreign key to column virusTaxid in table virus.	varchar(16)
+virus	virusTaxid	Virus taxonomy ID	varchar(16)
+virus	nucleic1	Level 1 in the Baltimore virus classification system (https://viralzone.expasy.org/254)	varchar(128)
+virus	nucleic2	Level 2 in the Baltimore virus classification system (https://viralzone.expasy.org/254)	varchar(128)
+virus	order	Virus order in the official virus taxonomy developed by the International Committee on Taxonomy of Viruses (ICTV)	varchar(128)
+virus	family	Virus family	varchar(128)
+virus	subfamily	Virus subfamily	varchar(128)
+virus	genus	Virus genus	varchar(128)
+virus	species	Virus species	varchar(128)
+virus	name	Virus strain	varchar(128)
+word_count	word	TCRD identifier and Primary key	varchar(128)
+word_count	count	Indicates the count of the word	int(11)
+xref	id	TCRD identifier for the external references table	int(11)
+xref	xtype	Foreign key to column name in table xref_type	varchar(255)
+xref	target_id	Foreign key to column id in table target	int(11)
+xref	protein_id	Foreign key to column id in table protein.	int(11)
+xref	nucleic_acid_id	Empty (reserved for future use)	int(11)
+xref	value	External reference value	varchar(255)
+xref	xtra	Additional info about the xref value	varchar(255)
+xref	dataset_id	Foreign key to column id in table dataset.	int(11)
+xref	nhprotein_id	Foreign key to column id in table nhprotein.	int(11)
+xref_type	name	External reference resource name	varchar(255)
+xref_type	description	External reference resource description	text
+xref_type	url	Empty (reserved for future use)	text
+xref_type	eg_q_url	Empty (reserved for future use)	text
