@@ -223,7 +223,7 @@ python3 ${prepscript}
 # https://osf.io/6gahk/
 Tsv2HeaderOnly $DATAPATH/id_namespace.tsv
 
-printf "${PROJECT_ID_NAMESPACE}\tIDGDC\tIDG DRUGCENTRAL\tIDG DrugCentral\n" >>${DATAPATH}/id_namespace.tsv
+printf "${PROJECT_ID_NAMESPACE}\tIDGDrugCentral\tIDG DrugCentral\tIDG DrugCentral.org, online reference for approved drugs\n" >>${DATAPATH}/id_namespace.tsv
 ###
 # https://github.com/nih-cfde/published-documentation/wiki/TableInfo:-dcc.tsv
 # https://osf.io/uvw9a/

@@ -44,6 +44,8 @@ rm $zipfile
 # phenotype_disease.tsv
 # phenotype_gene.tsv
 ###
+# Can we just let the script overwrite?
+###
 BUILT_BY_SCRIPT_TSVS="\
 anatomy.tsv
 analysis_type.tsv
@@ -57,10 +59,10 @@ ncbi_taxonomy.tsv
 phenotype.tsv
 substance.tsv
 "
-for f in $BUILT_BY_SCRIPT_TSVS ; do
-	printf "Removing BUILT_BY_SCRIPT_TSV: ${f}\n"
-	rm $DATADIR/$f
-done
+#for f in $BUILT_BY_SCRIPT_TSVS ; do
+#	printf "Removing BUILT_BY_SCRIPT_TSV: ${f}\n"
+#	rm $DATADIR/$f
+#done
 ###
 # Header-only TSVs (to be overwritten as needed):
 for f in $(ls $DATADIR/*.tsv) ; do

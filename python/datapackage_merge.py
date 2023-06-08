@@ -65,7 +65,7 @@ def datapackage_merge(inputs, output):
               )
               writer.writeheader()
           else:
-            assert json.dumps(complete_resources[resource['name']]) == json.dumps(resource), 'Schema mismatch not supported'
+            assert json.dumps(complete_resources[resource['name']]) == json.dumps(resource), f"Schema mismatch not supported: {complete_resources[resource['name']]} != {json.dumps(resource)}"
           records[resource['name']][path] = 0
           #
           with open(os.path.join(path, resource['path']), 'r') as fr:
@@ -86,7 +86,7 @@ def datapackage_merge(inputs, output):
       elif k not in complete_schema:
         complete_schema[k] = v
       else:
-        assert json.dumps(complete_schema[k]) == json.dumps(v), 'Schema mismatch not supported'
+        assert json.dumps(complete_schema[k]) == json.dumps(v), f"Schema mismatch not supported: {complete_schema[k]} != {json.dumps(v)}"
   #
   complete_schema['resources'] = list(complete_resources.values())
   with open(os.path.join(output, 'datapackage.json'), 'w') as fw:

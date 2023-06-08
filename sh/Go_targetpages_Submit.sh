@@ -214,7 +214,7 @@ python3 ${prepscript}
 # https://github.com/nih-cfde/published-documentation/wiki/TableInfo:-id_namespace.tsv
 # https://osf.io/6gahk/
 Tsv2HeaderOnly $DATAPATH/id_namespace.tsv
-printf "${PROJECT_ID_NAMESPACE}\tIDGTCRD\tIDG TCRD\tIDG Target Central Resource Database\n" >>${DATAPATH}/id_namespace.tsv
+printf "${PROJECT_ID_NAMESPACE}\tIDGTargets\tIDG TCRD Targets\tIDG Target Central Resource Database (TCRD) Targets\n" >>${DATAPATH}/id_namespace.tsv
 ###
 # https://github.com/nih-cfde/published-documentation/wiki/TableInfo:-dcc.tsv
 # https://osf.io/uvw9a/
