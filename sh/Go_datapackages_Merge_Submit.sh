@@ -85,6 +85,18 @@ cp $DATADIR/ncbi_taxonomy.tsv $DATAPATH/
 python3 -m BioClients.util.pandas.App selectcols_deduplicate --i $DATAPATH/dcc.tsv --coltags "id" --o $DATADIR/dcc.tsv
 cp $DATADIR/dcc.tsv $DATAPATH/
 ###
+# Kludge: create project_in_project.tsv
+(cat <<__EOF__
+parent_project_id_namespace	parent_project_local_id	child_project_id_namespace	child_project_local_id
+https://www.druggablegenome.net/	IDG	https://www.druggablegenome.net/	Harmonizome
+https://www.druggablegenome.net/	IDG	https://www.druggablegenome.net/	Drugmonizome
+https://www.druggablegenome.net/	IDG	https://druggablegenome.net/cfde_idg_tcrd_diseases	idg_tcrd_diseases
+https://www.druggablegenome.net/	IDG	https://druggablegenome.net/cfde_idg_drugcentral_drugs	idg_drugcentral_drugs
+https://www.druggablegenome.net/	IDG	https://druggablegenome.net/cfde_idg_tcrd_targets	idg_tcrd_targets
+__EOF__
+	) >$DATAPATH/project_in_project.tsv
+
+###
 if [ ! "$CONDA_EXE" ]; then
 	CONDA_EXE=$(which conda)
 fi
