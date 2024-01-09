@@ -4,12 +4,11 @@
 import sys,os,csv,logging
 import tqdm
 import pandas as pd
-from collections import defaultdict
 
 logging.basicConfig(format='%(levelname)s:%(message)s', level=(logging.INFO)) #.DEBUG 
 
 if len(sys.argv) != 2:
-  logging.error(f"ERROR: Syntax: {sys.argv[0]} COMPOUND_TSV_FILE")
+  logging.error(f"Syntax: {sys.argv[0]} COMPOUND_TSV_FILE")
   sys.exit(1)
 
 def Longest(txts):
@@ -39,15 +38,18 @@ logging.info(f"Output columns: {df_out.columns.to_list()}; rows: {df_out.shape[0
 
 tq = tqdm.tqdm(total=df_out.id.shape[0])
 
+n_rows_merged=0
+
 for i,id_this in enumerate(df_out.id):
   tq.update(1)
-  df_out.loc[df_in['id'] == id_this, ['synonyms']] = Longest(df_in.loc[df_in['id'] == id_this].synonyms.to_list())
-  df_out.loc[df_in['id'] == id_this, ['description']] = Longest(df_in.loc[df_in['id'] == id_this].description.to_list())
-  df_out.loc[df_in['id'] == id_this, ['name']] = df_in.loc[df_in['id'] == id_this].name.to_list()[0]
-  df_out_this = df_out[df_in['id'] == id_this]
-  df_out_this.reindex()
+  if df_in.loc[df_in['id'] == id_this].shape[0]>1:
+    n_rows_merged += (df_in.loc[df_in['id'] == id_this].shape[0]-1)
+  df_out.loc[df_out['id'] == id_this, ['synonyms']] = Longest(df_in.loc[df_in['id'] == id_this].synonyms.to_list())
+  df_out.loc[df_out['id'] == id_this, ['description']] = Longest(df_in.loc[df_in['id'] == id_this].description.to_list())
+  df_out.loc[df_out['id'] == id_this, ['name']] = df_in.loc[df_in['id'] == id_this].name.to_list()[0]
+  df_out_this = df_out[df_out['id'] == id_this]
   df_out_this.to_csv(sys.stdout, sep="\t", header=bool(i==0), index=False, quoting=csv.QUOTE_NONE)
 
 tq.close()
 
-logging.info(f"Output IDs/rows: {i}")
+logging.info(f"Input rows: {df_in.shape[0]}; output IDs/rows: {i}; rows merged: {n_rows_merged}")
